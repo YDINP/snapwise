@@ -1,0 +1,28 @@
+---
+title: "Promise vs async/await 완벽 정리"
+emoji: "⚡"
+category: "it"
+tags: ["JavaScript", "비동기"]
+difficulty: 2
+style: "gradient"
+pubDate: "2026-02-15"
+---
+
+**Promise는 콜백 지옥의 해결책**, async/await는 Promise의 문법적 설탕입니다.
+
+```javascript
+// Promise 방식
+fetch(url).then(res => res.json()).then(data => console.log(data));
+
+// async/await 방식
+const res = await fetch(url);
+const data = await res.json();
+console.log(data);
+```
+
+**핵심 차이:**
+- async/await는 동기 코드처럼 읽히지만 비동기로 실행됩니다
+- try/catch로 깔끔한 에러 처리 가능
+- 병렬 실행은 `Promise.all()` 사용
+
+여러 API를 병렬로 호출할 때는 `await Promise.all([api1(), api2()])` 패턴을 사용하세요.

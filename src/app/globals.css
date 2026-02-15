@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-border: #e5e7eb;
+  --color-surface: #f9fafb;
+  --color-muted: #6b7280;
+}
+
+.dark {
+  --color-bg: #0a0a0a;
+  --color-text: #f5f5f5;
+  --color-border: #27272a;
+  --color-surface: #18181b;
+  --color-muted: #a1a1aa;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+  height: 100dvh;
+}
+
+/* ======== Scroll Snap ======== */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100dvh;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.snap-card {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 100dvh;
+  width: 100%;
+}
+
+/* ======== Hide Scrollbar ======== */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ======== Card Content Styles ======== */
+.card-content p {
+  margin-bottom: 0.6rem;
+  line-height: 1.75;
+}
+
+.card-content strong {
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-content ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-content ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-content li {
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+
+.card-content code {
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+}
+
+.card-content blockquote {
+  border-left: 3px solid rgba(255, 255, 255, 0.4);
+  padding-left: 1rem;
+  margin: 0.75rem 0;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.card-content hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0.75rem 0;
+}
+
+/* ======== Focus ======== */
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}

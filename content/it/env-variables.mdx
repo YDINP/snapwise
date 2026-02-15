@@ -1,0 +1,25 @@
+---
+title: "환경변수 .env 제대로 쓰는 법"
+emoji: "🔐"
+category: "it"
+tags: ["보안", "DevOps"]
+difficulty: 1
+style: "gradient"
+pubDate: "2026-02-15"
+---
+
+환경변수 파일 **.env** 사용 시 필수 규칙:
+
+**1. .env는 반드시 .gitignore에 추가**
+비밀키가 GitHub에 노출되면 해킹 위험!
+
+**2. 클라이언트 노출은 접두사로 구분**
+Next.js: `NEXT_PUBLIC_`, Vite: `VITE_` 접두사만 브라우저에서 접근 가능
+
+**3. 우선순위 이해**
+`.env.local` > `.env.production` > `.env`
+
+**4. 절대 커밋하지 말 것**
+API 키, DB 비밀번호, JWT 시크릿 등은 .env.example로 템플릿만 공유
+
+실수로 커밋했다면 즉시 키를 재발급하세요!
