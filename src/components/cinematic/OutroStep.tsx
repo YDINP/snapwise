@@ -189,7 +189,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             repeat: Infinity,
             ease: 'easeInOut'
           }}
-          className="flex flex-col items-center gap-1 pt-4 text-white/70"
+          className="flex flex-col items-center gap-1 pt-8 text-white/70"
         >
           <span className="text-sm">다음 카드로</span>
           <ChevronDown size={20} />
