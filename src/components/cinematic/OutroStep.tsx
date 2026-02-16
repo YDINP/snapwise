@@ -114,7 +114,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           {/* Like button */}
           <button
             onClick={handleLike}
-            className={`flex items-center gap-3 rounded-full px-10 py-5 text-sm font-medium backdrop-blur-sm transition-all ${
+            className={`flex items-center gap-3 rounded-full px-16 py-5 text-sm font-medium backdrop-blur-sm transition-all ${
               liked
                 ? 'bg-red-500/80 text-white'
                 : 'bg-white/20 text-white hover:bg-white/30'
@@ -127,7 +127,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           {/* Share button */}
           <button
             onClick={handleShare}
-            className="flex items-center gap-3 rounded-full bg-white/20 px-10 py-5 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30"
+            className="flex items-center gap-3 rounded-full bg-white/20 px-16 py-5 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30"
           >
             <Share2 size={36} />
             공유
@@ -136,7 +136,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           {/* Save button */}
           <button
             onClick={handleSave}
-            className={`flex items-center gap-3 rounded-full px-10 py-5 text-sm font-medium backdrop-blur-sm transition-all ${
+            className={`flex items-center gap-3 rounded-full px-16 py-5 text-sm font-medium backdrop-blur-sm transition-all ${
               saved
                 ? 'bg-yellow-500/80 text-white'
                 : 'bg-white/20 text-white hover:bg-white/30'
