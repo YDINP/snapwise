@@ -18,7 +18,7 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
           {/* All category */}
           <Link href="/">
             <div
-              className={`px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              className={`px-8 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 isAllSelected
                   ? 'bg-gray-900 dark:bg-white text-white dark:text-black'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -36,7 +36,7 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
             return (
               <Link key={key} href={`/category/${key}`}>
                 <div
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                  className={`px-8 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                     isSelected
                       ? 'text-white'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
