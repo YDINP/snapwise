@@ -81,14 +81,12 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="w-full max-w-sm"
         >
-          <div className="flex items-start gap-2 rounded-xl bg-white/8 px-4 py-3 backdrop-blur-sm">
-            <Quote size={14} className="mt-0.5 shrink-0 text-white/40" />
-            <div>
-              <p className="text-xs italic leading-relaxed text-white/70">
-                &ldquo;{quote.text}&rdquo;
-              </p>
-              <p className="mt-1 text-right text-[10px] text-white/50">— {quote.author}</p>
-            </div>
+          <div className="flex flex-col items-center gap-1 rounded-xl bg-white/8 px-4 py-3 backdrop-blur-sm">
+            <Quote size={14} className="shrink-0 text-white/40" />
+            <p className="text-center text-xs italic leading-relaxed text-white/70">
+              &ldquo;{quote.text}&rdquo;
+            </p>
+            <p className="text-center text-[10px] text-white/50">— {quote.author}</p>
           </div>
         </motion.div>
 
