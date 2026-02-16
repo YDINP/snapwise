@@ -127,3 +127,67 @@ body {
   outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 2px;
 }
+
+/* ===== Cinematic V3 Styles ===== */
+
+/* Dialogue bubble tail */
+.dialogue-tail-left::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent rgba(255,255,255,0.15) transparent transparent;
+}
+
+.dialogue-tail-right::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(255,255,255,0.15);
+}
+
+/* Impact text glow */
+.impact-text {
+  text-shadow: 0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(255,255,255,0.1);
+}
+
+/* Reveal animation */
+@keyframes reveal-glow {
+  0% { text-shadow: 0 0 0 transparent; transform: scale(0.8); opacity: 0; }
+  50% { text-shadow: 0 0 60px rgba(255,255,255,0.4); }
+  100% { text-shadow: 0 0 20px rgba(255,255,255,0.2); transform: scale(1); opacity: 1; }
+}
+
+.reveal-animation {
+  animation: reveal-glow 0.8s ease-out forwards;
+}
+
+/* Character speaking pulse */
+@keyframes speaking-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+}
+
+.speaking-pulse {
+  animation: speaking-pulse 1.5s ease-in-out infinite;
+}
+
+/* Step image overlay */
+.step-overlay-dark {
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.3) 100%);
+}
+
+.step-overlay-medium {
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 40%, transparent 100%);
+}
+
+.step-overlay-light {
+  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
+}
