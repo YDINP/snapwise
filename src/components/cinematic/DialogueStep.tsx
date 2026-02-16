@@ -68,7 +68,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
                 filter: 'drop-shadow(-1px 0 0 rgba(255,255,255,0.95))',
               }}
             />
-            <p className="text-sm font-medium leading-relaxed text-gray-800">
+            <p className="text-sm font-medium leading-relaxed text-gray-800" style={{ marginLeft: '6px' }}>
               {renderWithLineBreaks(step.content)}
             </p>
           </div>

@@ -24,8 +24,12 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isSwiping = useRef(false);
 
   const handleTap = useCallback((e: React.MouseEvent) => {
+    if (isSwiping.current) { isSwiping.current = false; return; }
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -38,11 +42,27 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
     }
   }, [goNext, goPrev]);
 
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isSwiping.current = false;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      isSwiping.current = true;
+      if (dx < 0) goNext();  // swipe left → next
+      else goPrev();          // swipe right → prev
+    }
+  }, [goNext, goPrev]);
+
   const step = card.steps[currentStep];
   if (!step) return null;
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden" onClick={handleTap}>
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden" onClick={handleTap} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 z-50">
         <StepProgressBar totalSteps={totalSteps} currentStep={currentStep} />
@@ -52,7 +72,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
       {!isFirstStep && (
         <button
           onClick={(e) => { e.stopPropagation(); goToStart(); }}
-          className="absolute top-7 left-3 z-50 flex items-center gap-1 rounded-full bg-black/30 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
+          className="absolute top-7 left-3 z-50 flex items-center gap-1.5 rounded-full bg-black/30 px-5 py-2 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
         >
           ← 처음으로
         </button>

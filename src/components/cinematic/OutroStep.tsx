@@ -7,7 +7,8 @@ import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
 import { useLikes } from '@/hooks/useLikes';
 import { useSaved } from '@/hooks/useSaved';
-import { Heart, Share2, Bookmark, ChevronDown, HelpCircle } from 'lucide-react';
+import { Heart, Share2, Bookmark, ChevronDown, HelpCircle, Quote } from 'lucide-react';
+import { getQuoteForCard } from '@/lib/quotes';
 
 interface OutroStepProps {
   step: CardStep;
@@ -23,6 +24,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
   const [showToast, setShowToast] = useState('');
   const [showGlossary, setShowGlossary] = useState(false);
   const glossary = card.glossary;
+  const quote = getQuoteForCard(card.slug, card.category);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -61,6 +63,17 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
 
       {/* Content */}
       <div className="relative z-10 flex w-full flex-col items-center gap-6 px-6">
+        {/* Card identity */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={isActive ? { opacity: 1, scale: 1 } : {}}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col items-center gap-1"
+        >
+          <span className="text-3xl">{card.emoji}</span>
+          <span className="text-sm font-bold text-white/90">{card.title}</span>
+        </motion.div>
+
         {/* Summary glass card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -83,35 +96,35 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           {/* Like button */}
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium backdrop-blur-sm transition-all ${
+            className={`flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium backdrop-blur-sm transition-all ${
               liked
                 ? 'bg-red-500/80 text-white'
                 : 'bg-white/20 text-white hover:bg-white/30'
             }`}
           >
-            <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
+            <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
             {liked ? '추천함' : '추천'}
           </button>
 
           {/* Share button */}
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 rounded-full bg-white/20 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30"
+            className="flex items-center gap-2 rounded-full bg-white/20 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30"
           >
-            <Share2 size={16} />
+            <Share2 size={20} />
             공유
           </button>
 
           {/* Save button */}
           <button
             onClick={handleSave}
-            className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium backdrop-blur-sm transition-all ${
+            className={`flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium backdrop-blur-sm transition-all ${
               saved
                 ? 'bg-yellow-500/80 text-white'
                 : 'bg-white/20 text-white hover:bg-white/30'
             }`}
           >
-            <Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />
+            <Bookmark size={20} fill={saved ? 'currentColor' : 'none'} />
             {saved ? '저장됨' : '저장'}
           </button>
         </motion.div>
@@ -147,6 +160,24 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             )}
           </motion.div>
         )}
+
+        {/* Related quote */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={isActive ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="w-full max-w-sm"
+        >
+          <div className="flex items-start gap-2 rounded-xl bg-white/8 px-4 py-3 backdrop-blur-sm">
+            <Quote size={14} className="mt-0.5 shrink-0 text-white/40" />
+            <div>
+              <p className="text-xs italic leading-relaxed text-white/70">
+                &ldquo;{quote.text}&rdquo;
+              </p>
+              <p className="mt-1 text-right text-[10px] text-white/50">— {quote.author}</p>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Next card CTA */}
         <motion.div

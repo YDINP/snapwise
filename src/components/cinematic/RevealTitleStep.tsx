@@ -14,10 +14,17 @@ interface RevealTitleStepProps {
 export default function RevealTitleStep({ step, card, isActive }: RevealTitleStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
 
-  // Parse content: first line = subtitle, rest = description
-  const lines = step.content.split('\n').filter((l: string) => l.trim() !== '');
-  const subtitle = lines[0] || '';
-  const description = lines.slice(1).join('\n');
+  // Parse content: filter out lines that duplicate card emoji/title
+  const lines = step.content.split('\n').filter((l: string) => {
+    const trimmed = l.trim();
+    if (!trimmed) return false;
+    // Remove line if it's just the emoji+title repeated
+    const stripped = trimmed.replace(/^[^\w가-힣]*/, '').trim();
+    if (stripped === card.title || stripped === `${card.emoji} ${card.title}`) return false;
+    if (trimmed === card.emoji || trimmed === card.title) return false;
+    return true;
+  });
+  const description = lines.join('\n');
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
@@ -52,25 +59,13 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
           {card.title}
         </motion.h1>
 
-        {/* Subtitle fade-in */}
-        {subtitle && (
+        {/* Description fade-in (duplicate emoji/title filtered) */}
+        {description && (
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.5, duration: 0.6 }}
             className="text-center text-base text-white/80"
-          >
-            {subtitle}
-          </motion.p>
-        )}
-
-        {/* Description fade-in */}
-        {description && (
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.7, duration: 0.6 }}
-            className="text-center text-sm text-white/70"
           >
             {renderWithLineBreaks(description)}
           </motion.p>
