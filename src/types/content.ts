@@ -1,4 +1,4 @@
-export type CategoryKey = 'science' | 'psychology' | 'people' | 'history' | 'life' | 'business' | 'culture' | 'origins';
+export type CategoryKey = 'science' | 'psychology' | 'people' | 'history' | 'life' | 'business' | 'culture' | 'origins' | 'etc';
 export type CardStyle = 'gradient' | 'solid' | 'glass';
 export type Difficulty = 1 | 2 | 3;
 
@@ -27,6 +27,11 @@ export interface CardStep {
   characterId?: string;  // v3: for dialogue steps
 }
 
+export interface GlossaryItem {
+  term: string;
+  meaning: string;
+}
+
 export interface CardMeta {
   title: string;
   slug: string;
@@ -47,6 +52,7 @@ export interface CardMeta {
   // v3 fields
   characters?: Character[];
   isCinematic?: boolean;  // true if card uses v3 step types
+  glossary?: GlossaryItem[];
 }
 
 export interface CategoryInfo {

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import type { CardMeta, CardStep, CategoryKey, StepType, Character } from '@/types/content';
+import type { CardMeta, CardStep, CategoryKey, StepType, Character, GlossaryItem } from '@/types/content';
 
 const contentDirectory = path.join(process.cwd(), 'content');
 
@@ -99,6 +99,7 @@ export function getAllCards(): CardMeta[] {
         const readingTime = calculateReadingTime(content);
         const images = data.images as Record<string, string> | undefined;
         const characters = data.characters as Character[] | undefined;
+        const glossary = data.glossary as GlossaryItem[] | undefined;
         const steps = parseSteps(content, images);
 
         cards.push({
@@ -119,6 +120,7 @@ export function getAllCards(): CardMeta[] {
           images,
           characters,
           isCinematic: hasCinematicSteps(steps),
+          glossary,
         });
       }
     }

@@ -73,9 +73,18 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     bgDark: '#083344',
     accent: '#06B6D4',
   },
+  etc: {
+    key: 'etc',
+    label: '기타',
+    emoji: '✨',
+    gradient: 'from-gray-800 to-zinc-950',
+    bgLight: '#F4F4F5',
+    bgDark: '#18181B',
+    accent: '#A1A1AA',
+  },
 };
 
-export const ALL_CATEGORY_KEYS: CategoryKey[] = ['science', 'psychology', 'people', 'history', 'life', 'business', 'culture', 'origins'];
+export const ALL_CATEGORY_KEYS: CategoryKey[] = ['science', 'psychology', 'people', 'history', 'life', 'business', 'culture', 'origins', 'etc'];
 
 export function getCategoryInfo(key: CategoryKey): CategoryInfo {
   return CATEGORIES[key];

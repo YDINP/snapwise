@@ -7,7 +7,7 @@ import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
 import { useLikes } from '@/hooks/useLikes';
 import { useSaved } from '@/hooks/useSaved';
-import { Heart, Share2, Bookmark, ChevronDown } from 'lucide-react';
+import { Heart, Share2, Bookmark, ChevronDown, HelpCircle } from 'lucide-react';
 
 interface OutroStepProps {
   step: CardStep;
@@ -21,6 +21,8 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
   const { liked, toggle } = useLikes(card.slug);
   const { saved, toggleSave } = useSaved(card.slug, card);
   const [showToast, setShowToast] = useState('');
+  const [showGlossary, setShowGlossary] = useState(false);
+  const glossary = card.glossary;
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -113,6 +115,38 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             {saved ? '저장됨' : '저장'}
           </button>
         </motion.div>
+
+        {/* Glossary toggle */}
+        {glossary && glossary.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : {}}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="w-full max-w-sm"
+          >
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowGlossary(!showGlossary); }}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-xs font-medium text-white/70 backdrop-blur-sm transition-all hover:bg-white/20"
+            >
+              <HelpCircle size={14} />
+              용어 해설 {showGlossary ? '접기' : '보기'}
+            </button>
+            {showGlossary && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-2 space-y-2 rounded-xl bg-black/30 p-4 backdrop-blur-md"
+              >
+                {glossary.map((item, i) => (
+                  <div key={i} className="flex gap-2 text-xs">
+                    <span className="shrink-0 font-bold text-white/90">{item.term}</span>
+                    <span className="text-white/60">{item.meaning}</span>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </motion.div>
+        )}
 
         {/* Next card CTA */}
         <motion.div
