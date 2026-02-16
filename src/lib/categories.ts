@@ -1,15 +1,6 @@
 import type { CategoryKey, CategoryInfo } from '@/types/content';
 
 export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
-  it: {
-    key: 'it',
-    label: 'IT·테크',
-    emoji: '💻',
-    gradient: 'from-blue-600 to-indigo-700',
-    bgLight: '#EEF2FF',
-    bgDark: '#1E1B4B',
-    accent: '#6366F1',
-  },
   science: {
     key: 'science',
     label: '과학',
@@ -19,14 +10,41 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     bgDark: '#022C22',
     accent: '#10B981',
   },
+  psychology: {
+    key: 'psychology',
+    label: '심리',
+    emoji: '🧠',
+    gradient: 'from-blue-600 to-indigo-700',
+    bgLight: '#EEF2FF',
+    bgDark: '#1E1B4B',
+    accent: '#6366F1',
+  },
+  people: {
+    key: 'people',
+    label: '인물',
+    emoji: '👤',
+    gradient: 'from-amber-500 to-yellow-600',
+    bgLight: '#FFFBEB',
+    bgDark: '#451A03',
+    accent: '#F59E0B',
+  },
+  history: {
+    key: 'history',
+    label: '역사',
+    emoji: '📜',
+    gradient: 'from-stone-600 to-amber-800',
+    bgLight: '#FAFAF9',
+    bgDark: '#1C1917',
+    accent: '#A8A29E',
+  },
   life: {
     key: 'life',
     label: '라이프',
     emoji: '💡',
-    gradient: 'from-amber-500 to-orange-600',
-    bgLight: '#FFFBEB',
-    bgDark: '#451A03',
-    accent: '#F59E0B',
+    gradient: 'from-orange-500 to-red-500',
+    bgLight: '#FFF7ED',
+    bgDark: '#431407',
+    accent: '#F97316',
   },
   business: {
     key: 'business',
@@ -48,7 +66,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
   },
 };
 
-export const ALL_CATEGORY_KEYS: CategoryKey[] = ['it', 'science', 'life', 'business', 'culture'];
+export const ALL_CATEGORY_KEYS: CategoryKey[] = ['science', 'psychology', 'people', 'history', 'life', 'business', 'culture'];
 
 export function getCategoryInfo(key: CategoryKey): CategoryInfo {
   return CATEGORIES[key];
