@@ -16,9 +16,10 @@ interface StoryCardProps {
 }
 
 export default function StoryCard({ card, isActive, nextCard, onComplete }: StoryCardProps) {
-  const { currentStep, goNext, goPrev, isFirstStep, isLastStep, totalSteps } = useStepNavigation({
+  const { currentStep, goNext, goPrev, goToStart, isFirstStep, totalSteps } = useStepNavigation({
     totalSteps: card.steps.length,
     isActive,
+    slug: card.slug,
     onComplete,
   });
 
@@ -46,6 +47,16 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
       <div className="absolute top-0 left-0 right-0 z-50">
         <StepProgressBar totalSteps={totalSteps} currentStep={currentStep} />
       </div>
+
+      {/* 처음으로 button — only visible after step 0 */}
+      {!isFirstStep && (
+        <button
+          onClick={(e) => { e.stopPropagation(); goToStart(); }}
+          className="absolute top-7 left-3 z-50 flex items-center gap-1 rounded-full bg-black/30 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
+        >
+          ← 처음으로
+        </button>
+      )}
 
       {/* Step content with animation */}
       <AnimatePresence mode="wait">

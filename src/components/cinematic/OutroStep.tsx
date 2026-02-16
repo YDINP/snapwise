@@ -1,10 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
-import { Share2, Bookmark } from 'lucide-react';
+import { useLikes } from '@/hooks/useLikes';
+import { useSaved } from '@/hooks/useSaved';
+import { Heart, Share2, Bookmark, ChevronDown } from 'lucide-react';
 
 interface OutroStepProps {
   step: CardStep;
@@ -13,17 +16,49 @@ interface OutroStepProps {
   nextCard?: CardMeta;
 }
 
-export default function OutroStep({ step, card, isActive, nextCard }: OutroStepProps) {
+export default function OutroStep({ step, card, isActive }: OutroStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
-  const nextCategoryInfo = nextCard ? getCategoryInfo(nextCard.category) : null;
+  const { liked, toggle } = useLikes(card.slug);
+  const { saved, toggleSave } = useSaved(card.slug, card);
+  const [showToast, setShowToast] = useState('');
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggle();
+  };
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleSave();
+    if (!saved) {
+      setShowToast('저장됨! 메뉴 → 저장한 카드에서 확인');
+      setTimeout(() => setShowToast(''), 2500);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/card/${card.slug}`;
+    const text = `${card.emoji} ${card.title} — SnapWise`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: card.title, text, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setShowToast('링크가 복사되었습니다!');
+        setTimeout(() => setShowToast(''), 2000);
+      }
+    } catch {}
+  };
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden py-12">
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
       {/* Category gradient background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
 
       {/* Content */}
-      <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-8 px-6">
+      <div className="relative z-10 flex w-full flex-col items-center gap-6 px-6">
         {/* Summary glass card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -41,37 +76,70 @@ export default function OutroStep({ step, card, isActive, nextCard }: OutroStepP
           initial={{ opacity: 0, y: 20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="flex gap-4"
+          className="flex items-center gap-3"
         >
-          <button className="flex items-center gap-2 rounded-full bg-white/20 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30">
+          {/* Like button */}
+          <button
+            onClick={handleLike}
+            className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium backdrop-blur-sm transition-all ${
+              liked
+                ? 'bg-red-500/80 text-white'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
+            {liked ? '추천함' : '추천'}
+          </button>
+
+          {/* Share button */}
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 rounded-full bg-white/20 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30"
+          >
             <Share2 size={16} />
-            공유하기
+            공유
           </button>
-          <button className="flex items-center gap-2 rounded-full bg-white/20 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30">
-            <Bookmark size={16} />
-            저장하기
+
+          {/* Save button */}
+          <button
+            onClick={handleSave}
+            className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium backdrop-blur-sm transition-all ${
+              saved
+                ? 'bg-yellow-500/80 text-white'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            <Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />
+            {saved ? '저장됨' : '저장'}
           </button>
+        </motion.div>
+
+        {/* Next card CTA */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isActive ? { opacity: [0.5, 1, 0.5] } : {}}
+          transition={{
+            delay: 0.6,
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+          className="flex flex-col items-center gap-1 pt-4 text-white/70"
+        >
+          <span className="text-sm">다음 카드로</span>
+          <ChevronDown size={20} />
         </motion.div>
       </div>
 
-      {/* Next card preview */}
-      {nextCard && nextCategoryInfo && (
+      {/* Toast notification */}
+      {showToast && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="relative z-10 w-full max-w-sm px-6"
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className="absolute bottom-8 left-1/2 z-50 -translate-x-1/2 rounded-full bg-black/80 px-5 py-2.5 text-xs font-medium text-white backdrop-blur-md"
         >
-          <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
-            <p className="mb-2 text-xs text-white/60">다음 카드</p>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{nextCard.emoji}</span>
-              <div className="flex-1">
-                <h3 className="text-sm font-bold text-white">{nextCard.title}</h3>
-                <p className="text-xs text-white/70">{nextCategoryInfo.label}</p>
-              </div>
-            </div>
-          </div>
+          {showToast}
         </motion.div>
       )}
     </div>

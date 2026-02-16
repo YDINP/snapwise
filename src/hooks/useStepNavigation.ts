@@ -2,21 +2,53 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
+const PROGRESS_KEY = 'snapwise-progress';
+
+function loadProgress(slug: string): number {
+  try {
+    const data = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}');
+    return data[slug] || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveProgress(slug: string, step: number) {
+  try {
+    const data = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}');
+    data[slug] = step;
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
+  } catch {}
+}
+
 interface UseStepNavigationOptions {
   totalSteps: number;
   isActive: boolean;
-  onComplete?: () => void; // called when user tries to go past last step
+  slug?: string;
+  onComplete?: () => void;
 }
 
-export function useStepNavigation({ totalSteps, isActive, onComplete }: UseStepNavigationOptions) {
+export function useStepNavigation({ totalSteps, isActive, slug, onComplete }: UseStepNavigationOptions) {
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Reset step when card becomes active
+  // Load saved progress when card becomes active
   useEffect(() => {
     if (isActive) {
-      setCurrentStep(0);
+      if (slug) {
+        const saved = loadProgress(slug);
+        setCurrentStep(Math.min(saved, totalSteps - 1));
+      } else {
+        setCurrentStep(0);
+      }
     }
-  }, [isActive]);
+  }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Save progress on step change
+  useEffect(() => {
+    if (slug && isActive) {
+      saveProgress(slug, currentStep);
+    }
+  }, [slug, currentStep, isActive]);
 
   const goNext = useCallback(() => {
     setCurrentStep(prev => {
@@ -35,6 +67,11 @@ export function useStepNavigation({ totalSteps, isActive, onComplete }: UseStepN
   const goToStep = useCallback((step: number) => {
     setCurrentStep(Math.max(0, Math.min(step, totalSteps - 1)));
   }, [totalSteps]);
+
+  const goToStart = useCallback(() => {
+    setCurrentStep(0);
+    if (slug) saveProgress(slug, 0);
+  }, [slug]);
 
   // Keyboard navigation (only when active)
   useEffect(() => {
@@ -61,6 +98,7 @@ export function useStepNavigation({ totalSteps, isActive, onComplete }: UseStepN
     goNext,
     goPrev,
     goToStep,
+    goToStart,
     isFirstStep: currentStep === 0,
     isLastStep: currentStep >= totalSteps - 1,
     totalSteps,

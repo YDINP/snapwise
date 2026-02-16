@@ -24,13 +24,13 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
 
       {/* Content container */}
-      <div className="relative z-10 flex w-full items-start gap-4">
+      <div className="relative z-10 flex w-full items-start gap-3">
         {/* Character avatar */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={isActive ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.5 }}
-          className="flex flex-col items-center gap-2"
+          className="flex flex-shrink-0 flex-col items-center gap-2"
         >
           {character.image ? (
             <div className="h-16 w-16 overflow-hidden rounded-full border-2 border-white shadow-lg">
@@ -44,7 +44,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
           <span className="text-xs font-bold text-white/80">{character.name}</span>
         </motion.div>
 
-        {/* Speech bubble — comic style */}
+        {/* Speech bubble — SVG-based comic style */}
         <motion.div
           initial={{ opacity: 0, x: 20, scale: 0.9 }}
           animate={isActive ? { opacity: 1, x: 0, scale: 1 } : {}}
@@ -52,12 +52,24 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
           className="relative flex-1"
           style={{ maxWidth: '80%' }}
         >
-          {/* Bubble tail */}
-          <div className="absolute left-0 top-4 h-0 w-0 -translate-x-2 border-r-[10px] border-t-[10px] border-b-[10px] border-r-white/90 border-t-transparent border-b-transparent" />
+          {/* SVG speech bubble background */}
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 300 150"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20,5 Q5,5 5,20 L5,120 Q5,135 20,135 L30,135 L15,148 L40,135 L280,135 Q295,135 295,120 L295,20 Q295,5 280,5 Z"
+              fill="rgba(255,255,255,0.92)"
+              stroke="rgba(255,255,255,1)"
+              strokeWidth="2"
+            />
+          </svg>
 
-          {/* Bubble content */}
-          <div className="rounded-xl rounded-tl-sm border-2 border-white bg-white/90 p-4 shadow-lg">
-            <p className="text-sm leading-relaxed text-gray-900">
+          {/* Text content */}
+          <div className="relative z-10 px-5 py-4">
+            <p className="text-sm font-medium leading-relaxed text-gray-800">
               {renderWithLineBreaks(step.content)}
             </p>
           </div>
