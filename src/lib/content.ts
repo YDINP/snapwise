@@ -1,9 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import type { CardMeta, CardStep, CategoryKey, StepType } from '@/types/content';
+import type { CardMeta, CardStep, CategoryKey, StepType, Character } from '@/types/content';
 
 const contentDirectory = path.join(process.cwd(), 'content');
+
+// All valid step types (v2 + v3)
+const VALID_V2_TYPES = ['hook', 'story', 'detail', 'example', 'reveal', 'tip', 'compare', 'action', 'quiz'];
+const VALID_V3_TYPES = ['cinematic-hook', 'scene', 'dialogue', 'narration', 'impact', 'reveal-title', 'outro'];
+const ALL_VALID_TYPES = [...VALID_V2_TYPES, ...VALID_V3_TYPES];
 
 function calculateReadingTime(content: string): number {
   const chars = content.length;
@@ -15,17 +20,39 @@ function getSlugFromFilename(filename: string): string {
 }
 
 export function parseSteps(rawContent: string, images?: Record<string, string>): CardStep[] {
-  const stepRegex = /<!--\s*step:(\w+)\s*-->/g;
+  // v3 regex: supports <!-- step:type --> and <!-- step:dialogue:characterId -->
+  const stepRegex = /<!--\s*step:([\w-]+(?::[\w-]+)?)\s*-->/g;
   const parts = rawContent.split(stepRegex).filter(p => p.trim());
 
-  // v2 format (has step comments)
+  // v2/v3 format (has step comments)
   if (parts.length > 1) {
     const steps: CardStep[] = [];
     for (let i = 0; i < parts.length; i += 2) {
-      const type = parts[i].trim() as StepType;
+      const rawType = parts[i].trim();
       const content = parts[i + 1]?.trim() || '';
-      if (['hook', 'story', 'detail', 'example', 'reveal', 'tip', 'compare', 'action', 'quiz'].includes(type)) {
-        steps.push({ type, content, image: images?.[type] });
+
+      // Parse type and optional characterId (e.g., "dialogue:einstein")
+      let type: string;
+      let characterId: string | undefined;
+
+      if (rawType.includes(':')) {
+        const [t, ...rest] = rawType.split(':');
+        type = t;
+        characterId = rest.join(':');
+      } else {
+        type = rawType;
+      }
+
+      if (ALL_VALID_TYPES.includes(type)) {
+        const step: CardStep = {
+          type: type as StepType,
+          content,
+          image: images?.[type] || images?.[rawType],
+        };
+        if (characterId) {
+          step.characterId = characterId;
+        }
+        steps.push(step);
       }
     }
     return steps;
@@ -44,6 +71,10 @@ export function parseSteps(rawContent: string, images?: Record<string, string>):
     { type: 'story', content: paragraphs.slice(1, -1).join('\n\n') },
     { type: 'action', content: paragraphs[paragraphs.length - 1] },
   ];
+}
+
+function hasCinematicSteps(steps: CardStep[]): boolean {
+  return steps.some(s => VALID_V3_TYPES.includes(s.type));
 }
 
 export function getAllCards(): CardMeta[] {
@@ -67,6 +98,7 @@ export function getAllCards(): CardMeta[] {
         const slug = getSlugFromFilename(item);
         const readingTime = calculateReadingTime(content);
         const images = data.images as Record<string, string> | undefined;
+        const characters = data.characters as Character[] | undefined;
         const steps = parseSteps(content, images);
 
         cards.push({
@@ -85,6 +117,8 @@ export function getAllCards(): CardMeta[] {
           steps,
           storyType: data.storyType,
           images,
+          characters,
+          isCinematic: hasCinematicSteps(steps),
         });
       }
     }
