@@ -1,13 +1,29 @@
 export type CategoryKey = 'it' | 'science' | 'life' | 'business' | 'culture';
 export type CardStyle = 'gradient' | 'solid' | 'glass';
 export type Difficulty = 1 | 2 | 3;
-export type StepType = 'hook' | 'story' | 'detail' | 'example' | 'reveal' | 'tip' | 'compare' | 'action' | 'quiz';
+
+// v2 step types (backward compatible)
+export type V2StepType = 'hook' | 'story' | 'detail' | 'example' | 'reveal' | 'tip' | 'compare' | 'action' | 'quiz';
+
+// v3 cinematic step types
+export type V3StepType = 'cinematic-hook' | 'scene' | 'dialogue' | 'narration' | 'impact' | 'reveal-title' | 'outro';
+
+// Union of all step types
+export type StepType = V2StepType | V3StepType;
+
 export type StoryType = 'realStory' | 'whatIf' | 'fable' | 'firstPerson' | 'twist';
+
+export interface Character {
+  id: string;
+  name: string;
+  emoji: string;
+}
 
 export interface CardStep {
   type: StepType;
   content: string;
   image?: string;
+  characterId?: string;  // v3: for dialogue steps
 }
 
 export interface CardMeta {
@@ -27,6 +43,9 @@ export interface CardMeta {
   steps: CardStep[];
   storyType?: StoryType;
   images?: Record<string, string>;
+  // v3 fields
+  characters?: Character[];
+  isCinematic?: boolean;  // true if card uses v3 step types
 }
 
 export interface CategoryInfo {
