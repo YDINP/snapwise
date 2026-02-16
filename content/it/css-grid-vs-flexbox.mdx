@@ -4,105 +4,71 @@ emoji: "🎨"
 category: "it"
 tags: ["CSS", "레이아웃"]
 difficulty: 1
-style: "gradient"
+storyType: "firstPerson"
+characters:
+  - id: junior
+    name: "주니어"
+    emoji: "👩‍💻"
+  - id: designer
+    name: "디자이너"
+    emoji: "🎨"
+  - id: senior
+    name: "시니어"
+    emoji: "👨‍💻"
+images:
+  hook: "css layout grid flexbox"
+  scene-1: "web design responsive"
 pubDate: "2026-02-15"
-storyType: "whatIf"
 ---
 
-<!-- step:hook -->
+<!-- step:cinematic-hook -->
+네비게이션 바 버튼 3개를
+가운데 정렬하는 데
+30분이 걸렸다.
 
-방 안에 가구를 배치한다고 상상해보세요. **한 줄로 쭉 늘어놓으면** Flexbox, **격자 형태로 배치하면** Grid입니다. 언제 뭘 써야 할까요?
+<!-- step:scene -->
+Grid를 썼다.
+grid-template-columns, justify-items...
+너무 복잡했다.
 
-<!-- step:compare -->
+<!-- step:dialogue:designer -->
+"그건 Flexbox가 나아."
 
-두 디자이너가 같은 웹페이지를 만들었습니다.
+<!-- step:dialogue:junior -->
+"Grid랑 뭐가 달라요?"
 
-**A 디자이너 (Flexbox만 사용)**
+<!-- step:dialogue:senior -->
+"Flexbox는 1차원 나열,
+Grid는 2차원 격자."
 
-네비게이션 바는 완벽했습니다. 버튼들이 균등하게 배치되고, 반응형도 쉬웠죠.
+<!-- step:narration -->
+Flexbox로 바꿨다.
+`display: flex; justify-content: center;`
+3초 만에 완성.
 
-```css
-.nav { display: flex; justify-content: space-between; }
-```
+<!-- step:impact -->
+**Flexbox** → 1차원 (행 또는 열)
+**Grid** → 2차원 (행과 열 동시)
 
-하지만 복잡한 그리드 레이아웃을 만들려니 **지옥**이었습니다. 중첩된 Flexbox 9단을 만들어야 했고, 코드는 300줄이 넘었습니다.
+<!-- step:narration -->
+페이지 전체 레이아웃은 Grid.
+헤더, 사이드바, 메인, 푸터.
 
-**B 디자이너 (Grid만 사용)**
+각 영역 내부는 Flexbox.
+버튼, 카드, 태그 정렬.
 
-페이지 전체 레이아웃은 완벽했습니다. 헤더, 사이드바, 메인, 푸터가 깔끔하게 나뉘었죠.
+<!-- step:dialogue:senior -->
+"Grid로 큰 틀을 나누고,
+Flexbox로 안을 채워."
 
-```css
-.page {
-  display: grid;
-  grid-template-areas:
-    "header header"
-    "sidebar main"
-    "footer footer";
-}
-```
+<!-- step:dialogue:junior -->
+"레이아웃 문제는 거의 이 둘로 해결되겠네요."
 
-하지만 네비게이션 바의 버튼들을 가운데 정렬하려니 복잡했습니다. Grid는 **1차원 정렬에는 과한** 도구였죠.
+<!-- step:reveal-title -->
+🎨 CSS Grid vs Flexbox 언제 쓸까?
+Grid는 페이지 구조,
+Flexbox는 컴포넌트 정렬.
 
-**C 디자이너 (하이브리드)**
-
-Grid로 페이지를 나누고, 각 영역 내부는 Flexbox로 정렬했습니다. 코드는 절반으로 줄었고, 유지보수도 쉬웠습니다.
-
-3개월 뒤, C 디자이너만 모바일/태블릿/데스크톱 대응을 **하루 만에** 끝냈습니다.
-
-<!-- step:tip -->
-
-**언제 뭘 쓸까?**
-
-**Grid를 사용하세요:**
-- ✅ 복잡한 2D 레이아웃 (대시보드, 갤러리)
-- ✅ 페이지 전체 구조 (헤더, 사이드바, 메인, 푸터)
-- ✅ 행과 열을 **동시에** 제어해야 할 때
-
-**Flexbox를 사용하세요:**
-- ✅ 네비게이션 바, 버튼 그룹
-- ✅ 카드 내부 정렬 (제목, 내용, 버튼)
-- ✅ 1차원 나열 (리스트, 태그, 아이콘)
-
-**실무 조합:**
-Grid로 페이지를 나누고 → 각 영역 내부는 Flexbox로 정렬
-
-<!-- step:example -->
-
-**실제 코드 비교:**
-
-**Flexbox (네비게이션 바):**
-```css
-.nav {
-  display: flex;
-  justify-content: space-between; /* 양끝 정렬 */
-  align-items: center; /* 세로 가운데 */
-}
-```
-
-**Grid (페이지 레이아웃):**
-```css
-.page {
-  display: grid;
-  grid-template-columns: 200px 1fr; /* 사이드바 고정, 메인 유연 */
-  grid-template-rows: auto 1fr auto; /* 헤더/메인/푸터 */
-  gap: 20px;
-}
-```
-
-**하이브리드 (카드 레이아웃):**
-```css
-.card-grid {
-  display: grid; /* 카드들을 격자로 */
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.card {
-  display: flex; /* 카드 내부는 Flexbox */
-  flex-direction: column;
-  justify-content: space-between;
-}
-```
-
-<!-- step:action -->
-
-**오늘부터 실천**: 새 레이아웃을 만들 때 **"2차원 구조인가, 1차원 나열인가?"**를 먼저 물어보세요. Grid + Flexbox 조합을 익히면 거의 모든 레이아웃 문제를 해결할 수 있습니다. `float`는 이제 역사책에만 남겨두세요!
+<!-- step:outro -->
+**레이아웃 시간 90% 단축.**
+Grid + Flexbox 조합으로 모든 레이아웃 해결.

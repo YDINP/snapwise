@@ -4,80 +4,69 @@ emoji: "🔀"
 category: "it"
 tags: ["Git", "버전관리"]
 difficulty: 2
+storyType: "firstPerson"
+characters:
+  - id: junior
+    name: "주니어"
+    emoji: "👩‍💻"
+  - id: senior
+    name: "시니어"
+    emoji: "👨‍💻"
+images:
+  hook: "git branch conflict merge"
+  scene-1: "developers working together office"
 pubDate: "2026-02-15"
-storyType: "whatIf"
 ---
 
-<!-- step:hook -->
+<!-- step:cinematic-hook -->
+코드 리뷰 중.
+히스토리가 지하철 노선도처럼 꼬여 있었다.
+"누가 이렇게 했어?"
 
-일기장을 정리하는 두 가지 방법이 있습니다. 하나는 **모든 낙서와 수정 흔적을 그대로** 남기는 것, 다른 하나는 **깔끔하게 다시 정서**하는 것. Git의 `merge`와 `rebase`가 바로 이 차이입니다.
+<!-- step:scene -->
+브랜치를 합칠 때마다
+"Merge branch 'feature/login'" 커밋이 생겼다.
+3개월 뒤 히스토리는 추적 불가능.
 
-<!-- step:story -->
+<!-- step:dialogue:senior -->
+"merge 대신 rebase 써봤어?"
 
-세 명의 팀원이 같은 프로젝트를 진행했습니다.
+<!-- step:dialogue:junior -->
+"히스토리가 깔끔해진다던데...
+근데 위험하다고 들었어요."
 
-**A팀원**은 매번 `git merge`를 사용했습니다. 브랜치를 합칠 때마다 "병합 커밋"이 자동 생성됐죠. 3개월 뒤 히스토리는 **지하철 노선도**처럼 복잡했습니다. 하지만 "누가 언제 뭘 했는지"는 명확히 추적할 수 있었습니다.
+<!-- step:narration -->
+시니어가 화이트보드에 그림을 그렸다.
+merge는 모든 흔적 보존.
+rebase는 일직선 정리.
 
-**B팀원**은 `git rebase`만 고집했습니다. 커밋 히스토리를 **일직선으로 정리**하니 깔끔했죠. 그런데 어느 날 실수로 이미 push한 브랜치를 rebase했습니다. 다른 팀원들이 pull하자 충돌이 폭발했고, **일부 작업이 사라졌습니다**.
+<!-- step:dialogue:senior -->
+"일기장을 정리하는 두 가지 방법.
+낙서 흔적까지 남기거나,
+깔끔하게 다시 쓰거나."
 
-**C팀원**은 두 가지를 상황에 맞게 사용했습니다.
+<!-- step:impact -->
+**Merge** → 안전하지만 복잡
+**Rebase** → 깔끔하지만 위험
 
-- 로컬에서 정리할 때 → `rebase`
-- 공개 브랜치를 합칠 때 → `merge`
+<!-- step:narration -->
+규칙은 간단했다.
+**혼자 작업하는 로컬 브랜치** → rebase OK
+**이미 push한 공개 브랜치** → rebase 절대 금지
 
-히스토리는 적당히 깔끔하면서도 안전했습니다.
+<!-- step:dialogue:senior -->
+"이미 push한 브랜치를 rebase하면
+팀원들 작업이 망가져.
+협업 충돌 폭발."
 
-3개월 뒤, C팀원만 배포 전 rollback을 **단 5분 만에** 해냈습니다. 히스토리가 명확했으니까요.
+<!-- step:dialogue:junior -->
+"로컬에서만 쓰면 안전하겠네요."
 
-<!-- step:compare -->
+<!-- step:reveal-title -->
+🔀 Git rebase vs merge 차이
+로컬 브랜치는 rebase로 정리,
+공개 브랜치는 merge로 안전하게.
 
-**Merge vs Rebase 완벽 비교:**
-
-| 항목 | Merge | Rebase |
-|------|-------|--------|
-| **히스토리** | 모든 흔적 보존 | 일직선으로 정리 |
-| **커밋 개수** | 병합 커밋 추가 생성 | 커밋 재작성 |
-| **안전성** | 안전 (팀 협업 OK) | **위험** (push 후 사용 금지) |
-| **가독성** | 복잡할 수 있음 | 깔끔 |
-| **추적성** | 누가 언제 합쳤는지 명확 | 흔적이 사라짐 |
-
-<!-- step:tip -->
-
-**실무 사용 규칙:**
-
-**Merge를 써야 할 때:**
-- 공개 브랜치(`main`, `develop`) 합칠 때
-- 팀원들과 공유 중인 브랜치
-- 히스토리 추적이 중요한 경우
-
-**Rebase를 써도 되는 때:**
-- **혼자 작업하는 로컬 브랜치**
-- 아직 push하지 않은 커밋 정리
-- 커밋 메시지 수정이 필요할 때
-
-**절대 금지:**
-- 이미 push한 브랜치를 rebase → **팀원 작업 망가짐**
-- 공개 브랜치에서 `git rebase -i` → **협업 충돌 폭발**
-
-<!-- step:example -->
-
-**실제 시나리오:**
-
-당신이 `feature/login` 브랜치에서 작업 중입니다.
-
-**안전한 rebase:**
-```bash
-# 로컬에서만 작업했다면 OK
-git rebase main  # main의 최신 변경사항을 반영
-```
-
-**위험한 rebase:**
-```bash
-# 이미 push했다면 절대 금지!
-git push origin feature/login
-git rebase main  # ← 이러면 팀원들이 곤란해짐
-```
-
-<!-- step:action -->
-
-**오늘부터 실천**: `rebase`는 **혼자 작업하는 브랜치**에서만 쓰세요. 이미 push한 커밋을 rebase하면 팀원들의 히스토리가 꼬입니다. 공개 브랜치는 무조건 `merge`로 합치는 습관을 들이면 **협업 충돌을 90% 줄일 수 있습니다**!
+<!-- step:outro -->
+**협업 충돌 90% 감소.**
+push 전에는 rebase, push 후에는 merge.
