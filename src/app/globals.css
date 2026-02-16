@@ -111,6 +111,17 @@ body {
   margin: 0.75rem 0;
 }
 
+/* ======== Story Card Styles ======== */
+.story-text-shadow {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.glass-card {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
 /* ======== Focus ======== */
 :focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.5);
