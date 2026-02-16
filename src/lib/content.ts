@@ -24,7 +24,7 @@ export function parseSteps(rawContent: string, images?: Record<string, string>):
     for (let i = 0; i < parts.length; i += 2) {
       const type = parts[i].trim() as StepType;
       const content = parts[i + 1]?.trim() || '';
-      if (['hook', 'story', 'reveal', 'action', 'quiz'].includes(type)) {
+      if (['hook', 'story', 'detail', 'example', 'reveal', 'tip', 'compare', 'action', 'quiz'].includes(type)) {
         steps.push({ type, content, image: images?.[type] });
       }
     }

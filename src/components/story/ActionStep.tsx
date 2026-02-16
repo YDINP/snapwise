@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
-import CardContent from '@/components/feed/CardContent';
+import AnimatedCardContent from '@/components/feed/AnimatedCardContent';
 import GlassCard from '@/components/ui/GlassCard';
 
 interface ActionStepProps {
@@ -18,15 +18,12 @@ export default function ActionStep({ step, card, isActive, nextCard }: ActionSte
 
   return (
     <div className="relative w-full h-full">
-      {/* Background */}
       <div
         className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`}
         style={{ filter: 'blur(10px) brightness(0.35)' }}
       />
 
-      {/* Content */}
       <div className="relative h-full flex flex-col justify-center px-5 py-12 space-y-5">
-        {/* Summary */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -35,14 +32,13 @@ export default function ActionStep({ step, card, isActive, nextCard }: ActionSte
           <GlassCard>
             <div className="text-center space-y-3">
               <div className="text-5xl mb-3">{card.emoji}</div>
-              <div className="card-content text-white/90 text-base leading-relaxed">
-                <CardContent content={step.content} />
+              <div className="text-white/90 text-base leading-relaxed">
+                <AnimatedCardContent content={step.content} delayStart={0.15} />
               </div>
             </div>
           </GlassCard>
         </motion.div>
 
-        {/* Action buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,7 +53,6 @@ export default function ActionStep({ step, card, isActive, nextCard }: ActionSte
           </button>
         </motion.div>
 
-        {/* Next card preview */}
         {nextCard && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

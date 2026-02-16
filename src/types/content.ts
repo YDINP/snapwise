@@ -1,7 +1,7 @@
 export type CategoryKey = 'it' | 'science' | 'life' | 'business' | 'culture';
 export type CardStyle = 'gradient' | 'solid' | 'glass';
 export type Difficulty = 1 | 2 | 3;
-export type StepType = 'hook' | 'story' | 'reveal' | 'action' | 'quiz';
+export type StepType = 'hook' | 'story' | 'detail' | 'example' | 'reveal' | 'tip' | 'compare' | 'action' | 'quiz';
 export type StoryType = 'realStory' | 'whatIf' | 'fable' | 'firstPerson' | 'twist';
 
 export interface CardStep {

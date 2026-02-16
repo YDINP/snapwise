@@ -16,13 +16,15 @@ export default function StepRenderer({ step, card, isActive, nextCard }: StepRen
     case 'hook':
       return <HookStep step={step} card={card} isActive={isActive} />;
     case 'story':
+    case 'detail':
+    case 'example':
       return <StoryStep step={step} card={card} isActive={isActive} />;
     case 'reveal':
+    case 'tip':
+    case 'compare':
       return <RevealStep step={step} card={card} isActive={isActive} />;
     case 'action':
-      return <ActionStep step={step} card={card} isActive={isActive} nextCard={nextCard} />;
     case 'quiz':
-      // Fallback to ActionStep for now (Phase 2 will implement QuizStep)
       return <ActionStep step={step} card={card} isActive={isActive} nextCard={nextCard} />;
     default:
       return <StoryStep step={step} card={card} isActive={isActive} />;
