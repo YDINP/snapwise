@@ -16,48 +16,62 @@ export default function HookStep({ step, card, isActive }: HookStepProps) {
 
   return (
     <div className={`relative w-full h-full bg-gradient-to-br ${categoryInfo.gradient}`}>
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/50" style={{ filter: 'brightness(0.5)' }} />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40" />
 
-      {/* Bottom gradient overlay */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.8) 100%)'
-        }}
-      />
-
-      {/* Content */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative h-full flex flex-col justify-end pb-12 px-6"
-      >
+      {/* Content - centered */}
+      <div className="relative h-full flex flex-col items-center justify-center px-8 text-center">
         {/* Emoji */}
-        <div className="text-4xl mb-4">
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          className="text-7xl mb-6"
+        >
           {card.emoji}
-        </div>
+        </motion.div>
+
+        {/* Card title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="text-2xl md:text-3xl font-black text-white leading-tight mb-5"
+          style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
+        >
+          {card.title}
+        </motion.h1>
 
         {/* Hook text */}
-        <div className="text-2xl md:text-3xl font-bold text-white mb-4" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="text-base md:text-lg text-white/90 leading-relaxed max-w-sm"
+          style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}
+        >
           <CardContent content={step.content} />
-        </div>
+        </motion.div>
 
         {/* Category badge */}
-        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium mb-6 ${categoryInfo.bgLight} dark:${categoryInfo.bgDark} w-fit`}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+          className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium bg-white/15 backdrop-blur-sm text-white/90"
+        >
           <span>{categoryInfo.emoji}</span>
           <span>{categoryInfo.label}</span>
-        </div>
-
-        {/* Tap to start */}
-        <motion.div
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-white/80 text-sm font-medium"
-        >
-          탭하여 시작 →
         </motion.div>
+      </div>
+
+      {/* Tap hint at bottom */}
+      <motion.div
+        animate={{ opacity: [0.4, 0.9, 0.4] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-8 left-0 right-0 text-center text-white/70 text-sm font-medium"
+      >
+        탭하여 시작 →
       </motion.div>
     </div>
   );

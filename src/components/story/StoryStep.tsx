@@ -16,25 +16,28 @@ export default function StoryStep({ step, card, isActive }: StoryStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
 
   return (
-    <div className="relative w-full h-full flex flex-col">
-      {/* Top 40% - Image placeholder (category gradient) */}
-      <div className={`h-[40%] bg-gradient-to-br ${categoryInfo.gradient}`} />
+    <div className="relative w-full h-full">
+      {/* Full-screen gradient background (darkened) */}
+      <div
+        className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`}
+        style={{ filter: 'brightness(0.35)' }}
+      />
 
-      {/* Bottom 60% - Glass card with narrative */}
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="h-[60%] -mt-8"
-      >
-        <GlassCard className="h-full rounded-t-3xl overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <div className="prose prose-invert max-w-none">
+      {/* Content - centered glass card */}
+      <div className="relative h-full flex items-center px-5 pt-14 pb-8">
+        <motion.div
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="w-full"
+        >
+          <GlassCard className="max-h-[72vh] overflow-y-auto">
+            <div className="card-content text-white/90 text-base leading-relaxed">
               <CardContent content={step.content} />
             </div>
-          </div>
-        </GlassCard>
-      </motion.div>
+          </GlassCard>
+        </motion.div>
+      </div>
     </div>
   );
 }

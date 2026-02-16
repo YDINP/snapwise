@@ -16,7 +16,7 @@ function getSlugFromFilename(filename: string): string {
 
 export function parseSteps(rawContent: string, images?: Record<string, string>): CardStep[] {
   const stepRegex = /<!--\s*step:(\w+)\s*-->/g;
-  const parts = rawContent.split(stepRegex).filter(Boolean);
+  const parts = rawContent.split(stepRegex).filter(p => p.trim());
 
   // v2 format (has step comments)
   if (parts.length > 1) {

@@ -16,7 +16,7 @@ export default function RevealStep({ step, card, isActive }: RevealStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center px-6">
+    <div className="relative w-full h-full flex items-center justify-center px-5">
       {/* Blurred background */}
       <div
         className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`}
@@ -25,14 +25,14 @@ export default function RevealStep({ step, card, isActive }: RevealStepProps) {
 
       {/* Centered glass card */}
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="relative w-full max-w-2xl"
       >
         <GlassCard>
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-white mb-6">
+            <h3 className="text-xl font-bold text-white mb-4">
               💡 핵심 포인트
             </h3>
 
@@ -41,16 +41,14 @@ export default function RevealStep({ step, card, isActive }: RevealStepProps) {
               animate="visible"
               variants={{
                 visible: {
-                  transition: {
-                    staggerChildren: 0.1
-                  }
+                  transition: { staggerChildren: 0.08 }
                 }
               }}
-              className="prose prose-invert max-w-none"
+              className="card-content text-white/90 text-base leading-relaxed"
             >
               <motion.div
                 variants={{
-                  hidden: { opacity: 0, x: -20 },
+                  hidden: { opacity: 0, x: -15 },
                   visible: { opacity: 1, x: 0 }
                 }}
               >
