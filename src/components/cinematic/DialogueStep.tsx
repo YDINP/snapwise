@@ -44,7 +44,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
           <span className="text-xs font-bold text-white/80">{character.name}</span>
         </motion.div>
 
-        {/* Speech bubble — SVG-based comic style */}
+        {/* Speech bubble — CSS-based comic style */}
         <motion.div
           initial={{ opacity: 0, x: 20, scale: 0.9 }}
           animate={isActive ? { opacity: 1, x: 0, scale: 1 } : {}}
@@ -52,23 +52,22 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
           className="relative flex-1"
           style={{ maxWidth: '80%' }}
         >
-          {/* SVG speech bubble background */}
-          <svg
-            className="absolute inset-0 h-full w-full"
-            viewBox="0 0 300 150"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
+          {/* Bubble body */}
+          <div className="relative rounded-2xl bg-white/92 px-5 py-5 shadow-lg"
+            style={{ minHeight: '80px', border: '2px solid rgba(255,255,255,0.95)' }}
           >
-            <path
-              d="M20,5 Q5,5 5,20 L5,120 Q5,135 20,135 L30,135 L15,148 L40,135 L280,135 Q295,135 295,120 L295,20 Q295,5 280,5 Z"
-              fill="rgba(255,255,255,0.92)"
-              stroke="rgba(255,255,255,1)"
-              strokeWidth="2"
+            {/* Tail pointing left toward character */}
+            <div
+              className="absolute top-6 -left-3"
+              style={{
+                width: 0,
+                height: 0,
+                borderTop: '8px solid transparent',
+                borderBottom: '8px solid transparent',
+                borderRight: '12px solid rgba(255,255,255,0.92)',
+                filter: 'drop-shadow(-1px 0 0 rgba(255,255,255,0.95))',
+              }}
             />
-          </svg>
-
-          {/* Text content */}
-          <div className="relative z-10 px-5 py-4">
             <p className="text-sm font-medium leading-relaxed text-gray-800">
               {renderWithLineBreaks(step.content)}
             </p>
