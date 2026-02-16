@@ -72,7 +72,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
       {!isFirstStep && (
         <button
           onClick={(e) => { e.stopPropagation(); goToStart(); }}
-          className="absolute top-7 left-3 z-50 flex items-center gap-2 rounded-full bg-black/30 px-7 py-3 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
+          className="absolute top-7 left-3 z-50 flex items-center gap-2 rounded-full bg-black/30 px-10 py-4 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
         >
           ← 처음으로
         </button>
