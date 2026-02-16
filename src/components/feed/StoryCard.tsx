@@ -6,6 +6,7 @@ import type { CardMeta } from '@/types/content';
 import { useStepNavigation } from '@/hooks/useStepNavigation';
 import StepProgressBar from '@/components/story/StepProgressBar';
 import StepRenderer from '@/components/story/StepRenderer';
+import CinematicRenderer from '@/components/cinematic/CinematicRenderer';
 
 interface StoryCardProps {
   card: CardMeta;
@@ -56,12 +57,21 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
           transition={{ duration: 0.3 }}
           className="w-full h-full"
         >
-          <StepRenderer
-            step={step}
-            card={card}
-            isActive={isActive}
-            nextCard={nextCard}
-          />
+          {card.isCinematic ? (
+            <CinematicRenderer
+              step={step}
+              card={card}
+              isActive={isActive}
+              nextCard={nextCard}
+            />
+          ) : (
+            <StepRenderer
+              step={step}
+              card={card}
+              isActive={isActive}
+              nextCard={nextCard}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
