@@ -7,6 +7,7 @@ import { useStepNavigation } from '@/hooks/useStepNavigation';
 import StepProgressBar from '@/components/story/StepProgressBar';
 import StepRenderer from '@/components/story/StepRenderer';
 import CinematicRenderer from '@/components/cinematic/CinematicRenderer';
+import StepGlossary from '@/components/cinematic/StepGlossary';
 
 interface StoryCardProps {
   card: CardMeta;
@@ -102,6 +103,10 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
               isActive={isActive}
               nextCard={nextCard}
             />
+          )}
+          {/* Glossary — show matching terms at bottom of each step (except outro) */}
+          {step.type !== 'outro' && (
+            <StepGlossary content={step.content} glossary={card.glossary} />
           )}
         </motion.div>
       </AnimatePresence>
