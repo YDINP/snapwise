@@ -4,82 +4,69 @@ emoji: "🐳"
 category: "it"
 tags: ["Docker", "DevOps"]
 difficulty: 1
+storyType: "firstPerson"
+characters:
+  - id: junior
+    name: "주니어"
+    emoji: "👩‍💻"
+  - id: senior
+    name: "시니어"
+    emoji: "👨‍💻"
+images:
+  hook: "frustrated developer computer setup"
+  scene-1: "modern office workspace"
 pubDate: "2026-02-15"
-storyType: "fable"
 ---
 
-<!-- step:hook -->
+<!-- step:cinematic-hook -->
+새 회사 첫 날.
+"프로젝트 세팅하는 데 3일 걸려요."
+선배가 말했다.
 
-이사할 때 짐을 일일이 싸고 풀지 않고, **방 전체를 복사해서 순간이동** 시킬 수 있다면 어떨까요? Docker가 바로 그 마법입니다. 서버 환경을 통째로 박스에 담아서 어디든 옮길 수 있죠.
+<!-- step:scene -->
+환경 설정 지옥.
+Node 버전 충돌, DB 설치, 라이브러리 호환...
 
-<!-- step:story -->
+<!-- step:dialogue:junior -->
+"이거 다 설치해야 하는 건가요...?"
 
-옛날 개발팀에는 "환경설정 마법사"가 있었습니다. 새 서버를 띄우려면 그에게 부탁해야 했죠. Node.js 버전 맞추고, 데이터베이스 설정하고, 환경변수 입력하는 데만 **반나절**이 걸렸습니다.
+<!-- step:dialogue:senior -->
+"예전엔 그랬지.
+근데 이제 명령어 하나면 끝이야."
 
-어느 날 팀원이 물었습니다.
-> "왜 매번 똑같은 작업을 반복하나요?"
+<!-- step:narration -->
+시니어가 터미널을 열었다.
+단 한 줄을 입력했다.
 
-마법사가 한숨 쉬며 답했죠.
-> "서버마다 OS가 다르고, 버전도 달라서... 설정 하나만 틀려도 전체가 안 돌아가거든."
+<!-- step:impact -->
+**docker-compose up**
 
-그 팀원은 고민 끝에 **컨테이너**를 도입했습니다. 앱과 설정을 **택배 박스에 통째로 담아서**, 어떤 서버에서도 똑같이 실행되게 만든 거죠.
+<!-- step:narration -->
+3일 걸리던 세팅이
+10초 만에 끝났다.
 
-이제 배포는 "박스 복사-붙여넣기"처럼 간단해졌습니다. 마법사는 놀라워하며 물었습니다.
+<!-- step:dialogue:senior -->
+"컨테이너라는 건 이사할 때
+짐을 통째로 옮기는 것과 같아."
 
-> "어떻게 한 거지?"
+<!-- step:narration -->
+내 컴퓨터에서 되면,
+어디서든 된다.
+그게 핵심이었다.
 
-팀원이 웃으며 답했죠.
+<!-- step:dialogue:junior -->
+"Docker 명령어 몇 개나 외워야 해요?"
 
-> "Docker 명령어 10개만 익히면 됩니다."
+<!-- step:dialogue:senior -->
+"10개면 충분해.
+run, ps, stop, logs...
+나머지는 필요할 때 찾아봐."
 
-<!-- step:detail -->
+<!-- step:reveal-title -->
+🐳 Docker 핵심 명령어 10개
+"내 컴퓨터에서는 되는데요?"
+이 말을 없애주는 마법.
 
-Docker는 **"환경까지 포함한 앱 복사본"**을 만듭니다. 이미지는 박스, 컨테이너는 박스를 연 상태라고 생각하면 됩니다.
-
-실제로 어떻게 쓰는지 예시를 볼까요?
-
-**1. 웹 서버 실행하기**
-
-```bash
-docker run -p 3000:3000 my-app
-```
-
-"my-app 박스를 열어서 3000번 포트로 실행해" — 이게 끝입니다. 설치, 설정 없이 **바로 실행**.
-
-**2. 여러 서비스 한 번에 띄우기**
-
-`docker-compose.yml` 파일 하나로 웹서버 + 데이터베이스 + Redis를 동시에 실행합니다.
-
-```bash
-docker-compose up
-```
-
-마치 **풀세트 밀키트**를 데우는 것과 같습니다.
-
-<!-- step:tip -->
-
-**실무 팁 — 명령어 조합 패턴:**
-
-- **컨테이너 청소**: `docker rm $(docker ps -aq)` — 멈춘 컨테이너 전부 삭제
-- **이미지 청소**: `docker rmi $(docker images -q)` — 안 쓰는 박스 전부 버리기
-- **로그 실시간 확인**: `docker logs -f <컨테이너명>` — 에러 추적에 필수
-- **컨테이너 내부 접속**: `docker exec -it <컨테이너명> bash` — 박스 안으로 들어가기
-
-<!-- step:reveal -->
-
-**Docker 필수 명령어 10개:**
-
-1. **`docker run`** — 이미지를 컨테이너로 실행 (박스 열기)
-2. **`docker ps`** — 실행 중인 컨테이너 목록 확인
-3. **`docker stop`** — 컨테이너 중지 (박스 닫기)
-4. **`docker rm`** — 컨테이너 삭제 (박스 버리기)
-5. **`docker images`** — 로컬에 있는 박스 목록 확인
-6. **`docker pull`** — Docker Hub에서 박스 다운로드
-7. **`docker build`** — `Dockerfile`로 새 박스 만들기
-8. **`docker exec`** — 실행 중 컨테이너에서 명령어 실행
-9. **`docker logs`** — 컨테이너 로그 확인 (디버깅 필수)
-10. **`docker-compose up`** — 여러 컨테이너 한 번에 실행
-
-<!-- step:action -->
-
-**오늘부터 실천**: 로컬 개발 환경을 Docker로 만들어보세요. `docker-compose.yml` 하나면 **"내 컴퓨터에선 되는데"** 문제가 사라집니다. 이 10개 명령어로 Docker의 80%를 활용할 수 있습니다!
+<!-- step:outro -->
+**환경 설정 지옥에서 탈출.**
+docker-compose up 하나로 세팅 끝.

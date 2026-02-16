@@ -4,107 +4,71 @@ emoji: "⚡"
 category: "it"
 tags: ["JavaScript", "비동기"]
 difficulty: 2
-style: "gradient"
+storyType: "firstPerson"
+characters:
+  - id: junior
+    name: "주니어"
+    emoji: "👩‍💻"
+  - id: senior
+    name: "시니어"
+    emoji: "👨‍💻"
+images:
+  hook: "callback hell nested code"
+  scene-1: "developer coffee async"
 pubDate: "2026-02-15"
-storyType: "fable"
 ---
 
-<!-- step:hook -->
+<!-- step:cinematic-hook -->
+콜백이 7단계로 중첩됐다.
+코드가 피라미드처럼 쌓여서
+오른쪽으로 사라졌다.
 
-커피를 주문하고 카운터에서 멍하니 기다리시나요? 아니면 **진동벨을 받고 자리에 앉아** 다른 일을 하시나요? 비동기 프로그래밍이 바로 진동벨입니다. JavaScript는 두 가지 벨을 제공합니다.
+<!-- step:scene -->
+API 호출 → DB 저장 → 이메일 발송 → 로그 기록
+각 단계가 콜백 안에 콜백.
+"콜백 지옥"이었다.
 
-<!-- step:story -->
+<!-- step:dialogue:senior -->
+"Promise로 바꿔봐.
+체인으로 연결할 수 있어."
 
-옛날 카페에서는 주문하면 **카운터 앞에서 계속 기다려야** 했습니다. 다른 손님들도 줄을 서서 기다렸죠.
+<!-- step:narration -->
+`.then()`으로 바꿨다.
+피라미드가 일직선이 됐다.
 
-```javascript
-// 옛날 방식 (콜백 지옥)
-orderCoffee(function(coffee) {
-  drinkCoffee(coffee, function() {
-    orderDessert(function(dessert) {
-      eatDessert(dessert, function() {
-        console.log("끝!");
-      });
-    });
-  });
-});
-```
+<!-- step:dialogue:junior -->
+"읽기는 쉬워졌는데,
+여전히 체인이 길어요."
 
-중첩이 깊어질수록 코드가 **피라미드**처럼 쌓였습니다.
+<!-- step:dialogue:senior -->
+"async/await 써봐.
+동기 코드처럼 보이지만 비동기로 작동해."
 
-어느 날, 카페 주인이 **진동벨 시스템**을 도입했습니다. 주문하면 벨을 받고, 준비되면 울립니다. 손님들은 자리에 앉아서 다른 일을 할 수 있었죠.
+<!-- step:impact -->
+**const user = await fetchUser();
+const post = await savePost(user);
+await sendEmail(post);**
 
-```javascript
-// Promise 방식 (진동벨)
-orderCoffee()
-  .then(coffee => drinkCoffee(coffee))
-  .then(() => orderDessert())
-  .then(dessert => eatDessert(dessert))
-  .catch(error => console.log("주문 실패"));
-```
+<!-- step:narration -->
+마치 순서대로 실행되는 것처럼 읽힌다.
+하지만 뒤에서는 비동기로 돌아간다.
 
-훨씬 읽기 쉬워졌습니다. 하지만 체인이 길어지면 여전히 복잡했죠.
+<!-- step:dialogue:senior -->
+"에러 처리는 try/catch로.
+Promise는 .catch()였지."
 
-그래서 카페가 **주문표 시스템**을 만들었습니다. 주문표에 적힌 순서대로 자동으로 가져다줍니다. 손님은 그냥 기다리면 됩니다.
+<!-- step:dialogue:junior -->
+"병렬로 실행하려면?"
 
-```javascript
-// async/await 방식 (주문표)
-async function enjoyMeal() {
-  const coffee = await orderCoffee();
-  await drinkCoffee(coffee);
-  const dessert = await orderDessert();
-  await eatDessert(dessert);
-  console.log("만족!");
-}
-```
+<!-- step:dialogue:senior -->
+"Promise.all()로 묶어.
+두 API를 동시에 호출하면 시간이 절반."
 
-**마치 동기 코드처럼 읽히지만**, 비동기로 실행됩니다.
+<!-- step:reveal-title -->
+⚡ Promise vs async/await 완벽 정리
+콜백 지옥 → Promise 체인 → async/await
+동기처럼 읽히는 비동기 코드.
 
-<!-- step:reveal -->
-
-**Promise vs async/await 핵심 차이:**
-
-**Promise 방식**
-- `.then()` 체인으로 연결
-- 콜백 지옥을 해결했지만 여전히 중첩 가능
-- 에러 처리는 `.catch()`
-- 여러 Promise를 `Promise.all()`로 병렬 실행
-
-**async/await 방식**
-- **동기 코드처럼 읽히지만** 비동기로 실행
-- `try/catch`로 깔끔한 에러 처리
-- 코드가 직관적이고 읽기 쉬움
-- `await`는 반드시 `async` 함수 안에서만 사용
-
-<!-- step:tip -->
-
-**실무 패턴:**
-
-**병렬 실행 (빠름):**
-```javascript
-// 두 API를 동시에 호출
-const [users, posts] = await Promise.all([
-  fetchUsers(),
-  fetchPosts()
-]);
-```
-
-**순차 실행 (느림):**
-```javascript
-// 하나씩 기다림
-const users = await fetchUsers();
-const posts = await fetchPosts(); // users 완료 후 시작
-```
-
-**에러 처리:**
-```javascript
-try {
-  const data = await fetchData();
-} catch (error) {
-  console.error("데이터 가져오기 실패:", error);
-}
-```
-
-<!-- step:action -->
-
-**오늘부터 실천**: 새로운 비동기 코드는 무조건 `async/await`로 작성하세요. 기존 Promise 코드도 리팩토링하면 **가독성이 2배 올라갑니다**. 단, 여러 API를 병렬로 호출할 땐 `Promise.all()`을 꼭 써서 **속도를 최적화**하세요!
+<!-- step:outro -->
+**가독성 2배 향상.**
+async/await + Promise.all로 깔끔하고 빠르게.
