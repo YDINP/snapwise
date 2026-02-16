@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { renderWithLineBreaks } from '@/lib/renderContent';
 
 interface CinematicHookProps {
   step: CardStep;
@@ -50,7 +51,7 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           className="max-w-xs text-center text-lg font-medium text-white"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
         >
-          {step.content}
+          {renderWithLineBreaks(step.content)}
         </motion.p>
       </div>
 

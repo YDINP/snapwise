@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { renderWithLineBreaks } from '@/lib/renderContent';
 
 interface ImpactStepProps {
   step: CardStep;
@@ -37,7 +38,7 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
             textShadow: '0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.3)'
           }}
         >
-          {step.content}
+          {renderWithLineBreaks(step.content)}
         </h2>
       </motion.div>
     </div>

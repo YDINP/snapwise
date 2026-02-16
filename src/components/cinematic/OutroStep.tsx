@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { renderWithLineBreaks } from '@/lib/renderContent';
 import { Share2, Bookmark } from 'lucide-react';
 
 interface OutroStepProps {
@@ -31,7 +32,7 @@ export default function OutroStep({ step, card, isActive, nextCard }: OutroStepP
           className="w-full max-w-sm rounded-2xl bg-white/15 p-6 backdrop-blur-md"
         >
           <p className="text-center text-sm leading-relaxed text-white/90">
-            {step.content}
+            {renderWithLineBreaks(step.content)}
           </p>
         </motion.div>
 

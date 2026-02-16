@@ -17,6 +17,7 @@ export interface Character {
   id: string;
   name: string;
   emoji: string;
+  image?: string;
 }
 
 export interface CardStep {

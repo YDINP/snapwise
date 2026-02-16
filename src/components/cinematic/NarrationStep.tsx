@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { renderWithLineBreaks } from '@/lib/renderContent';
 
 interface NarrationStepProps {
   step: CardStep;
@@ -29,7 +30,7 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
           className="text-center text-base font-light italic text-white/90"
           style={{ textShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
         >
-          {step.content}
+          {renderWithLineBreaks(step.content)}
         </p>
       </motion.div>
     </div>

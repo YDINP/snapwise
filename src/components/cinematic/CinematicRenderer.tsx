@@ -23,49 +23,55 @@ interface CinematicRendererProps {
 }
 
 export default function CinematicRenderer({ step, card, isActive, nextCard }: CinematicRendererProps) {
+  // Ensure step content is never empty
+  const safeStep = {
+    ...step,
+    content: step.content?.trim() || '...'
+  };
+
   // v3 cinematic types
-  switch (step.type) {
+  switch (safeStep.type) {
     case 'cinematic-hook':
-      return <CinematicHook step={step} card={card} isActive={isActive} />;
+      return <CinematicHook step={safeStep} card={card} isActive={isActive} />;
 
     case 'scene':
-      return <SceneStep step={step} card={card} isActive={isActive} />;
+      return <SceneStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'dialogue':
-      return <DialogueStep step={step} card={card} isActive={isActive} />;
+      return <DialogueStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'narration':
-      return <NarrationStep step={step} card={card} isActive={isActive} />;
+      return <NarrationStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'impact':
-      return <ImpactStep step={step} card={card} isActive={isActive} />;
+      return <ImpactStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'reveal-title':
-      return <RevealTitleStep step={step} card={card} isActive={isActive} />;
+      return <RevealTitleStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'outro':
-      return <OutroStep step={step} card={card} isActive={isActive} nextCard={nextCard} />;
+      return <OutroStep step={safeStep} card={card} isActive={isActive} nextCard={nextCard} />;
 
     // v2 fallback types
     case 'hook':
-      return <HookStep step={step} card={card} isActive={isActive} />;
+      return <HookStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'story':
     case 'detail':
     case 'example':
-      return <StoryStep step={step} card={card} isActive={isActive} />;
+      return <StoryStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'reveal':
     case 'tip':
     case 'compare':
-      return <RevealStep step={step} card={card} isActive={isActive} />;
+      return <RevealStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'action':
     case 'quiz':
-      return <ActionStep step={step} card={card} isActive={isActive} />;
+      return <ActionStep step={safeStep} card={card} isActive={isActive} />;
 
     // Default fallback
     default:
-      return <NarrationStep step={step} card={card} isActive={isActive} />;
+      return <NarrationStep step={safeStep} card={card} isActive={isActive} />;
   }
 }

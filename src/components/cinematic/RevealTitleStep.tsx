@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { renderWithLineBreaks } from '@/lib/renderContent';
 
 interface RevealTitleStepProps {
   step: CardStep;
@@ -13,8 +14,10 @@ interface RevealTitleStepProps {
 export default function RevealTitleStep({ step, card, isActive }: RevealTitleStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
 
-  // Parse content: first line = subtitle
-  const subtitle = step.content.split('\n')[0];
+  // Parse content: first line = subtitle, rest = description
+  const lines = step.content.split('\n').filter((l: string) => l.trim() !== '');
+  const subtitle = lines[0] || '';
+  const description = lines.slice(1).join('\n');
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
@@ -58,6 +61,18 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
             className="text-center text-base text-white/80"
           >
             {subtitle}
+          </motion.p>
+        )}
+
+        {/* Description fade-in */}
+        {description && (
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="text-center text-sm text-white/70"
+          >
+            {renderWithLineBreaks(description)}
           </motion.p>
         )}
       </div>
