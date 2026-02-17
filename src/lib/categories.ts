@@ -35,7 +35,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     gradient: 'from-stone-800 to-stone-950',
     bgLight: '#FAFAF9',
     bgDark: '#1C1917',
-    accent: '#A8A29E',
+    accent: '#D4A76A',
   },
   life: {
     key: 'life',

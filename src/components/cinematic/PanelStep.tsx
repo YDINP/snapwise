@@ -17,26 +17,39 @@ interface PanelLine {
   isStageDirection: boolean;
 }
 
-/** Parse panel content: "characterId: text" per line */
+/** Parse panel content: "characterId: text" per line, merging continuation lines */
 function parsePanelLines(content: string): PanelLine[] {
-  return content
-    .split('\n')
-    .filter(l => l.trim())
-    .map(line => {
-      const trimmed = line.trim();
-      // Stage direction line: *(text)*
-      if (/^\*\(.*\)\*$/.test(trimmed)) {
-        return { characterId: null, text: trimmed.slice(2, -2), isStageDirection: true };
-      }
-      // Character line: characterId: "text" or characterId: text
-      const match = trimmed.match(/^([\w-]+):\s*(.+)/);
-      if (match) {
-        const text = match[2].replace(/^[""]|[""]$/g, '');
-        return { characterId: match[1], text, isStageDirection: false };
-      }
-      // Plain narration
-      return { characterId: null, text: trimmed, isStageDirection: false };
-    });
+  const rawLines = content.split('\n').filter(l => l.trim());
+  const result: PanelLine[] = [];
+
+  for (const line of rawLines) {
+    const trimmed = line.trim();
+
+    // Stage direction line: *(text)*
+    if (/^\*\(.*\)\*$/.test(trimmed)) {
+      result.push({ characterId: null, text: trimmed.slice(2, -2), isStageDirection: true });
+      continue;
+    }
+
+    // Character line: characterId: "text" or characterId: text
+    const match = trimmed.match(/^([\w-]+):\s*(.+)/);
+    if (match) {
+      const text = match[2].replace(/^[""]|[""]$/g, '');
+      result.push({ characterId: match[1], text, isStageDirection: false });
+      continue;
+    }
+
+    // Continuation line — merge into previous character's dialogue
+    if (result.length > 0 && result[result.length - 1].characterId) {
+      result[result.length - 1].text += '\n' + trimmed;
+      continue;
+    }
+
+    // Plain narration (no previous character to attach to)
+    result.push({ characterId: null, text: trimmed, isStageDirection: false });
+  }
+
+  return result;
 }
 
 /** Parse **bold** inline */
@@ -173,7 +186,12 @@ export default function PanelStep({ step, card, isActive }: PanelStepProps) {
                     className={`text-sm leading-relaxed ${isRight ? 'text-white/90' : 'text-gray-800'}`}
                     style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                   >
-                    {parseInlineBold(line.text, isRight ? '#fff' : categoryInfo.accent)}
+                    {line.text.split('\n').map((textLine, j, arr) => (
+                      <React.Fragment key={j}>
+                        {parseInlineBold(textLine, isRight ? '#fff' : categoryInfo.accent)}
+                        {j < arr.length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
                   </p>
                 </div>
               </div>
