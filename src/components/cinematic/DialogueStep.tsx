@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
-import { renderWithLineBreaks } from '@/lib/renderContent';
+import TypingText from '@/components/cinematic/TypingText';
 
 interface DialogueStepProps {
   step: CardStep;
@@ -69,7 +69,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
               }}
             />
             <p className="text-sm font-medium leading-relaxed text-gray-800" style={{ marginLeft: '6px' }}>
-              {renderWithLineBreaks(step.content)}
+              <TypingText text={step.content} isActive={isActive} />
             </p>
           </div>
         </motion.div>
