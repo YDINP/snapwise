@@ -16,9 +16,7 @@
   --color-muted: #a1a1aa;
 }
 
-* {
-  margin: 0;
-  padding: 0;
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
