@@ -75,12 +75,12 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
   },
   etc: {
     key: 'etc',
-    label: '기타',
-    emoji: '✨',
-    gradient: 'from-gray-800 to-zinc-950',
-    bgLight: '#F4F4F5',
-    bgDark: '#18181B',
-    accent: '#A1A1AA',
+    label: '상식',
+    emoji: '🧩',
+    gradient: 'from-sky-900 to-blue-950',
+    bgLight: '#F0F9FF',
+    bgDark: '#0C4A6E',
+    accent: '#38BDF8',
   },
 };
 
