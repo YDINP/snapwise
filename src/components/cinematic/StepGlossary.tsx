@@ -20,7 +20,7 @@ export default function StepGlossary({ content, glossary }: StepGlossaryProps) {
 
   return (
     <div className="absolute bottom-4 left-4 right-4 z-40">
-      <div className="rounded-xl bg-black/50 px-4 py-3 backdrop-blur-md">
+      <div className="rounded-xl bg-black/50 px-5 py-4 backdrop-blur-md">
         <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-white/50">
           <HelpCircle size={10} />
           용어 해설
