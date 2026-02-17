@@ -14,6 +14,8 @@ import StatStep from './StatStep';
 import QuoteStep from './QuoteStep';
 import StepsStep from './StepsStep';
 import TimelineStep from './TimelineStep';
+import PanelStep from './PanelStep';
+import SplashStep from './SplashStep';
 
 // v2 fallback components
 import HookStep from '@/components/story/HookStep';
@@ -66,6 +68,12 @@ export default function CinematicRenderer({ step, card, isActive, nextCard }: Ci
 
     case 'timeline':
       return <TimelineStep step={safeStep} card={card} isActive={isActive} />;
+
+    case 'panel':
+      return <PanelStep step={safeStep} card={card} isActive={isActive} />;
+
+    case 'splash':
+      return <SplashStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'impact':
       return <ImpactStep step={safeStep} card={card} isActive={isActive} />;

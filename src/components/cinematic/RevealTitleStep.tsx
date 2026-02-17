@@ -25,11 +25,27 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
   });
   const description = lines.join('\n');
 
+  const hasCoverImage = !!card.coverImage;
+
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
-      {/* Category gradient background with radial vignette */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
+      {/* Background: cover image or category gradient */}
+      {hasCoverImage ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${card.coverImage})` }}
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+        </>
+      ) : (
+        <>
+          <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
+        </>
+      )}
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center gap-5 px-6">
