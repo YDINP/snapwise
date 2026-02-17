@@ -14,9 +14,11 @@ interface StoryCardProps {
   isActive: boolean;
   nextCard?: CardMeta;
   onComplete?: () => void;
+  /** Top offset in px when rendered below a fixed nav bar */
+  topOffset?: number;
 }
 
-export default function StoryCard({ card, isActive, nextCard, onComplete }: StoryCardProps) {
+export default function StoryCard({ card, isActive, nextCard, onComplete, topOffset = 0 }: StoryCardProps) {
   const { currentStep, goNext, goPrev, goToStart, isFirstStep, totalSteps } = useStepNavigation({
     totalSteps: card.steps.length,
     isActive,
@@ -65,7 +67,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden" onClick={handleTap} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       {/* Progress bar */}
-      <div className="absolute top-0 left-0 right-0 z-50">
+      <div className="absolute left-0 right-0 z-50" style={{ top: topOffset }}>
         <StepProgressBar totalSteps={totalSteps} currentStep={currentStep} />
       </div>
 
@@ -73,7 +75,8 @@ export default function StoryCard({ card, isActive, nextCard, onComplete }: Stor
       {!isFirstStep && (
         <button
           onClick={(e) => { e.stopPropagation(); goToStart(); }}
-          className="absolute top-7 left-3 z-50 flex items-center gap-2 rounded-full bg-black/30 px-5 py-2.5 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
+          className="absolute left-3 z-50 flex items-center gap-2 rounded-full bg-black/30 px-5 py-2.5 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
+          style={{ top: topOffset + 16 }}
         >
           ← 처음으로
         </button>

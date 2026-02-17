@@ -14,6 +14,10 @@ interface ImpactStepProps {
 export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
 
+  // Adaptive font size: shorter content gets larger text
+  const lineCount = step.content.split('\n').filter(l => l.trim()).length;
+  const fontSize = lineCount <= 3 ? 'text-3xl md:text-4xl' : lineCount <= 5 ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl';
+
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
       {/* Category gradient background with dark overlay */}
@@ -33,9 +37,10 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
         className="relative z-10 px-8"
       >
         <h2
-          className="text-center text-3xl font-black text-white md:text-4xl"
+          className={`text-center ${fontSize} font-black text-white break-keep`}
           style={{
-            textShadow: '0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.3)'
+            textShadow: '0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.3)',
+            wordBreak: 'keep-all',
           }}
         >
           {renderWithLineBreaks(step.content)}

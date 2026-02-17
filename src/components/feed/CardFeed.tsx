@@ -140,6 +140,7 @@ export default function CardFeed({ cards }: CardFeedProps) {
             isActive={index === currentIndex}
             nextCard={shuffled[index + 1]}
             onComplete={() => handleCardComplete(index)}
+            topOffset={52}
           />
         </div>
       ))}
