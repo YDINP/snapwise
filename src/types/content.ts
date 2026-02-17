@@ -6,7 +6,7 @@ export type Difficulty = 1 | 2 | 3;
 export type V2StepType = 'hook' | 'story' | 'detail' | 'example' | 'reveal' | 'tip' | 'compare' | 'action' | 'quiz';
 
 // v3 cinematic step types
-export type V3StepType = 'cinematic-hook' | 'scene' | 'dialogue' | 'narration' | 'impact' | 'reveal-title' | 'outro' | 'showcase';
+export type V3StepType = 'cinematic-hook' | 'scene' | 'dialogue' | 'narration' | 'impact' | 'reveal-title' | 'outro' | 'showcase' | 'vs' | 'stat' | 'quote' | 'steps' | 'timeline';
 
 // Union of all step types
 export type StepType = V2StepType | V3StepType;
