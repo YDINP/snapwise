@@ -65,7 +65,31 @@ function parseVsContent(content: string): VsParsed {
 
   // ─── Format 1: Standalone pipe separator ───
   if (isStandalonePipeFormat(lines)) {
-    const pipeIdx = lines.indexOf('|');
+    // Count standalone pipes to detect 3-block format (title | left | right)
+    const pipeIndices = lines.reduce<number[]>((acc, l, i) => {
+      if (l === '|') acc.push(i);
+      return acc;
+    }, []);
+
+    if (pipeIndices.length >= 2) {
+      // 3-block: title | leftBlock | rightBlock
+      const titleBlock = lines.slice(0, pipeIndices[0]).join('\n').trim();
+      const leftBlock = lines.slice(pipeIndices[0] + 1, pipeIndices[1]).join('\n').trim();
+      const rightBlock = lines.slice(pipeIndices[1] + 1).join('\n').trim();
+
+      const left = extractTitle(leftBlock);
+      const right = extractTitle(rightBlock);
+
+      return {
+        leftTitle: left.title || titleBlock,
+        rightTitle: right.title || '',
+        rows: [{ left: left.body || leftBlock, right: right.body || rightBlock }],
+        footer: titleBlock && left.title ? [titleBlock] : [],
+      };
+    }
+
+    // 2-block: leftBlock | rightBlock
+    const pipeIdx = pipeIndices[0];
     const leftBlock = lines.slice(0, pipeIdx).join('\n').trim();
     const rightBlock = lines.slice(pipeIdx + 1).join('\n').trim();
 
