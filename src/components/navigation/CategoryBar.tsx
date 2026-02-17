@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ALL_CATEGORY_KEYS, getCategoryInfo } from '@/lib/categories';
 import type { CategoryKey } from '@/types/content';
 
@@ -9,7 +10,9 @@ interface CategoryBarProps {
 }
 
 export default function CategoryBar({ currentCategory }: CategoryBarProps) {
-  const isAllSelected = currentCategory === undefined;
+  const pathname = usePathname();
+  const isSavedPage = pathname === '/saved';
+  const isAllSelected = currentCategory === undefined && !isSavedPage;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
@@ -25,6 +28,19 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
               }`}
             >
               🌟 전체
+            </div>
+          </Link>
+
+          {/* Saved cards */}
+          <Link href="/saved">
+            <div
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                isSavedPage
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              🔖 저장됨
             </div>
           </Link>
 
