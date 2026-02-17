@@ -8,6 +8,7 @@ import NarrationStep from './NarrationStep';
 import ImpactStep from './ImpactStep';
 import RevealTitleStep from './RevealTitleStep';
 import OutroStep from './OutroStep';
+import ShowcaseStep from './ShowcaseStep';
 
 // v2 fallback components
 import HookStep from '@/components/story/HookStep';
@@ -42,6 +43,9 @@ export default function CinematicRenderer({ step, card, isActive, nextCard }: Ci
 
     case 'narration':
       return <NarrationStep step={safeStep} card={card} isActive={isActive} />;
+
+    case 'showcase':
+      return <ShowcaseStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'impact':
       return <ImpactStep step={safeStep} card={card} isActive={isActive} />;
