@@ -151,13 +151,13 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
               className="w-full rounded-t-2xl border border-b-0 border-blue-500/20 bg-blue-950/20 px-5 py-4 backdrop-blur-sm"
             >
               {leftTitle && (
-                <p className="mb-2 text-sm font-black text-blue-300" style={{ wordBreak: 'keep-all' }}>
+                <p className="mb-2 text-sm font-black text-blue-300" style={{ wordBreak: 'keep-all', textWrap: 'balance' }}>
                   {leftTitle}
                 </p>
               )}
               <p
                 className="text-sm leading-relaxed text-white/80"
-                style={{ wordBreak: 'keep-all' }}
+                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {renderWithLineBreaks(rows[0].left)}
               </p>
@@ -198,7 +198,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
               )}
               <p
                 className="text-sm leading-relaxed text-white/80"
-                style={{ wordBreak: 'keep-all' }}
+                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {renderWithLineBreaks(rows[0].right)}
               </p>
@@ -217,7 +217,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
               >
                 <h2
                   className="text-center text-sm font-black leading-tight text-blue-300 sm:text-base"
-                  style={{ wordBreak: 'keep-all' }}
+                  style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                 >
                   {leftTitle}
                 </h2>
@@ -269,7 +269,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
                   >
                     <p
                       className="text-center text-xs leading-snug text-white/85 sm:text-sm"
-                      style={{ wordBreak: 'keep-all' }}
+                      style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                     >
                       {renderWithLineBreaks(row.left)}
                     </p>
@@ -291,7 +291,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
                   >
                     <p
                       className="text-center text-xs leading-snug text-white/85 sm:text-sm"
-                      style={{ wordBreak: 'keep-all' }}
+                      style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                     >
                       {renderWithLineBreaks(row.right)}
                     </p>
@@ -312,7 +312,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
           >
             <p
               className="text-center text-xs leading-relaxed text-white/50 sm:text-sm"
-              style={{ wordBreak: 'keep-all' }}
+              style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
             >
               {renderWithLineBreaks(footer.join('\n'))}
             </p>

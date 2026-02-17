@@ -82,7 +82,7 @@ export default function TimelineStep({ step, card, isActive }: TimelineStepProps
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.45, ease: 'easeOut' }}
             className="mb-5 text-center text-xs font-medium text-white/50"
-            style={{ wordBreak: 'keep-all' }}
+            style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
           >
             {intro}
           </motion.p>
@@ -145,7 +145,7 @@ export default function TimelineStep({ step, card, isActive }: TimelineStepProps
                     )}
                     <span
                       className="text-sm leading-snug text-white/80"
-                      style={{ wordBreak: 'keep-all' }}
+                      style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                     >
                       {item.event}
                     </span>

@@ -98,7 +98,7 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
                 <h3 className="mb-1 text-base font-bold text-white">
                   {item.title}
                 </h3>
-                <p className="text-sm leading-relaxed text-white/70" style={{ wordBreak: 'keep-all' }}>
+                <p className="text-sm leading-relaxed text-white/70" style={{ wordBreak: 'keep-all', textWrap: 'balance' }}>
                   {renderWithLineBreaks(item.description)}
                 </p>
               </div>

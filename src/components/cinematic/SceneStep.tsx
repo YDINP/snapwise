@@ -29,7 +29,7 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
         transition={{ duration: 0.8, ease: 'easeOut' }}
         className="relative z-10 w-full px-8"
       >
-        <p className="text-center text-lg font-medium text-white">
+        <p className="text-center text-lg font-medium text-white" style={{ wordBreak: 'keep-all', textWrap: 'balance' }}>
           {renderWithLineBreaks(step.content)}
         </p>
       </motion.div>

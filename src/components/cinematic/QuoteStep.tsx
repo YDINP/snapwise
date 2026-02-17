@@ -102,7 +102,7 @@ export default function QuoteStep({ step, card, isActive }: QuoteStepProps) {
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 0.85, ease: 'easeOut', delay: 0.1 }}
           className="text-center text-xl font-light italic leading-relaxed text-white/90"
-          style={{ wordBreak: 'keep-all', lineHeight: 1.75 }}
+          style={{ wordBreak: 'keep-all', textWrap: 'balance', lineHeight: 1.75 }}
         >
           {quoteText.split('\n').map((line, i, arr) => (
             <span key={i}>

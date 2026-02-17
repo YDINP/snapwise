@@ -47,7 +47,7 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
         {/* Text content */}
         <p
           className={`text-center ${fontSize} font-medium leading-relaxed text-white/90`}
-          style={{ wordBreak: 'keep-all', textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
+          style={{ wordBreak: 'keep-all', textWrap: 'balance', textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
         >
           {renderWithLineBreaks(step.content, categoryInfo.accent)}
         </p>

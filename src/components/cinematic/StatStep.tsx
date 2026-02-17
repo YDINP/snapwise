@@ -28,12 +28,13 @@ interface ParsedStat {
  */
 function splitPipeLine(line: string): StatItem {
   const [left, right] = line.split('|').map(s => s.trim());
-  // A "stat" token contains digits, %, ×, 배, 명, 원, +, ~
-  const statPattern = /[\d%×배명원+~]/;
-  const leftIsStat = statPattern.test(left);
-  if (leftIsStat) {
-    return { value: left, label: right ?? '' };
-  }
+  // Detect stat side by actual digit presence (avoids false positives like 수명/원인)
+  const hasDigit = (s: string) => /\d/.test(s);
+  const leftHasDigit = hasDigit(left);
+  const rightHasDigit = hasDigit(right ?? '');
+
+  if (leftHasDigit && !rightHasDigit) return { value: left, label: right ?? '' };
+  // Default: right side is value (most common format: "label | value")
   return { value: right ?? '', label: left };
 }
 
@@ -166,7 +167,7 @@ function SingleStat({ bigStat, description, accent, isActive }: SingleStatProps)
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.55 }}
           className="text-center text-base font-medium leading-snug text-white/70"
-          style={{ wordBreak: 'keep-all' }}
+          style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
         >
           {description}
         </motion.p>
@@ -221,7 +222,7 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
           {/* Label on top */}
           <p
             className="text-xs font-medium leading-snug text-white/50"
-            style={{ wordBreak: 'keep-all' }}
+            style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
           >
             {item.label}
           </p>
@@ -243,7 +244,7 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.15 + items.length * 0.12 + 0.1 }}
           className="mt-1 text-center text-sm font-medium leading-snug text-white/50"
-          style={{ wordBreak: 'keep-all' }}
+          style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
         >
           {description}
         </motion.p>

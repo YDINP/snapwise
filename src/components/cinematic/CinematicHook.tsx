@@ -65,7 +65,7 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3, duration: 0.6 }}
           className="max-w-xs text-center text-lg font-medium text-white"
-          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all' }}
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all', textWrap: 'balance' }}
         >
           {renderWithLineBreaks(step.content, categoryInfo.accent)}
         </motion.p>

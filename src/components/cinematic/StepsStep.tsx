@@ -76,7 +76,7 @@ export default function StepsStep({ step, card, isActive }: StepsStepProps) {
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.4 }}
             className="mb-2 text-center text-sm font-medium text-white/60"
-            style={{ wordBreak: 'keep-all' }}
+            style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
           >
             {header}
           </motion.p>
@@ -122,14 +122,14 @@ export default function StepsStep({ step, card, isActive }: StepsStepProps) {
               >
                 <p
                   className="text-sm font-bold leading-snug text-white"
-                  style={{ wordBreak: 'keep-all' }}
+                  style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                 >
                   {item.title}
                 </p>
                 {item.description && (
                   <p
                     className="mt-1 text-xs leading-relaxed text-white/60"
-                    style={{ wordBreak: 'keep-all' }}
+                    style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                   >
                     {item.description}
                   </p>

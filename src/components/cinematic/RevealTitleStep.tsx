@@ -92,7 +92,7 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.5, duration: 0.5 }}
             className="max-w-xs text-center text-base leading-relaxed text-white/80"
-            style={{ wordBreak: 'keep-all' }}
+            style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
           >
             {renderWithLineBreaks(description, categoryInfo.accent)}
           </motion.p>

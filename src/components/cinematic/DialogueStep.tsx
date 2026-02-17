@@ -90,7 +90,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
           >
             <p
               className="text-sm font-medium leading-relaxed text-gray-800"
-              style={{ wordBreak: 'keep-all' }}
+              style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
             >
               <TypingText text={step.content} isActive={isActive} />
             </p>

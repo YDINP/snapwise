@@ -102,7 +102,7 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
                 animate={isActive ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.5, delay: 0.2 + i * 0.08, ease: 'easeOut' }}
                 className={`text-center ${fontSize} font-bold text-white/90`}
-                style={{ wordBreak: 'keep-all' }}
+                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {parseInlineAccent(trimmed, categoryInfo.accent)}
               </motion.p>
