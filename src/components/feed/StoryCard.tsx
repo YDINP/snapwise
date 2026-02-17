@@ -107,9 +107,9 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
               nextCard={nextCard}
             />
           )}
-          {/* Glossary — show matching terms at bottom of each step (except outro) */}
-          {step.type !== 'outro' && (
-            <StepGlossary content={step.content} glossary={card.glossary} />
+          {/* Glossary — only on outro (end card) to avoid spoilers */}
+          {step.type === 'outro' && (
+            <StepGlossary content={card.steps.map(s => s.content).join('\n')} glossary={card.glossary} />
           )}
         </motion.div>
       </AnimatePresence>
