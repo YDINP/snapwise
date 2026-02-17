@@ -32,7 +32,7 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center gap-4 px-6">
+      <div className="relative z-10 flex flex-col items-center gap-6 px-6">
         {/* ── Title ── with accent decorative lines */}
         <div className="flex items-center gap-3">
           <motion.div
