@@ -19,7 +19,7 @@ interface OutroStepProps {
 
 export default function OutroStep({ step, card, isActive }: OutroStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
-  const { liked, toggle } = useLikes(card.slug);
+  const { liked, toggle, count } = useLikes(card.slug);
   const { saved, toggleSave } = useSaved(card.slug, card);
   const [showToast, setShowToast] = useState('');
   const quote = getQuoteForCard(card.slug, card.category);
@@ -117,7 +117,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             }`}
           >
             <Heart size={18} fill={liked ? 'currentColor' : 'none'} />
-            {liked ? '추천함' : '추천'}
+            {count}
           </button>
 
           {/* Share button */}

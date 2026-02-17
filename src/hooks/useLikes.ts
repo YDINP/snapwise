@@ -16,11 +16,23 @@ function getLikesData(): LikesData {
   }
 }
 
+/** Deterministic pseudo-count per slug (12–89 range) for social proof */
+function getBaseCount(slug: string): number {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
+  }
+  return 12 + Math.abs(hash % 78);
+}
+
 export function useLikes(slug: string) {
   const [liked, setLiked] = useState(false);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    setLiked(!!getLikesData()[slug]);
+    const isLiked = !!getLikesData()[slug];
+    setLiked(isLiked);
+    setCount(getBaseCount(slug) + (isLiked ? 1 : 0));
   }, [slug]);
 
   const toggle = useCallback(() => {
@@ -28,13 +40,10 @@ export function useLikes(slug: string) {
     data[slug] = !data[slug];
     if (!data[slug]) delete data[slug];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    setLiked(!!data[slug]);
+    const isLiked = !!data[slug];
+    setLiked(isLiked);
+    setCount(getBaseCount(slug) + (isLiked ? 1 : 0));
   }, [slug]);
 
-  // Total likes count across all cards (for display)
-  const getLikeCount = useCallback(() => {
-    return getLikesData()[slug] ? 1 : 0;
-  }, [slug]);
-
-  return { liked, toggle, getLikeCount };
+  return { liked, toggle, count };
 }
