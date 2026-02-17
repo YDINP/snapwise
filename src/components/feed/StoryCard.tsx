@@ -107,9 +107,14 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
               nextCard={nextCard}
             />
           )}
-          {/* Glossary — only on outro (end card) to avoid spoilers */}
-          {step.type === 'outro' && (
-            <StepGlossary content={card.steps.map(s => s.content).join('\n')} glossary={card.glossary} />
+          {/* Glossary — shown per step when technical terms are detected */}
+          {card.isCinematic && step.type !== 'cinematic-hook' && step.type !== 'reveal-title' && step.type !== 'outro' && (
+            <StepGlossary
+              stepContent={step.content}
+              cardTitle={card.title}
+              cardTags={card.tags}
+              isActive={isActive}
+            />
           )}
         </motion.div>
       </AnimatePresence>

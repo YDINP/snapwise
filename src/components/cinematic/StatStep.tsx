@@ -195,33 +195,40 @@ interface MultiStatsProps {
   isActive: boolean;
 }
 
+function getValueSize(value: string): string {
+  const len = value.length;
+  if (len <= 8) return 'text-2xl';
+  if (len <= 15) return 'text-xl';
+  return 'text-base';
+}
+
 function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
   return (
-    <div className="flex w-full flex-col items-center gap-4">
-      {/* Stat glass cards — stagger in */}
+    <div className="flex w-full flex-col items-center gap-3">
+      {/* Stat glass cards — stagger in, vertical layout */}
       {items.map((item, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, y: 24 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.15 + i * 0.12, ease: 'easeOut' }}
-          className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-5 py-4 backdrop-blur-md"
+          className="flex w-full flex-col gap-1.5 rounded-2xl border border-white/10 px-5 py-3.5 backdrop-blur-md"
           style={{
             boxShadow: `0 0 24px ${accent}12, inset 0 1px 0 rgba(255,255,255,0.08)`,
             backgroundColor: 'rgba(255,255,255,0.06)',
           }}
         >
-          {/* Label */}
+          {/* Label on top */}
           <p
-            className="text-sm font-medium leading-snug text-white/60"
+            className="text-xs font-medium leading-snug text-white/50"
             style={{ wordBreak: 'keep-all' }}
           >
             {item.label}
           </p>
 
-          {/* Value */}
+          {/* Value below — adaptive font size */}
           <p
-            className="ml-4 shrink-0 text-right text-3xl font-black leading-none tracking-tight"
+            className={`${getValueSize(item.value)} font-black leading-tight tracking-tight`}
             style={{ color: accent, wordBreak: 'keep-all' }}
           >
             {item.value}

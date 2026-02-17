@@ -1,39 +1,45 @@
 'use client';
 
-import type { GlossaryItem } from '@/types/content';
+import { motion } from 'motion/react';
 import { HelpCircle } from 'lucide-react';
+import { findGlossaryTerms } from '@/lib/glossary';
 
 interface StepGlossaryProps {
-  content: string;
-  glossary?: GlossaryItem[];
+  /** Current step's text content */
+  stepContent: string;
+  /** Card title — used to filter out on-topic terms */
+  cardTitle: string;
+  /** Card tags — used to filter out on-topic terms */
+  cardTags: string[];
+  isActive: boolean;
 }
 
-export default function StepGlossary({ content, glossary }: StepGlossaryProps) {
-  if (!glossary || glossary.length === 0) return null;
+export default function StepGlossary({ stepContent, cardTitle, cardTags, isActive }: StepGlossaryProps) {
+  const terms = findGlossaryTerms(stepContent, cardTitle, cardTags);
 
-  // Filter terms that appear in this step's content
-  const matched = glossary.filter(item =>
-    content.includes(item.term)
-  );
-
-  if (matched.length === 0) return null;
+  if (terms.length === 0) return null;
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-40">
-      <div className="rounded-xl bg-black/50 px-5 py-4 backdrop-blur-md">
-        <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-white/50">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={isActive ? { opacity: 1, y: 0 } : {}}
+      transition={{ delay: 0.6, duration: 0.4 }}
+      className="absolute bottom-3 left-3 right-3 z-40"
+    >
+      <div className="rounded-xl border border-white/10 bg-black/60 px-4 py-3 backdrop-blur-lg">
+        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/40">
           <HelpCircle size={10} />
           용어 해설
         </div>
-        <div className="space-y-1">
-          {matched.map((item, i) => (
-            <div key={i} className="flex gap-2 text-xs">
-              <span className="shrink-0 font-bold text-white/90">{item.term}</span>
-              <span className="text-white/60">{item.meaning}</span>
+        <div className="space-y-1.5">
+          {terms.slice(0, 3).map((entry, i) => (
+            <div key={i} className="flex gap-2 text-xs leading-snug">
+              <span className="shrink-0 font-bold text-white/80">{entry.term}</span>
+              <span className="text-white/50">{entry.meaning}</span>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
