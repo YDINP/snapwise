@@ -1,7 +1,7 @@
 import React from 'react';
 
 /** Parse inline markdown: **bold** and ───(divider) */
-function parseInline(text: string): React.ReactNode[] {
+function parseInline(text: string, accentColor?: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
   const boldRegex = /\*\*(.+?)\*\*/g;
   let lastIndex = 0;
@@ -12,9 +12,13 @@ function parseInline(text: string): React.ReactNode[] {
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
-    // Bold text
+    // Bold text — optionally accent-colored
     parts.push(
-      <strong key={`b-${match.index}`} className="font-bold">
+      <strong
+        key={`b-${match.index}`}
+        className="font-bold"
+        style={accentColor ? { color: accentColor } : undefined}
+      >
         {match[1]}
       </strong>
     );
@@ -29,7 +33,7 @@ function parseInline(text: string): React.ReactNode[] {
   return parts.length > 0 ? parts : [text];
 }
 
-export function renderWithLineBreaks(content: string): React.ReactNode {
+export function renderWithLineBreaks(content: string, accentColor?: string): React.ReactNode {
   if (!content) return null;
   const lines = content.split('\n').filter(line => line.trim() !== '');
 
@@ -47,7 +51,7 @@ export function renderWithLineBreaks(content: string): React.ReactNode {
 
     return (
       <React.Fragment key={i}>
-        {parseInline(trimmed)}
+        {parseInline(trimmed, accentColor)}
         {i < lines.length - 1 && <br />}
       </React.Fragment>
     );
