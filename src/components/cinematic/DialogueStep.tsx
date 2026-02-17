@@ -19,56 +19,79 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
     ?? { id: 'unknown', name: '화자', emoji: '💬' };
 
   return (
-    <div className="relative flex h-full w-full items-center overflow-hidden px-6">
+    <div className="relative flex h-full w-full items-center overflow-hidden px-5">
       {/* Category gradient background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
 
       {/* Content container */}
-      <div className="relative z-10 flex w-full items-start gap-3">
-        {/* Character avatar */}
+      <div className="relative z-10 flex w-full flex-col items-start gap-3">
+        {/* Character row: avatar + name badge */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -16 }}
           animate={isActive ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="flex flex-shrink-0 flex-col items-center gap-2"
+          transition={{ duration: 0.4 }}
+          className="flex items-center gap-3"
         >
           {character.image ? (
-            <div className="h-16 w-16 overflow-hidden rounded-full border-2 border-white shadow-lg">
+            <div
+              className="h-14 w-14 overflow-hidden rounded-full shadow-lg"
+              style={{ border: `3px solid ${categoryInfo.accent}` }}
+            >
               <img src={character.image} alt={character.name} className="h-full w-full object-cover" />
             </div>
           ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-4xl backdrop-blur-sm">
+            <div
+              className="flex h-14 w-14 items-center justify-center rounded-full text-3xl shadow-lg"
+              style={{
+                background: `linear-gradient(135deg, ${categoryInfo.accent}40, ${categoryInfo.accent}20)`,
+                border: `3px solid ${categoryInfo.accent}80`,
+              }}
+            >
               {character.emoji}
             </div>
           )}
-          <span className="text-xs font-bold text-white/80">{character.name}</span>
+          <span
+            className="rounded-full px-3 py-1 text-xs font-bold text-white"
+            style={{ backgroundColor: `${categoryInfo.accent}90` }}
+          >
+            {character.name}
+          </span>
         </motion.div>
 
-        {/* Speech bubble — CSS-based comic style */}
+        {/* Comic speech bubble */}
         <motion.div
-          initial={{ opacity: 0, x: 20, scale: 0.9 }}
-          animate={isActive ? { opacity: 1, x: 0, scale: 1 } : {}}
-          transition={{ delay: 0.2, duration: 0.6, type: 'spring' }}
-          className="relative flex-1"
-          style={{ maxWidth: '80%' }}
+          initial={{ opacity: 0, scale: 0.92, y: 8 }}
+          animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
+          transition={{ delay: 0.15, duration: 0.5, type: 'spring', damping: 20 }}
+          className="relative ml-4 w-full"
+          style={{ maxWidth: 'calc(100% - 16px)' }}
         >
+          {/* Tail — comic-style triangle pointing up-left toward character */}
+          <div
+            className="absolute -top-2 left-6"
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '8px solid transparent',
+              borderRight: '8px solid transparent',
+              borderBottom: '10px solid rgba(255,255,255,0.95)',
+              filter: 'drop-shadow(0 -1px 1px rgba(0,0,0,0.08))',
+            }}
+          />
+
           {/* Bubble body */}
-          <div className="relative rounded-2xl bg-white/92 px-5 py-5 shadow-lg"
-            style={{ minHeight: '80px', border: '2px solid rgba(255,255,255,0.95)' }}
+          <div
+            className="relative rounded-2xl px-5 py-4"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.95)',
+              boxShadow: `0 4px 20px rgba(0,0,0,0.15), 0 0 0 2px ${categoryInfo.accent}20`,
+              minHeight: '72px',
+            }}
           >
-            {/* Tail pointing left toward character */}
-            <div
-              className="absolute top-6 -left-3"
-              style={{
-                width: 0,
-                height: 0,
-                borderTop: '8px solid transparent',
-                borderBottom: '8px solid transparent',
-                borderRight: '12px solid rgba(255,255,255,0.92)',
-                filter: 'drop-shadow(-1px 0 0 rgba(255,255,255,0.95))',
-              }}
-            />
-            <p className="text-sm font-medium leading-relaxed text-gray-800" style={{ marginLeft: '6px' }}>
+            <p
+              className="text-sm font-medium leading-relaxed text-gray-800"
+              style={{ wordBreak: 'keep-all' }}
+            >
               <TypingText text={step.content} isActive={isActive} />
             </p>
           </div>

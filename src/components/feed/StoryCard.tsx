@@ -82,14 +82,14 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
         </button>
       )}
 
-      {/* Step content with animation */}
-      <AnimatePresence mode="wait">
+      {/* Step content with smooth crossfade — minimal opacity change to reduce eye strain */}
+      <AnimatePresence mode="popLayout">
         <motion.div
           key={currentStep}
-          initial={{ opacity: 0.6, y: 8 }}
+          initial={{ opacity: 0.88, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0.6, y: -8 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.15, ease: 'easeOut' }}
           className="w-full h-full"
         >
           {card.isCinematic ? (
