@@ -77,38 +77,64 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
           style={{ backgroundColor: categoryInfo.accent }}
         />
 
-        {/* Staggered lines */}
-        <div className="flex flex-col items-center gap-1">
-          {lines.map((line, i) => {
-            const trimmed = line.trim();
-
-            // Divider line
-            if (/^[─━—-]{2,}$/.test(trimmed)) {
-              return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scaleX: 0 }}
-                  animate={isActive ? { opacity: 0.3, scaleX: 1 } : {}}
-                  transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
-                  className="my-2 h-px w-10 bg-white"
-                />
-              );
+        {/* Grouped blocks separated by dividers */}
+        {(() => {
+          // Split lines into blocks by divider
+          const blocks: string[][] = [[]];
+          lines.forEach(line => {
+            if (/^[─━—-]{2,}$/.test(line.trim())) {
+              blocks.push([]);
+            } else {
+              blocks[blocks.length - 1].push(line);
             }
+          });
+          const filteredBlocks = blocks.filter(b => b.length > 0);
 
-            return (
-              <motion.p
-                key={i}
-                initial={{ opacity: 0, y: 12 }}
-                animate={isActive ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.2 + i * 0.08, ease: 'easeOut' }}
-                className={`text-center ${fontSize} font-bold text-white/90`}
-                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-              >
-                {parseInlineAccent(trimmed, categoryInfo.accent)}
-              </motion.p>
-            );
-          })}
-        </div>
+          // Smaller font for secondary blocks
+          const secondaryFontSize = lines.length <= 3
+            ? 'text-xl md:text-2xl'
+            : lines.length <= 5
+              ? 'text-lg md:text-xl'
+              : 'text-base md:text-lg';
+
+          let globalIndex = 0;
+
+          return (
+            <div className="flex flex-col items-center gap-6">
+              {filteredBlocks.map((block, blockIdx) => (
+                <div key={blockIdx} className="flex flex-col items-center gap-1">
+                  {/* Divider before secondary blocks */}
+                  {blockIdx > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scaleX: 0 }}
+                      animate={isActive ? { opacity: 0.5, scaleX: 1 } : {}}
+                      transition={{ duration: 0.5, delay: 0.2 + globalIndex * 0.08 }}
+                      className="mb-2 h-0.5 w-16"
+                      style={{ backgroundColor: categoryInfo.accent }}
+                    />
+                  )}
+                  {block.map((line) => {
+                    const idx = globalIndex++;
+                    const trimmed = line.trim();
+                    const isSecondary = blockIdx > 0;
+                    return (
+                      <motion.p
+                        key={idx}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={isActive ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.5, delay: 0.2 + idx * 0.08, ease: 'easeOut' }}
+                        className={`text-center ${isSecondary ? secondaryFontSize : fontSize} font-bold ${isSecondary ? 'text-white/70' : 'text-white/90'}`}
+                        style={{ wordBreak: 'keep-all', textWrap: 'balance' as any }}
+                      >
+                        {parseInlineAccent(trimmed, categoryInfo.accent)}
+                      </motion.p>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Bottom accent line */}
         <motion.div

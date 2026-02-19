@@ -26,23 +26,27 @@ function parseShowcase(content: string): { intro: string; items: ShowcaseItem[] 
     const lines = sections[i].split('\n').map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) continue;
 
-    // First line: "emoji title" pattern
-    const firstLine = lines[0];
-    const emojiMatch = firstLine.match(/^(\p{Emoji_Presentation}|\p{Extended_Pictographic})\s*(.+)$/u);
+    const emojiRegex = /^(\p{Emoji_Presentation}|\p{Extended_Pictographic})\s*(.+)$/u;
+    let currentItem: ShowcaseItem | null = null;
 
-    if (emojiMatch) {
-      items.push({
-        emoji: emojiMatch[1],
-        title: emojiMatch[2],
-        description: lines.slice(1).join('\n'),
-      });
-    } else {
-      items.push({
-        emoji: '',
-        title: firstLine,
-        description: lines.slice(1).join('\n'),
-      });
+    for (const line of lines) {
+      const emojiMatch = line.match(emojiRegex);
+      if (emojiMatch) {
+        // 이전 아이템이 있으면 push
+        if (currentItem) items.push(currentItem);
+        currentItem = {
+          emoji: emojiMatch[1],
+          title: emojiMatch[2],
+          description: '',
+        };
+      } else if (currentItem) {
+        currentItem.description += (currentItem.description ? '\n' : '') + line;
+      } else {
+        // 이모지 없는 첫 라인 → 타이틀만 있는 아이템
+        currentItem = { emoji: '', title: line, description: '' };
+      }
     }
+    if (currentItem) items.push(currentItem);
   }
 
   return { intro, items };

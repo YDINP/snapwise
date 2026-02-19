@@ -17,31 +17,21 @@ interface StatItem {
 
 interface ParsedStat {
   mode: 'multi' | 'single';
-  items: StatItem[];      // for multi mode
-  bigStat: string;        // for single mode
-  description: string;   // context text (below stats in both modes)
+  items: StatItem[];
+  bigStat: string;
+  description: string;
 }
 
-/**
- * Detect which side of a pipe-separated pair contains the numeric/stat value.
- * Returns { value, label } with the stat on the value side.
- */
 function splitPipeLine(line: string): StatItem {
   const [left, right] = line.split('|').map(s => s.trim());
-  // Detect stat side by actual digit presence (avoids false positives like 수명/원인)
   const hasDigit = (s: string) => /\d/.test(s);
   const leftHasDigit = hasDigit(left);
   const rightHasDigit = hasDigit(right ?? '');
 
   if (leftHasDigit && !rightHasDigit) return { value: left, label: right ?? '' };
-  // Default: right side is value (most common format: "label | value")
   return { value: right ?? '', label: left };
 }
 
-/**
- * Detect whether a line looks like a standalone big stat (no pipe).
- * Matches: digits, %, ×, 배, 명, 원, 개, 초, km, kg, etc.
- */
 function looksLikeStat(line: string): boolean {
   return /^[\d\s%×배명원개초km㎞kg,.\-+~x]+$/.test(line.trim()) ||
     /^\d/.test(line.trim()) ||
@@ -62,21 +52,18 @@ function parseStatContent(content: string): ParsedStat {
     }
   }
 
-  // Format A: at least one pipe line → multi mode
   if (pipeLines.length > 0) {
     const items = pipeLines.map(splitPipeLine);
     const description = plainLines.join('\n');
     return { mode: 'multi', items, bigStat: '', description };
   }
 
-  // Format B: no pipes — first line is the big stat if it looks numeric
   if (rawLines.length > 0 && looksLikeStat(rawLines[0])) {
     const bigStat = rawLines[0];
     const description = rawLines.slice(1).join('\n');
     return { mode: 'single', items: [], bigStat, description };
   }
 
-  // Fallback: treat everything as a single stat block
   const bigStat = rawLines[0] ?? '';
   const description = rawLines.slice(1).join('\n');
   return { mode: 'single', items: [], bigStat, description };
@@ -88,24 +75,20 @@ export default function StatStep({ step, card, isActive }: StatStepProps) {
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
-      {/* Pure black base */}
-      <div className="absolute inset-0 bg-black" />
+      {/* Dark base */}
+      <div className="absolute inset-0 bg-[#060606]" />
 
-      {/* Radial glow centered behind numbers */}
+      {/* Ambient glow - top */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.6 }}
-        animate={isActive ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 1.4, ease: 'easeOut' }}
-        className="pointer-events-none absolute inset-0 flex items-center justify-center"
-      >
-        <div
-          className="h-72 w-72 rounded-full blur-3xl"
-          style={{ backgroundColor: `${categoryInfo.accent}1A` }}
-        />
-      </motion.div>
+        initial={{ opacity: 0 }}
+        animate={isActive ? { opacity: 1 } : {}}
+        transition={{ duration: 1.5 }}
+        className="absolute -top-32 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full blur-[100px]"
+        style={{ backgroundColor: `${categoryInfo.accent}15` }}
+      />
 
       {/* Content */}
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-6 px-6">
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center px-6">
         {parsed.mode === 'single' ? (
           <SingleStat
             bigStat={parsed.bigStat}
@@ -127,7 +110,7 @@ export default function StatStep({ step, card, isActive }: StatStepProps) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Single big stat layout                                              */
+/* Single big stat — editorial magazine style                          */
 /* ------------------------------------------------------------------ */
 
 interface SingleStatProps {
@@ -139,54 +122,58 @@ interface SingleStatProps {
 
 function SingleStat({ bigStat, description, accent, isActive }: SingleStatProps) {
   return (
-    <div className="flex flex-col items-center gap-5">
-      {/* Accent top rule */}
+    <div className="flex flex-col items-center gap-6">
+      {/* Accent dot */}
       <motion.div
-        initial={{ scaleX: 0 }}
-        animate={isActive ? { scaleX: 1 } : {}}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="h-0.5 w-10 origin-center"
+        initial={{ scale: 0 }}
+        animate={isActive ? { scale: 1 } : {}}
+        transition={{ duration: 0.4, delay: 0.05 }}
+        className="h-2 w-2 rounded-full"
         style={{ backgroundColor: accent }}
       />
 
       {/* Big number */}
       <motion.p
-        initial={{ opacity: 0, scale: 0.7 }}
+        initial={{ opacity: 0, scale: 0.8 }}
         animate={isActive ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.7, delay: 0.2, type: 'spring', stiffness: 160, damping: 14 }}
-        className="text-center text-6xl font-black leading-none tracking-tight"
-        style={{ color: accent, wordBreak: 'keep-all' }}
+        transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center text-7xl font-black leading-none tracking-tighter"
+        style={{
+          color: accent,
+          textShadow: `0 0 40px ${accent}50, 0 4px 20px ${accent}30`,
+        }}
       >
         {bigStat}
       </motion.p>
 
-      {/* Description */}
+      {/* Expanding line */}
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={isActive ? { scaleX: 1 } : {}}
+        transition={{ duration: 0.7, delay: 0.5 }}
+        className="h-px w-20 origin-center"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+        }}
+      />
+
       {description && (
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.55 }}
-          className="text-center text-base font-medium leading-snug text-white/70"
+          transition={{ duration: 0.6, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center text-base font-medium leading-relaxed text-white/60"
           style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
         >
           {description}
         </motion.p>
       )}
-
-      {/* Accent bottom rule */}
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={isActive ? { scaleX: 1 } : {}}
-        transition={{ duration: 0.5, delay: 0.7 }}
-        className="h-0.5 w-10 origin-center"
-        style={{ backgroundColor: accent }}
-      />
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Multiple stats layout (glass cards)                                 */
+/* Multi stats — Hero number + horizontal bar infographic              */
 /* ------------------------------------------------------------------ */
 
 interface MultiStatsProps {
@@ -196,59 +183,115 @@ interface MultiStatsProps {
   isActive: boolean;
 }
 
-function getValueSize(value: string): string {
-  const len = value.length;
-  if (len <= 8) return 'text-2xl';
-  if (len <= 15) return 'text-xl';
-  return 'text-base';
-}
-
 function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
+  const hero = items[0];
+  const rest = items.slice(1);
+
   return (
-    <div className="flex w-full flex-col items-center gap-3">
-      {/* Stat glass cards — stagger in, vertical layout */}
-      {items.map((item, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 24 }}
-          animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.15 + i * 0.12, ease: 'easeOut' }}
-          className="flex w-full flex-col gap-1.5 rounded-2xl border border-white/10 px-5 py-3.5 backdrop-blur-md"
-          style={{
-            boxShadow: `0 0 24px ${accent}12, inset 0 1px 0 rgba(255,255,255,0.08)`,
-            backgroundColor: 'rgba(255,255,255,0.06)',
-          }}
-        >
-          {/* Label on top */}
-          <p
-            className="text-xs font-medium leading-snug text-white/50"
-            style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
+    <div className="flex w-full flex-col items-center gap-10">
+      {/* ── Hero section: giant number ── */}
+      {hero && (
+        <div className="flex flex-col items-center gap-3">
+          {/* Label above */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/40"
+            style={{ wordBreak: 'keep-all' }}
           >
-            {item.label}
-          </p>
+            {hero.label}
+          </motion.p>
 
-          {/* Value below — adaptive font size */}
-          <p
-            className={`${getValueSize(item.value)} font-black leading-tight tracking-tight`}
-            style={{ color: accent, wordBreak: 'keep-all' }}
+          {/* Number */}
+          <motion.p
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={isActive ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className={`text-center font-black leading-none tracking-tighter ${
+              hero.value.length <= 4 ? 'text-8xl' :
+              hero.value.length <= 8 ? 'text-7xl' :
+              hero.value.length <= 12 ? 'text-5xl' : 'text-4xl'
+            }`}
+            style={{
+              color: accent,
+              textShadow: `0 0 60px ${accent}40, 0 0 120px ${accent}20`,
+            }}
           >
-            {item.value}
-          </p>
-        </motion.div>
-      ))}
+            {hero.value}
+          </motion.p>
 
-      {/* Context description below all cards */}
-      {description && (
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.15 + items.length * 0.12 + 0.1 }}
-          className="mt-1 text-center text-sm font-medium leading-snug text-white/50"
-          style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-        >
-          {description}
-        </motion.p>
+          {/* Context label under hero */}
+          {description && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="text-center text-sm font-medium text-white/30"
+              style={{ wordBreak: 'keep-all' }}
+            >
+              {description}
+            </motion.p>
+          )}
+
+          {/* Accent bar under hero */}
+          <motion.div
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.65 }}
+            className="h-[3px] w-12 origin-center rounded-full"
+            style={{ backgroundColor: accent }}
+          />
+        </div>
       )}
+
+      {/* ── Secondary stats: glass cards ── */}
+      {rest.length > 0 && (
+        <div className="flex w-full flex-col gap-3">
+          {rest.map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              animate={isActive ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.5,
+                delay: 0.75 + i * 0.15,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="relative flex items-center justify-between rounded-xl px-4 py-3.5 overflow-hidden"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                borderLeft: `3px solid ${accent}`,
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              {/* Subtle inner glow */}
+              <div
+                className="pointer-events-none absolute inset-0 opacity-[0.03]"
+                style={{
+                  background: `linear-gradient(135deg, ${accent}, transparent 60%)`,
+                }}
+              />
+              <span
+                className="relative text-[13px] font-medium text-white/55"
+                style={{ wordBreak: 'keep-all' }}
+              >
+                {item.label}
+              </span>
+              <span
+                className="relative text-lg font-extrabold tracking-tight"
+                style={{
+                  color: accent,
+                  textShadow: `0 0 16px ${accent}30`,
+                }}
+              >
+                {item.value}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 }
