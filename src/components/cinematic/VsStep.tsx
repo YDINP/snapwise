@@ -1,9 +1,48 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
+
+/** Highlight numbers/percentages in footer text with accent color */
+function renderFooterWithHighlight(text: string, accent: string): React.ReactNode {
+  if (!text) return null;
+  const lines = text.split('\n').filter(l => l.trim());
+
+  return lines.map((line, lineIdx) => {
+    const trimmed = line.trim();
+    // Split by number patterns: digits with optional %p, %, 배, 만, 억, 원, 명, 개, km, kg, 초, 분, 시간, etc.
+    const parts: React.ReactNode[] = [];
+    const numRegex = /(\d[\d,.]*\s*(?:%p|%|배|만|억|원|명|개|km|kg|초|분|시간|x|×)?)/g;
+    let lastIdx = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = numRegex.exec(trimmed)) !== null) {
+      if (match.index > lastIdx) {
+        parts.push(trimmed.slice(lastIdx, match.index));
+      }
+      parts.push(
+        <span key={`n-${lineIdx}-${match.index}`} className="font-black" style={{ color: accent }}>
+          {match[1]}
+        </span>
+      );
+      lastIdx = match.index + match[0].length;
+    }
+
+    if (lastIdx < trimmed.length) {
+      parts.push(trimmed.slice(lastIdx));
+    }
+
+    return (
+      <React.Fragment key={lineIdx}>
+        {parts.length > 0 ? parts : trimmed}
+        {lineIdx < lines.length - 1 && <br />}
+      </React.Fragment>
+    );
+  });
+}
 
 interface VsStepProps {
   step: CardStep;
@@ -338,7 +377,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
               className="text-center text-xs leading-relaxed text-white/50 sm:text-sm"
               style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
             >
-              {renderWithLineBreaks(footer.join('\n'))}
+              {renderFooterWithHighlight(footer.join('\n'), categoryInfo.accent)}
             </p>
           </motion.div>
         )}
