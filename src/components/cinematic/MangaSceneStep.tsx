@@ -143,6 +143,98 @@ function parseInlineBold(text: string, accentColor: string): React.ReactNode[] {
   return parts.length > 0 ? parts : [text];
 }
 
+// ─── Utility Components ──────────────────────────────────────────────────────
+
+function TypeWriter({ text, isActive, delay = 0, speed = 30, className, style }: {
+  text: string; isActive: boolean; delay?: number; speed?: number; className?: string; style?: React.CSSProperties;
+}) {
+  const [displayed, setDisplayed] = React.useState('');
+  const [started, setStarted] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isActive) { setDisplayed(''); setStarted(false); return; }
+    const timer = setTimeout(() => setStarted(true), delay * 1000);
+    return () => clearTimeout(timer);
+  }, [isActive, delay]);
+
+  React.useEffect(() => {
+    if (!started) return;
+    if (displayed.length >= text.length) return;
+    const timer = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), speed);
+    return () => clearTimeout(timer);
+  }, [started, displayed, text, speed]);
+
+  return <span className={className} style={style}>{displayed}{displayed.length >= text.length ? '' : <span className="animate-pulse">|</span>}</span>;
+}
+
+function CountUp({ target, isActive, delay = 0, duration = 1200, className, style }: {
+  target: string; isActive: boolean; delay?: number; duration?: number; className?: string; style?: React.CSSProperties;
+}) {
+  const [value, setValue] = React.useState('0');
+
+  React.useEffect(() => {
+    if (!isActive) { setValue('0'); return; }
+    const numMatch = target.match(/^([\d,]+)/);
+    if (!numMatch) { setValue(target); return; }
+    const numStr = numMatch[1].replace(/,/g, '');
+    const num = parseInt(numStr);
+    if (isNaN(num)) { setValue(target); return; }
+    const suffix = target.slice(numMatch[0].length);
+    const startTime = Date.now() + delay * 1000;
+
+    let rafId: number;
+    const animate = () => {
+      const now = Date.now();
+      if (now < startTime) { rafId = requestAnimationFrame(animate); return; }
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(num * eased);
+      const formatted = numMatch[0].includes(',') ? current.toLocaleString() : String(current);
+      setValue(formatted + suffix);
+      if (progress < 1) rafId = requestAnimationFrame(animate);
+    };
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [isActive, target, delay, duration]);
+
+  return <span className={className} style={style}>{value}</span>;
+}
+
+function TextScramble({ text, isActive, delay = 0, className, style }: {
+  text: string; isActive: boolean; delay?: number; className?: string; style?: React.CSSProperties;
+}) {
+  const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+  const [displayed, setDisplayed] = React.useState('');
+  const [started, setStarted] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isActive) { setDisplayed(''); setStarted(false); return; }
+    const timer = setTimeout(() => setStarted(true), delay * 1000);
+    return () => clearTimeout(timer);
+  }, [isActive, delay]);
+
+  React.useEffect(() => {
+    if (!started) return;
+    let frame = 0;
+    const totalFrames = text.length * 3;
+    const interval = setInterval(() => {
+      frame++;
+      const resolved = Math.floor((frame / totalFrames) * text.length);
+      let result = '';
+      for (let i = 0; i < text.length; i++) {
+        if (text[i] === ' ') { result += ' '; continue; }
+        if (i < resolved) { result += text[i]; }
+        else { result += chars[Math.floor(Math.random() * chars.length)]; }
+      }
+      setDisplayed(result);
+      if (frame >= totalFrames) { setDisplayed(text); clearInterval(interval); }
+    }, 30);
+    return () => clearInterval(interval);
+  }, [started, text, chars]);
+
+  return <span className={className} style={style}>{displayed || text.split('').map(() => '\u00A0').join('')}</span>;
+}
+
 // ─── Panel Renderers ─────────────────────────────────────────────────────────
 
 /** 1. Narrative (나레이션) — Kinetic Typography */
@@ -155,6 +247,9 @@ function NarrativePanel({
   accent: string;
   isActive: boolean;
 }) {
+  const textLines = lines.filter(l => l.type === 'text');
+  const firstTextIndex = lines.findIndex(l => l.type === 'text');
+
   return (
     <div
       className="relative flex h-full w-full items-center justify-center"
@@ -203,17 +298,39 @@ function NarrativePanel({
                 animate={isActive ? { opacity: 1, scale: 1 } : {}}
                 transition={{ type: 'spring', stiffness: 300, damping: 15, delay }}
               >
-                <span
+                <motion.span
                   className="text-4xl font-black"
                   style={{
                     color: accent,
                     textShadow: `0 0 30px ${accent}80, 0 0 60px ${accent}40`,
                     wordBreak: 'keep-all',
                   }}
+                  animate={isActive ? { textShadow: [
+                    `0 0 30px ${accent}80, 0 0 60px ${accent}40`,
+                    `0 0 50px ${accent}CC, 0 0 90px ${accent}66`,
+                    `0 0 30px ${accent}80, 0 0 60px ${accent}40`,
+                  ] } : {}}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                 >
                   {line.text}
-                </span>
+                </motion.span>
               </motion.div>
+            );
+          }
+
+          // First text line: TypeWriter, rest: fade-in
+          if (line.type === 'text' && i === firstTextIndex) {
+            return (
+              <motion.p
+                key={i}
+                className="text-center text-xl leading-relaxed my-1 text-white"
+                style={{ wordBreak: 'keep-all' }}
+                initial={{ opacity: 0 }}
+                animate={isActive ? { opacity: 1 } : {}}
+                transition={{ duration: 0.3, delay }}
+              >
+                <TypeWriter text={line.text} isActive={isActive} delay={delay} speed={30} />
+              </motion.p>
             );
           }
 
@@ -316,8 +433,9 @@ function DialoguePanel({
                 <div className={`flex items-center gap-2 mb-1 ${isRight ? 'flex-row-reverse' : ''}`}>
                   <motion.span
                     className="text-5xl leading-none"
-                    animate={isActive ? { scale: [1, 1.05, 1] } : {}}
-                    transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse', delay: delay + 0.3 }}
+                    initial={{ scale: 0, rotate: -15 }}
+                    animate={isActive ? { scale: [0, 1.3, 1], rotate: [-15, 5, 0] } : {}}
+                    transition={{ type: 'spring', stiffness: 300, damping: 12, delay: delay + 0.1 }}
                   >
                     {character.emoji}
                   </motion.span>
@@ -329,8 +447,8 @@ function DialoguePanel({
                   </span>
                 </div>
 
-                {/* Quote */}
-                <motion.p
+                {/* Quote with TypeWriter */}
+                <motion.div
                   className={`text-2xl font-bold text-white ${isRight ? 'text-right' : 'text-left'}`}
                   style={{ wordBreak: 'keep-all' }}
                   initial={{ opacity: 0, x: isRight ? 20 : -20 }}
@@ -338,9 +456,9 @@ function DialoguePanel({
                   transition={{ type: 'spring', stiffness: 200, damping: 20, delay: delay + 0.12 }}
                 >
                   <span style={{ color: accent, opacity: 0.6 }}>&ldquo;</span>
-                  {parseInlineBold(line.text, accent)}
+                  <TypeWriter text={line.text} isActive={isActive} delay={delay + 0.25} speed={25} />
                   <span style={{ color: accent, opacity: 0.6 }}>&rdquo;</span>
-                </motion.p>
+                </motion.div>
               </motion.div>
             );
           }
@@ -368,6 +486,9 @@ function ActionPanel({
   findChar: (id: string) => Character;
   speakerOrder: string[];
 }) {
+  const sfxLines = lines.filter(l => l.type === 'sfx');
+  const firstSfxIndex = lines.findIndex(l => l.type === 'sfx');
+
   return (
     <div
       className="relative flex h-full w-full items-center justify-center overflow-hidden"
@@ -442,6 +563,30 @@ function ActionPanel({
           }
 
           if (line.type === 'sfx') {
+            // First SFX: TextScramble effect, rest: spring
+            if (i === firstSfxIndex) {
+              return (
+                <motion.div
+                  key={i}
+                  className="flex items-center justify-center"
+                  initial={{ opacity: 0, scale: 0.3 }}
+                  animate={isActive ? { opacity: 1, scale: [0.3, 1.1, 1] } : {}}
+                  transition={{ type: 'spring', stiffness: 250, damping: 12, delay }}
+                >
+                  <TextScramble
+                    text={line.text}
+                    isActive={isActive}
+                    delay={delay}
+                    className="text-5xl font-black sm:text-6xl"
+                    style={{
+                      color: '#fff',
+                      textShadow: `0 0 40px ${accent}99, 0 0 80px ${accent}44, 0 4px 20px rgba(0,0,0,0.5)`,
+                      wordBreak: 'keep-all',
+                    }}
+                  />
+                </motion.div>
+              );
+            }
             return (
               <motion.div
                 key={i}
@@ -482,12 +627,14 @@ function ActionPanel({
                   >
                     {character.name}
                   </span>
-                  <p
+                  <TypeWriter
+                    text={line.text}
+                    isActive={isActive}
+                    delay={delay + 0.15}
+                    speed={25}
                     className="text-base text-white/90"
                     style={{ wordBreak: 'keep-all' }}
-                  >
-                    {parseInlineBold(line.text, accent)}
-                  </p>
+                  />
                 </div>
               </motion.div>
             );
@@ -556,7 +703,7 @@ function DataPanel({
           return null;
         })}
 
-        {/* Stats */}
+        {/* Stats with CountUp */}
         {stats.map((stat, i) => {
           const isMain = i === 0;
           const delay = 0.3 + i * 0.2;
@@ -578,22 +725,27 @@ function DataPanel({
                 delay,
               }}
             >
-              <span
+              <CountUp
+                target={stat.number || '0'}
+                isActive={isActive}
+                delay={delay + 0.2}
+                duration={isMain ? 1500 : 1000}
                 className={`font-black ${isMain ? 'text-5xl' : 'text-2xl'}`}
                 style={{
                   color: '#fff',
                   textShadow: isMain ? `0 0 30px ${accent}4D` : undefined,
                   wordBreak: 'keep-all',
                 }}
-              >
-                {stat.number}
-              </span>
-              <span
+              />
+              <motion.span
                 className="text-sm mt-1 uppercase tracking-wider"
                 style={{ color: accent, wordBreak: 'keep-all' }}
+                initial={{ opacity: 0 }}
+                animate={isActive ? { opacity: 1 } : {}}
+                transition={{ duration: 0.4, delay: delay + 0.6 }}
               >
                 {stat.label}
-              </span>
+              </motion.span>
             </motion.div>
           );
         })}
@@ -618,7 +770,7 @@ function DataPanel({
   );
 }
 
-/** 5. Versus (비교) — Kinetic Typography */
+/** 5. Versus (비교) — Animated Card Comparison */
 function VersusPanel({
   lines,
   accent,
@@ -631,113 +783,97 @@ function VersusPanel({
   const statLines = lines.filter(l => l.type === 'stat');
   const headerLine = statLines.length > 0 ? statLines[0] : null;
   const dataLines = statLines.slice(1);
+  const textLines = lines.filter(l => l.type === 'text' || l.type === 'narration');
 
   return (
-    <div
-      className="relative flex h-full w-full overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, #0a0a14 0%, #0a0a14 48%, ${accent}1A 52%, ${accent}1A 100%)`,
-      }}
-    >
-      {/* Diagonal divider */}
-      <motion.div
-        className="absolute pointer-events-none"
-        style={{
-          top: 0,
-          right: 0,
-          width: '141%',
-          height: '2px',
-          backgroundColor: `${accent}4D`,
-          transformOrigin: 'top right',
-          transform: 'rotate(45deg)',
-        }}
-        initial={{ scaleX: 0 }}
-        animate={isActive ? { scaleX: 1 } : {}}
-        transition={{ duration: 0.8, delay: 0.3 }}
+    <div className="relative flex h-full w-full overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #08081a, #0d1525)' }}>
+
+      {/* Animated scan line */}
+      <motion.div className="absolute left-0 right-0 h-px pointer-events-none z-30"
+        style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+        initial={{ top: 0, opacity: 0 }}
+        animate={isActive ? { top: ['0%', '100%'], opacity: [0, 0.6, 0] } : {}}
+        transition={{ duration: 2, delay: 0.2, ease: 'linear' }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-3 px-5 py-5">
-        {/* Header row */}
+      <div className="relative z-10 flex h-full w-full flex-col justify-center px-4 py-5 gap-2">
+        {/* Header */}
         {headerLine && (
-          <motion.div
-            className="flex w-full justify-between px-4"
-            initial={{ opacity: 0, y: -12 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <span
-              className="text-lg font-black text-white"
-              style={{ wordBreak: 'keep-all' }}
-            >
-              {headerLine.number}
-            </span>
-            <span
-              className="text-lg font-black"
-              style={{ color: accent, wordBreak: 'keep-all' }}
-            >
-              {headerLine.label}
-            </span>
-          </motion.div>
+          <div className="flex w-full mb-3">
+            <motion.div className="flex-1 text-center"
+              initial={{ opacity: 0, x: -30 }}
+              animate={isActive ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.3 }}>
+              <span className="text-base font-black text-white" style={{ wordBreak: 'keep-all' }}>
+                {headerLine.number}
+              </span>
+            </motion.div>
+            <div className="w-px mx-2" style={{ backgroundColor: `${accent}66` }} />
+            <motion.div className="flex-1 text-center"
+              initial={{ opacity: 0, x: 30 }}
+              animate={isActive ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.3 }}>
+              <span className="text-base font-black" style={{ color: accent, wordBreak: 'keep-all' }}>
+                {headerLine.label}
+              </span>
+            </motion.div>
+          </div>
         )}
+
+        {/* Animated center divider */}
+        <motion.div className="absolute left-1/2 top-[15%] bottom-[15%] w-px -translate-x-1/2"
+          style={{ background: `linear-gradient(180deg, transparent, ${accent}66, transparent)` }}
+          initial={{ scaleY: 0 }}
+          animate={isActive ? { scaleY: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        />
 
         {/* Data rows */}
         {dataLines.map((line, i) => (
-          <motion.div
-            key={i}
-            className="flex w-full justify-between px-4"
-            initial={{ opacity: 0 }}
-            animate={isActive ? { opacity: 1 } : {}}
-            transition={{ duration: 0.3, delay: 0.5 + i * 0.1 }}
-          >
-            <span className="text-sm text-white/80" style={{ wordBreak: 'keep-all' }}>
-              {line.number}
-            </span>
-            <span
-              className="text-sm"
-              style={{ color: `${accent}CC`, wordBreak: 'keep-all' }}
-            >
-              {line.label}
-            </span>
-          </motion.div>
+          <div key={i} className="flex w-full">
+            <motion.div className="flex-1 text-center py-2"
+              initial={{ opacity: 0, x: -20 }}
+              animate={isActive ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.4, delay: 0.5 + i * 0.15 }}>
+              <TypeWriter text={line.number || ''} isActive={isActive} delay={0.6 + i * 0.15} speed={40}
+                className="text-sm text-white/80" style={{ wordBreak: 'keep-all' }} />
+            </motion.div>
+            <div className="w-px mx-2 opacity-20" style={{ backgroundColor: accent }} />
+            <motion.div className="flex-1 text-center py-2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={isActive ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.4, delay: 0.5 + i * 0.15 }}>
+              <TypeWriter text={line.label || ''} isActive={isActive} delay={0.6 + i * 0.15} speed={40}
+                className="text-sm" style={{ color: `${accent}CC`, wordBreak: 'keep-all' }} />
+            </motion.div>
+          </div>
         ))}
 
-        {/* Non-stat text lines */}
-        {lines
-          .filter(l => l.type === 'text' || l.type === 'narration')
-          .map((line, i) => (
-            <motion.p
-              key={`vt-${i}`}
-              className="text-center text-xs text-white/50"
-              style={{ wordBreak: 'keep-all' }}
-              initial={{ opacity: 0 }}
-              animate={isActive ? { opacity: 1 } : {}}
-              transition={{ duration: 0.3, delay: 0.7 }}
-            >
-              {line.type === 'narration' ? line.text : parseInlineBold(line.text, accent)}
-            </motion.p>
-          ))}
-      </div>
+        {/* Row separator glow for each data row */}
+        {dataLines.map((_, i) => (
+          <motion.div key={`sep-${i}`} className="absolute left-[10%] right-[10%] h-px"
+            style={{
+              top: `${30 + (i + 1) * (50 / (dataLines.length + 1))}%`,
+              background: `linear-gradient(90deg, transparent, ${accent}22, transparent)`
+            }}
+            initial={{ scaleX: 0 }}
+            animate={isActive ? { scaleX: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.6 + i * 0.15 }}
+          />
+        ))}
 
-      {/* VS badge */}
-      <motion.div
-        className="absolute left-1/2 top-1/2 z-20 flex items-center justify-center"
-        style={{
-          width: '44px',
-          height: '44px',
-          borderRadius: '50%',
-          backgroundColor: '#0a0a14',
-          border: `2px solid ${accent}`,
-          transform: 'translate(-50%, -50%)',
-        }}
-        initial={{ scale: 0 }}
-        animate={isActive ? { scale: 1 } : {}}
-        transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.5 }}
-      >
-        <span className="text-xs font-black" style={{ color: accent }}>
-          VS
-        </span>
-      </motion.div>
+        {/* Footer text */}
+        {textLines.map((line, i) => (
+          <motion.p key={`vt-${i}`} className="text-center text-xs text-white/50 mt-2"
+            style={{ wordBreak: 'keep-all' }}
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : {}}
+            transition={{ duration: 0.3, delay: 0.8 }}>
+            {line.type === 'narration' ? line.text : parseInlineBold(line.text, accent)}
+          </motion.p>
+        ))}
+      </div>
     </div>
   );
 }
@@ -752,18 +888,20 @@ function RevelationPanel({
   accent: string;
   isActive: boolean;
 }) {
+  const firstBigIndex = lines.findIndex(l => l.type === 'sfx' || l.type === 'text');
+
   return (
     <div
       className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
       style={{ backgroundColor: '#000' }}
     >
-      {/* Pulsing radial accent glow */}
+      {/* Pulsing radial accent glow — intensifies */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `radial-gradient(circle at center, ${accent}33 0%, transparent 65%)`,
         }}
-        animate={isActive ? { opacity: [0.4, 0.8, 0.4] } : { opacity: 0 }}
+        animate={isActive ? { opacity: [0.4, 1, 0.4] } : { opacity: 0 }}
         transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
       />
 
@@ -787,6 +925,26 @@ function RevelationPanel({
 
           if (line.type === 'sfx' || line.type === 'text') {
             const isMainText = line.type === 'sfx' || lines.filter(l => l.type === 'text').indexOf(line) === 0;
+
+            // First big text: TextScramble, rest: spring
+            if (i === firstBigIndex) {
+              return (
+                <motion.div
+                  key={i}
+                  className={`text-center font-black text-white ${isMainText ? 'text-3xl sm:text-4xl' : 'text-base'}`}
+                  style={{
+                    wordBreak: 'keep-all',
+                    ...(isMainText ? { textShadow: `0 0 40px ${accent}66` } : { color: 'rgba(255,255,255,0.7)' }),
+                  }}
+                  initial={{ opacity: 0, scale: 0.3 }}
+                  animate={isActive ? { opacity: isMainText ? 1 : 0.7, scale: [0.3, 1.05, 1] } : {}}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15, delay }}
+                >
+                  <TextScramble text={line.text} isActive={isActive} delay={delay} />
+                </motion.div>
+              );
+            }
+
             return (
               <motion.p
                 key={i}
@@ -864,7 +1022,7 @@ function MontagePanel({
       style={{ backgroundColor: '#0a0a0a' }}
     >
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-0 px-5 py-5">
-        {/* Section title with side lines */}
+        {/* Section title with TypeWriter */}
         {sectionTitle && (
           <motion.div
             className="flex items-center gap-3 mb-4"
@@ -879,12 +1037,14 @@ function MontagePanel({
               animate={isActive ? { scaleX: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.2 }}
             />
-            <span
+            <TypeWriter
+              text={sectionTitle.text}
+              isActive={isActive}
+              delay={0.2}
+              speed={40}
               className="text-xs uppercase tracking-widest font-semibold"
               style={{ color: accent, wordBreak: 'keep-all' }}
-            >
-              {sectionTitle.text}
-            </span>
+            />
             <motion.div
               className="h-px w-8"
               style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
@@ -909,20 +1069,26 @@ function MontagePanel({
 
           {frameLines.map((line, i) => {
             const fromLeft = i % 2 === 0;
+            const itemDelay = 0.2 + i * 0.15;
             return (
               <motion.div
                 key={i}
                 className="relative z-10 my-2 w-full"
                 initial={{ opacity: 0, x: fromLeft ? -30 : 30 }}
                 animate={isActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.2 + i * 0.15, ease: 'easeOut' }}
+                transition={{ duration: 0.5, delay: itemDelay, ease: 'easeOut' }}
               >
-                <p
+                <div
                   className={`text-sm text-white/80 ${fromLeft ? 'text-left pl-4' : 'text-right pr-4'}`}
                   style={{ wordBreak: 'keep-all' }}
                 >
-                  {parseInlineBold(line.text, accent)}
-                </p>
+                  <TypeWriter
+                    text={line.text.replace(/\*\*/g, '')}
+                    isActive={isActive}
+                    delay={itemDelay + 0.1}
+                    speed={25}
+                  />
+                </div>
                 <motion.div
                   className={`mt-1 h-px ${fromLeft ? 'mr-auto ml-4' : 'ml-auto mr-4'}`}
                   style={{
@@ -996,7 +1162,7 @@ function CloseupPanel({
 
           if (line.type === 'dialogue' && line.characterId) {
             return (
-              <motion.p
+              <motion.div
                 key={i}
                 className="text-center text-2xl font-black text-white"
                 style={{ wordBreak: 'keep-all' }}
@@ -1004,8 +1170,8 @@ function CloseupPanel({
                 animate={isActive ? { opacity: 1, scale: 1, rotate: 0 } : {}}
                 transition={{ type: 'spring', stiffness: 200, damping: 18, delay }}
               >
-                {parseInlineBold(line.text, accent)}
-              </motion.p>
+                <TypeWriter text={line.text} isActive={isActive} delay={delay + 0.1} speed={35} />
+              </motion.div>
             );
           }
 
