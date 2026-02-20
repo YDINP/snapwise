@@ -7,7 +7,7 @@ const contentDirectory = path.join(process.cwd(), 'content');
 
 // All valid step types (v2 + v3)
 const VALID_V2_TYPES = ['hook', 'story', 'detail', 'example', 'reveal', 'tip', 'compare', 'action', 'quiz'];
-const VALID_V3_TYPES = ['cinematic-hook', 'scene', 'dialogue', 'narration', 'impact', 'reveal-title', 'outro', 'showcase', 'vs', 'stat', 'quote', 'steps', 'timeline', 'panel', 'splash'];
+const VALID_V3_TYPES = ['cinematic-hook', 'scene', 'dialogue', 'narration', 'impact', 'reveal-title', 'outro', 'showcase', 'vs', 'stat', 'quote', 'steps', 'timeline', 'panel', 'splash', 'manga-scene'];
 const ALL_VALID_TYPES = [...VALID_V2_TYPES, ...VALID_V3_TYPES];
 
 function calculateReadingTime(content: string): number {

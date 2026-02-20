@@ -16,6 +16,7 @@ import StepsStep from './StepsStep';
 import TimelineStep from './TimelineStep';
 import PanelStep from './PanelStep';
 import SplashStep from './SplashStep';
+import MangaSceneStep from './MangaSceneStep';
 
 // v2 fallback components
 import HookStep from '@/components/story/HookStep';
@@ -74,6 +75,9 @@ export default function CinematicRenderer({ step, card, isActive, nextCard }: Ci
 
     case 'splash':
       return <SplashStep step={safeStep} card={card} isActive={isActive} />;
+
+    case 'manga-scene':
+      return <MangaSceneStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'impact':
       return <ImpactStep step={safeStep} card={card} isActive={isActive} />;
