@@ -276,7 +276,7 @@ function CountUp({ target, isActive }: { target: string; isActive: boolean }) {
 
 // ─── Panel Renderers ─────────────────────────────────────────────────────────
 
-/** 1. Narrative — Cinematic text reveal on atmospheric background */
+/** 1. Narrative — Cinematic text reveal on dark atmospheric background */
 function NarrativePanel({ lines, accent, isActive }: {
   lines: ContentLine[]; accent: string; isActive: boolean;
 }) {
@@ -285,9 +285,10 @@ function NarrativePanel({ lines, accent, isActive }: {
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      <AtmosphericBg accent={accent} variant="light" />
+      <AtmosphericBg accent={accent} variant="dark" />
       <KenBurnsLayer accent={accent} isActive={isActive} />
-      <Vignette intensity={0.3} />
+      <Vignette intensity={0.5} />
+      <BottomGradient height="40%" />
       <FilmGrain />
 
       {/* Narration captions */}
@@ -295,17 +296,18 @@ function NarrativePanel({ lines, accent, isActive }: {
         <NarrationCaption key={i} text={n.text} isActive={isActive} delay={0.2 + i * 0.2} />
       ))}
 
-      {/* Text content — bottom-weighted with gradient */}
+      {/* Text content — centered with large readable text */}
       <div className="absolute inset-0 flex flex-col justify-center items-center px-6 z-20">
-        <div className="flex flex-col items-center gap-2 max-w-[90%]">
+        <div className="flex flex-col items-center gap-3 max-w-[90%]">
           {textLines.map((line, i) => (
             <motion.p
               key={i}
-              className="text-center text-lg leading-relaxed"
+              className="text-center text-xl leading-relaxed font-medium"
               style={{
-                color: '#1a1a2e',
+                color: 'rgba(255,255,255,0.9)',
                 wordBreak: 'keep-all',
                 textWrap: 'balance' as 'balance',
+                textShadow: '0 2px 8px rgba(0,0,0,0.5)',
               }}
               initial={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
               animate={isActive ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
@@ -339,8 +341,8 @@ function DialoguePanel({ lines, accent, isActive, findChar, speakerOrder }: {
         <NarrationCaption key={i} text={n.text} isActive={isActive} delay={0.2 + i * 0.2} />
       ))}
 
-      {/* Dialogue content — vertically centered */}
-      <div className="absolute inset-0 flex flex-col justify-center gap-4 px-5 z-20">
+      {/* Dialogue content — lower-center positioning for natural chat feel */}
+      <div className="absolute inset-0 flex flex-col justify-end gap-4 px-5 pb-[25%] z-20">
         {contentLines.map((line, i) => {
           const delay = 0.4 + i * 0.4;
 
@@ -497,17 +499,17 @@ function ActionPanel({ lines, effect, accent, isActive, findChar, speakerOrder }
       <AtmosphericBg accent={accent} />
       <KenBurnsLayer accent={accent} isActive={isActive} />
 
-      {/* Focus/Impact lines — CSS conic-gradient */}
+      {/* Focus/Impact lines — CSS conic-gradient (high contrast) */}
       {(effect === 'focus' || effect === 'impact') && (
         <motion.div
           className="absolute inset-[-50%] pointer-events-none"
           style={{
             background: `conic-gradient(
               from 0deg at 50% 50%,
-              ${effect === 'impact' ? accent + '20' : 'rgba(255,255,255,0.08)'} 0deg,
-              transparent 3deg, transparent 15deg,
-              ${effect === 'impact' ? accent + '20' : 'rgba(255,255,255,0.08)'} 18deg,
-              transparent 21deg
+              ${effect === 'impact' ? accent + '50' : 'rgba(255,255,255,0.15)'} 0deg,
+              transparent 4deg, transparent 14deg,
+              ${effect === 'impact' ? accent + '50' : 'rgba(255,255,255,0.15)'} 18deg,
+              transparent 22deg
             )`,
           }}
           initial={{ scale: 0.3, opacity: 0, rotate: 0 }}
@@ -627,15 +629,15 @@ function DataPanel({ lines, accent, isActive }: {
                 className="font-black leading-none"
                 style={{
                   fontSize: 'clamp(1.8rem, 8vw, 2.8rem)',
-                  color: accent,
-                  textShadow: `0 0 20px ${accent}50, 0 0 40px ${accent}25`,
+                  color: '#fff',
+                  textShadow: `0 0 20px ${accent}, 0 0 40px ${accent}80, 0 2px 4px rgba(0,0,0,0.5)`,
                   wordBreak: 'keep-all',
                 }}
               >
                 <CountUp target={stat.number || ''} isActive={isActive} />
               </span>
-              <span className="text-xs mt-2 text-center"
-                style={{ color: 'rgba(255,255,255,0.6)', wordBreak: 'keep-all' }}>
+              <span className="text-xs mt-2 text-center font-medium"
+                style={{ color: accent, wordBreak: 'keep-all' }}>
                 {stat.label}
               </span>
             </motion.div>
@@ -955,14 +957,14 @@ function CloseupPanel({ lines, accent, isActive, findChar }: {
       <AtmosphericBg accent={accent} />
       <KenBurnsLayer accent={accent} isActive={isActive} />
 
-      {/* Radial focus lines — conic gradient */}
+      {/* Radial focus lines — conic gradient (high contrast) */}
       <motion.div
         className="absolute inset-[-30%] pointer-events-none"
         style={{
           background: `conic-gradient(
             from 0deg at 50% 50%,
-            rgba(255,255,255,0.06) 0deg, transparent 4deg,
-            transparent 18deg, rgba(255,255,255,0.06) 22deg,
+            rgba(255,255,255,0.12) 0deg, transparent 4deg,
+            transparent 18deg, rgba(255,255,255,0.12) 22deg,
             transparent 26deg
           )`,
         }}
