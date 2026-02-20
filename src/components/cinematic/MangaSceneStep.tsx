@@ -322,7 +322,7 @@ function DialoguePanel({
                     {character.emoji}
                   </motion.span>
                   <span
-                    className="text-xs font-semibold uppercase tracking-widest"
+                    className="text-base font-bold uppercase tracking-widest"
                     style={{ color: accent }}
                   >
                     {character.name}
@@ -423,7 +423,7 @@ function ActionPanel({
             return (
               <motion.div
                 key={i}
-                className="absolute left-4 top-4 z-20"
+                className="absolute left-4 top-12 z-20"
                 initial={{ opacity: 0, x: -15 }}
                 animate={isActive ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.4, delay }}
