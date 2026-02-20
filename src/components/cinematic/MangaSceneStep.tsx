@@ -254,7 +254,7 @@ function DialoguePanel({
       className="relative flex h-full w-full items-center justify-center"
       style={{ background: 'linear-gradient(180deg, #0a0a14, #141428)' }}
     >
-      <div className="relative z-10 flex h-full w-full flex-col justify-end gap-6 px-5 py-5">
+      <div className="relative z-10 flex h-full w-full flex-col justify-center gap-6 px-5 py-5">
         {lines.map((line, i) => {
           const delay = 0.2 + i * 0.18;
 
