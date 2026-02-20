@@ -145,26 +145,61 @@ function parseInlineBold(text: string, accentColor: string): React.ReactNode[] {
 
 // ─── Utility Components ──────────────────────────────────────────────────────
 
+function renderInlineMarkdown(str: string): React.ReactNode[] {
+  // Parse **bold** markers into <strong> elements
+  const parts = str.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="text-[var(--accent)]">{part.slice(2, -2)}</strong>;
+    }
+    return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
+}
+
 function TypeWriter({ text, isActive, delay = 0, speed = 30, className, style }: {
   text: string; isActive: boolean; delay?: number; speed?: number; className?: string; style?: React.CSSProperties;
 }) {
-  const [displayed, setDisplayed] = React.useState('');
+  // Strip markdown markers for length calculation, type visible chars only
+  const plainText = text.replace(/\*\*/g, '');
+  const [charIndex, setCharIndex] = React.useState(0);
   const [started, setStarted] = React.useState(false);
 
   React.useEffect(() => {
-    if (!isActive) { setDisplayed(''); setStarted(false); return; }
+    if (!isActive) { setCharIndex(0); setStarted(false); return; }
     const timer = setTimeout(() => setStarted(true), delay * 1000);
     return () => clearTimeout(timer);
   }, [isActive, delay]);
 
   React.useEffect(() => {
     if (!started) return;
-    if (displayed.length >= text.length) return;
-    const timer = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), speed);
+    if (charIndex >= plainText.length) return;
+    const timer = setTimeout(() => setCharIndex(prev => prev + 1), speed);
     return () => clearTimeout(timer);
-  }, [started, displayed, text, speed]);
+  }, [started, charIndex, plainText.length, speed]);
 
-  return <span className={className} style={style}>{displayed}{displayed.length >= text.length ? '' : <span className="animate-pulse">|</span>}</span>;
+  // Map charIndex back to original text position to get partial string with intact markdown
+  const visibleText = React.useMemo(() => {
+    let plain = 0;
+    let raw = 0;
+    while (plain < charIndex && raw < text.length) {
+      if (text[raw] === '*' && text[raw + 1] === '*') {
+        raw += 2; // skip opening/closing **
+      } else {
+        plain++;
+        raw++;
+      }
+    }
+    // Include any trailing ** to close bold properly
+    let slice = text.slice(0, raw);
+    // Count unmatched ** pairs and close them
+    const markers = (slice.match(/\*\*/g) || []).length;
+    if (markers % 2 !== 0) slice += '**';
+    return slice;
+  }, [charIndex, text]);
+
+  const done = charIndex >= plainText.length;
+
+  return <span className={className} style={style}>{renderInlineMarkdown(visibleText)}{done ? '' : <span className="animate-pulse">|</span>}</span>;
 }
 
 function CountUp({ target, isActive, delay = 0, duration = 1200, className, style }: {
@@ -203,12 +238,14 @@ function CountUp({ target, isActive, delay = 0, duration = 1200, className, styl
 function TextScramble({ text, isActive, delay = 0, className, style }: {
   text: string; isActive: boolean; delay?: number; className?: string; style?: React.CSSProperties;
 }) {
-  const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+  const scrambleChars = '!@#$%^&_+-=:,.<>?/~';
+  const plainText = text.replace(/\*\*/g, '');
   const [displayed, setDisplayed] = React.useState('');
+  const [done, setDone] = React.useState(false);
   const [started, setStarted] = React.useState(false);
 
   React.useEffect(() => {
-    if (!isActive) { setDisplayed(''); setStarted(false); return; }
+    if (!isActive) { setDisplayed(''); setStarted(false); setDone(false); return; }
     const timer = setTimeout(() => setStarted(true), delay * 1000);
     return () => clearTimeout(timer);
   }, [isActive, delay]);
@@ -216,23 +253,24 @@ function TextScramble({ text, isActive, delay = 0, className, style }: {
   React.useEffect(() => {
     if (!started) return;
     let frame = 0;
-    const totalFrames = text.length * 3;
+    const totalFrames = plainText.length * 3;
     const interval = setInterval(() => {
       frame++;
-      const resolved = Math.floor((frame / totalFrames) * text.length);
+      const resolved = Math.floor((frame / totalFrames) * plainText.length);
       let result = '';
-      for (let i = 0; i < text.length; i++) {
-        if (text[i] === ' ') { result += ' '; continue; }
-        if (i < resolved) { result += text[i]; }
-        else { result += chars[Math.floor(Math.random() * chars.length)]; }
+      for (let i = 0; i < plainText.length; i++) {
+        if (plainText[i] === ' ') { result += ' '; continue; }
+        if (i < resolved) { result += plainText[i]; }
+        else { result += scrambleChars[Math.floor(Math.random() * scrambleChars.length)]; }
       }
       setDisplayed(result);
-      if (frame >= totalFrames) { setDisplayed(text); clearInterval(interval); }
+      if (frame >= totalFrames) { setDone(true); clearInterval(interval); }
     }, 30);
     return () => clearInterval(interval);
-  }, [started, text, chars]);
+  }, [started, plainText, scrambleChars]);
 
-  return <span className={className} style={style}>{displayed || text.split('').map(() => '\u00A0').join('')}</span>;
+  if (done) return <span className={className} style={style}>{renderInlineMarkdown(text)}</span>;
+  return <span className={className} style={style}>{displayed || plainText.split('').map(() => '\u00A0').join('')}</span>;
 }
 
 // ─── Panel Renderers ─────────────────────────────────────────────────────────
@@ -1083,7 +1121,7 @@ function MontagePanel({
                   style={{ wordBreak: 'keep-all' }}
                 >
                   <TypeWriter
-                    text={line.text.replace(/\*\*/g, '')}
+                    text={line.text}
                     isActive={isActive}
                     delay={itemDelay + 0.1}
                     speed={25}
