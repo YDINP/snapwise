@@ -827,6 +827,18 @@ function VersusPanel({
     <div className="relative flex h-full w-full overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #08081a, #0d1525)' }}>
 
+      {/* Subtle background grid */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: `linear-gradient(${accent}18 1px, transparent 1px), linear-gradient(90deg, ${accent}18 1px, transparent 1px)`,
+        backgroundSize: '48px 48px',
+      }} />
+
+      {/* Corner glow accents */}
+      <div className="absolute top-0 left-0 w-40 h-40 pointer-events-none"
+        style={{ background: `radial-gradient(circle at 0% 0%, ${accent}18, transparent 70%)` }} />
+      <div className="absolute top-0 right-0 w-40 h-40 pointer-events-none"
+        style={{ background: `radial-gradient(circle at 100% 0%, ${accent}18, transparent 70%)` }} />
+
       {/* Animated scan line */}
       <motion.div className="absolute left-0 right-0 h-px pointer-events-none z-30"
         style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
@@ -834,6 +846,20 @@ function VersusPanel({
         animate={isActive ? { top: ['0%', '100%'], opacity: [0, 0.6, 0] } : {}}
         transition={{ duration: 2, delay: 0.2, ease: 'linear' }}
       />
+
+      {/* Top label */}
+      <motion.div
+        className="absolute top-6 left-0 right-0 z-20 flex items-center justify-center pointer-events-none"
+        initial={{ opacity: 0, y: -8 }}
+        animate={isActive ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <div className="h-px flex-1 ml-8" style={{ background: `linear-gradient(90deg, transparent, ${accent}45)` }} />
+        <span className="mx-3 shrink-0 text-xs font-bold tracking-[0.35em] uppercase" style={{ color: `${accent}90` }}>
+          비교 분석
+        </span>
+        <div className="h-px flex-1 mr-8" style={{ background: `linear-gradient(90deg, ${accent}45, transparent)` }} />
+      </motion.div>
 
       <div className="relative z-10 flex h-full w-full flex-col justify-center px-4 py-5 gap-2">
         {/* Header */}
