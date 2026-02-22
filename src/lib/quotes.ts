@@ -34,6 +34,13 @@ const CATEGORY_QUOTES: Record<CategoryKey, Quote[]> = {
     { text: '오늘의 역사가 내일의 전설이 된다.', author: '맥아더' },
     { text: '우리가 역사에서 배운 것은, 아무것도 배우지 못했다는 것이다.', author: '헤겔' },
   ],
+  koreanhistory: [
+    { text: '신에게는 아직 열두 척의 배가 있사옵니다.', author: '이순신' },
+    { text: '백성을 위한 새 문자를 만들었으니, 이것이 훈민정음이다.', author: '세종대왕' },
+    { text: '역사를 잊은 민족에게 미래는 없다.', author: '신채호' },
+    { text: '나라가 위태롭거든 죽음으로써 지켜라.', author: '이황' },
+    { text: '어두운 밤이 지나면 반드시 밝은 새벽이 온다.', author: '김구' },
+  ],
   life: [
     { text: '삶이 있는 한 희망은 있다.', author: '키케로' },
     { text: '인생은 가까이서 보면 비극이지만 멀리서 보면 희극이다.', author: '찰리 채플린' },
@@ -392,6 +399,8 @@ const CARD_QUOTES: Record<string, Quote> = {
   'superconductor': { text: '저항이 사라지면 에너지도 사라지지 않는다.', author: '헤이케 카메를링 오너스' },
   'time-travel': { text: '과거는 변할 수 없지만 미래는 열려 있다.', author: '스티븐 호킹' },
   'voyager-golden-record': { text: '우주에 띄운 병 속의 편지.', author: '칼 세이건' },
+  // koreanhistory
+  'hangul-creation': { text: '어린 백성이 이르고자 하는 바 있어도 마침내 제 뜻을 능히 펴지 못하는 자가 많으니라.', author: '세종대왕' },
 };
 
 /** Pick a quote for a card: slug-specific first, then category fallback */
