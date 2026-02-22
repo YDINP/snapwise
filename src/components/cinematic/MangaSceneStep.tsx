@@ -472,7 +472,7 @@ function DialoguePanel({
                   <motion.span
                     className="text-5xl leading-none"
                     initial={{ scale: 0, rotate: -15 }}
-                    animate={isActive ? { scale: [0, 1.3, 1], rotate: [-15, 5, 0] } : {}}
+                    animate={isActive ? { scale: 1, rotate: 0 } : {}}
                     transition={{ type: 'spring', stiffness: 300, damping: 12, delay: delay + 0.1 }}
                   >
                     {character.emoji}
@@ -608,7 +608,7 @@ function ActionPanel({
                   key={i}
                   className="flex items-center justify-center"
                   initial={{ opacity: 0, scale: 0.3 }}
-                  animate={isActive ? { opacity: 1, scale: [0.3, 1.1, 1] } : {}}
+                  animate={isActive ? { opacity: 1, scale: 1 } : {}}
                   transition={{ type: 'spring', stiffness: 250, damping: 12, delay }}
                 >
                   <TextScramble
@@ -630,7 +630,7 @@ function ActionPanel({
                 key={i}
                 className="flex items-center justify-center"
                 initial={{ opacity: 0, scale: 0.3 }}
-                animate={isActive ? { opacity: 1, scale: [0.3, 1.1, 1] } : {}}
+                animate={isActive ? { opacity: 1, scale: 1 } : {}}
                 transition={{ type: 'spring', stiffness: 250, damping: 12, delay }}
               >
                 <span
@@ -975,7 +975,7 @@ function RevelationPanel({
                     ...(isMainText ? { textShadow: `0 0 40px ${accent}66` } : { color: 'rgba(255,255,255,0.7)' }),
                   }}
                   initial={{ opacity: 0, scale: 0.3 }}
-                  animate={isActive ? { opacity: isMainText ? 1 : 0.7, scale: [0.3, 1.05, 1] } : {}}
+                  animate={isActive ? { opacity: isMainText ? 1 : 0.7, scale: 1 } : {}}
                   transition={{ type: 'spring', stiffness: 200, damping: 15, delay }}
                 >
                   <TextScramble text={line.text} isActive={isActive} delay={delay} />
@@ -994,7 +994,7 @@ function RevelationPanel({
                     : { color: 'rgba(255,255,255,0.7)' }),
                 }}
                 initial={{ opacity: 0, scale: 0.3 }}
-                animate={isActive ? { opacity: isMainText ? 1 : 0.7, scale: [0.3, 1.05, 1] } : {}}
+                animate={isActive ? { opacity: isMainText ? 1 : 0.7, scale: 1 } : {}}
                 transition={{
                   type: 'spring',
                   stiffness: 200,

@@ -135,7 +135,7 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
                       stiffness: 400,
                       damping: 12,
                     }}
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl"
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${[...item.emoji].length >= 3 ? 'text-sm' : [...item.emoji].length >= 2 ? 'text-base' : 'text-2xl'}`}
                     style={{
                       backgroundColor: `${categoryInfo.accent}25`,
                       animation: isActive ? 'emojiGlowPulse 2.5s ease-in-out infinite' : 'none',
