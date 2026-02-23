@@ -280,7 +280,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             }}
             className="flex flex-col items-center gap-1 text-white/70"
           >
-            <span className="text-sm">다음 카드로</span>
+            <span className="text-sm">탭하여 계속</span>
             <ChevronDown size={20} />
           </motion.div>
         </div>

@@ -17,18 +17,21 @@ interface StoryCardProps {
   onComplete?: () => void;
   /** Top offset in px when rendered below a fixed nav bar */
   topOffset?: number;
+  /** 광고 스텝 표시 여부 (기본: true, 단일 카드 뷰에서는 false) */
+  showAd?: boolean;
 }
 
-export default function StoryCard({ card, isActive, nextCard, onComplete, topOffset = 0 }: StoryCardProps) {
+export default function StoryCard({ card, isActive, nextCard, onComplete, topOffset = 0, showAd = true }: StoryCardProps) {
+  const adStepCount = showAd ? 1 : 0;
   const { currentStep, goNext, goPrev, goToStart, isFirstStep, totalSteps } = useStepNavigation({
-    totalSteps: card.steps.length + 1,   // +1 for ad step
+    totalSteps: card.steps.length + adStepCount,
     isActive,
     slug: card.slug,
     onComplete,
     progressMax: card.steps.length - 1, // 광고 스텝 인덱스 저장 방지
   });
 
-  const isAdStep = currentStep === card.steps.length;
+  const isAdStep = showAd && currentStep === card.steps.length;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
