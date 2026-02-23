@@ -89,12 +89,12 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
       )}
 
       {/* Step type badge — hide on ad step */}
-      {totalSteps > 0 && !isAdStep && (
+      {totalSteps > 0 && !isAdStep && step && (
         <div
-          className="absolute right-3 z-50 min-w-[48px] rounded-full bg-black/30 px-3 py-1 text-center text-[10px] font-medium tabular-nums text-white/60 backdrop-blur-sm"
+          className="absolute right-3 z-50 rounded-full bg-black/30 px-3 py-1 text-center text-[10px] font-medium text-white/60 backdrop-blur-sm"
           style={{ top: topOffset + 16 }}
         >
-          {currentStep + 1}/{card.steps.length}
+          {step.type}
         </div>
       )}
 
