@@ -237,17 +237,43 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             {saved ? '저장됨' : '저장'}
           </motion.button>
 
-          {/* 다음 챕터 버튼 — 챕터 시리즈 카드에서만 표시 */}
-          {card.nextChapter && (
-            <Link
-              href={`/card/${card.nextChapter}`}
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 rounded-full bg-white/90 px-5 py-3 text-sm font-bold text-gray-900 backdrop-blur-sm transition-colors hover:bg-white"
-            >
-              다음 챕터 →
-            </Link>
-          )}
         </motion.div>
+
+        {/* 챕터 네비게이션 row — prevChapter 또는 nextChapter가 있을 때만 표시 */}
+        {(card.prevChapter || card.nextChapter) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="flex w-full max-w-sm items-center justify-between gap-3"
+          >
+            {/* 이전 챕터 버튼 */}
+            {card.prevChapter ? (
+              <Link
+                href={`/card/${card.prevChapter}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+              >
+                ← 이전 챕터
+              </Link>
+            ) : (
+              <div />
+            )}
+
+            {/* 다음 챕터 버튼 */}
+            {card.nextChapter ? (
+              <Link
+                href={`/card/${card.nextChapter}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 rounded-full bg-white/90 px-4 py-2.5 text-sm font-bold text-gray-900 backdrop-blur-sm transition-colors hover:bg-white"
+              >
+                다음 챕터 →
+              </Link>
+            ) : (
+              <div />
+            )}
+          </motion.div>
+        )}
 
         {/* Next card CTA with expanding ring pulse */}
         <div className="relative flex flex-col items-center gap-1 pt-8">

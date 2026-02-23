@@ -57,6 +57,7 @@ export interface CardMeta {
   coverImageCaption?: string;  // Attribution text shown below the image
   // 챕터 시리즈 내비게이션
   nextChapter?: string;     // 다음 챕터 카드의 slug
+  prevChapter?: string;     // 이전 챕터 카드의 slug
   seriesId?: string;        // 시리즈 식별자 (예: "gyeyujeongnan")
   part?: number;            // 챕터 번호 (1, 2, 3…)
   totalParts?: number;      // 시리즈 전체 챕터 수
