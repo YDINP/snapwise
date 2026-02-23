@@ -1,31 +1,140 @@
 @import "tailwindcss";
 
+/* ================================================================
+   SNAPWISE DESIGN TOKENS — Editorial Ink System
+   개념: "활자의 깊이" — 지식의 층위를 공간감으로 표현
+   라이트: 크림 오프화이트 기반 / 다크: 따뜻한 잉크블랙 기반
+   ================================================================ */
+
 :root {
-  --color-bg: #ffffff;
-  --color-text: #1a1a1a;
-  --color-border: #e5e7eb;
-  --color-surface: #f9fafb;
-  --color-muted: #6b7280;
+  /* ─── Core Surface ─────────────────────────────── */
+  --color-bg:         #FAFAF8;   /* 크림 오프화이트 */
+  --color-surface:    #F4F4F1;   /* 약간 어두운 서피스 */
+  --color-surface-2:  #EEEEE9;   /* 2차 서피스 (카드, 패널) */
+  --color-overlay:    rgba(250, 250, 248, 0.88);
+
+  /* ─── Typography ───────────────────────────────── */
+  --color-text:       #141412;   /* 따뜻한 잉크블랙 */
+  --color-text-sub:   #4A4A45;   /* 보조 텍스트 */
+  --color-muted:      #88887E;   /* 힌트/레이블 */
+  --color-placeholder:#B0B0A6;   /* 플레이스홀더 */
+
+  /* ─── Border & Divider ─────────────────────────── */
+  --color-border:     #E0E0DA;   /* 기본 보더 */
+  --color-border-sub: #EBEBE5;   /* 약한 보더 */
+  --color-divider:    rgba(20, 20, 18, 0.07);
+
+  /* ─── Brand Accent ─────────────────────────────── */
+  --color-accent:     #1A1A16;   /* 프라이머리 액센트 (버튼, 선택) */
+  --color-accent-inv: #FAFAF8;   /* 액센트 위 텍스트 */
+
+  /* ─── Semantic ─────────────────────────────────── */
+  --color-success:    #2D7A4F;
+  --color-warning:    #C07A1A;
+  --color-danger:     #C03030;
+  --color-info:       #2060A8;
+
+  /* ─── Elevation / Shadow ───────────────────────── */
+  --shadow-xs:  0 1px 2px rgba(20, 20, 18, 0.06);
+  --shadow-sm:  0 2px 6px rgba(20, 20, 18, 0.08), 0 1px 2px rgba(20, 20, 18, 0.04);
+  --shadow-md:  0 4px 16px rgba(20, 20, 18, 0.10), 0 2px 4px rgba(20, 20, 18, 0.06);
+  --shadow-lg:  0 8px 32px rgba(20, 20, 18, 0.12), 0 4px 8px rgba(20, 20, 18, 0.06);
+  --shadow-xl:  0 16px 56px rgba(20, 20, 18, 0.14), 0 6px 16px rgba(20, 20, 18, 0.08);
+
+  /* ─── Radius ───────────────────────────────────── */
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  24px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* ─── Typography Scale ─────────────────────────── */
+  --text-xs:    0.6875rem;   /* 11px */
+  --text-sm:    0.8125rem;   /* 13px */
+  --text-base:  0.9375rem;   /* 15px */
+  --text-md:    1.0625rem;   /* 17px */
+  --text-lg:    1.1875rem;   /* 19px */
+  --text-xl:    1.375rem;    /* 22px */
+  --text-2xl:   1.625rem;    /* 26px */
+  --text-3xl:   2rem;        /* 32px */
+
+  /* ─── Spacing Scale (8dp grid) ─────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ─── Animation ────────────────────────────────── */
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:   cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 380ms;
 }
 
+/* ─── Dark Mode ─────────────────────────────────────── */
 .dark {
-  --color-bg: #0a0a0a;
-  --color-text: #f5f5f5;
-  --color-border: #27272a;
-  --color-surface: #18181b;
-  --color-muted: #a1a1aa;
+  /* Core Surface — 따뜻한 잉크블랙 */
+  --color-bg:         #0D0D0B;
+  --color-surface:    #161614;
+  --color-surface-2:  #1E1E1B;
+  --color-overlay:    rgba(13, 13, 11, 0.90);
+
+  /* Typography */
+  --color-text:       #F2F2EE;
+  --color-text-sub:   #B8B8B0;
+  --color-muted:      #707068;
+  --color-placeholder:#484840;
+
+  /* Border & Divider */
+  --color-border:     #2A2A26;
+  --color-border-sub: #222220;
+  --color-divider:    rgba(242, 242, 238, 0.07);
+
+  /* Brand Accent */
+  --color-accent:     #F2F2EE;
+  --color-accent-inv: #0D0D0B;
+
+  /* Semantic */
+  --color-success:    #4ABA80;
+  --color-warning:    #E0A44A;
+  --color-danger:     #E05858;
+  --color-info:       #5A9AE0;
+
+  /* Shadow — 다크에서는 더 선명하게 */
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-sm:  0 2px 6px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.20);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.25);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.50), 0 4px 8px rgba(0, 0, 0, 0.30);
+  --shadow-xl:  0 16px 56px rgba(0, 0, 0, 0.60), 0 6px 16px rgba(0, 0, 0, 0.35);
 }
+
+/* ================================================================
+   BASE RESET & GLOBAL
+   ================================================================ */
 
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 html {
-  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
   height: 100%;
+  /* 한국어 텍스트 최적화 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 body {
@@ -33,9 +142,14 @@ body {
   color: var(--color-text);
   overflow: hidden;
   height: 100%;
+  transition: background-color var(--duration-base) var(--ease-smooth),
+              color var(--duration-base) var(--ease-smooth);
 }
 
-/* ======== Scroll Snap ======== */
+/* ================================================================
+   SCROLL SNAP — 핵심 피드 구조 (변경 금지)
+   ================================================================ */
+
 .snap-container {
   scroll-snap-type: y mandatory;
   overflow-y: scroll;
@@ -51,7 +165,10 @@ body {
   width: 100%;
 }
 
-/* ======== Hide Scrollbar ======== */
+/* ================================================================
+   UTILITY
+   ================================================================ */
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -60,7 +177,54 @@ body {
   display: none;
 }
 
-/* ======== Card Content Styles ======== */
+/* ================================================================
+   NAVIGATION — Category Bar
+   ================================================================ */
+
+.nav-bar {
+  background: var(--color-overlay);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-smooth),
+              color var(--duration-fast) var(--ease-smooth),
+              box-shadow var(--duration-fast) var(--ease-smooth);
+  /* 최소 터치 타겟 44dp */
+  min-height: 32px;
+}
+
+.nav-pill-default {
+  background: var(--color-surface-2);
+  color: var(--color-text-sub);
+}
+
+.nav-pill-default:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.nav-pill-active {
+  background: var(--color-accent);
+  color: var(--color-accent-inv);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ================================================================
+   CARD CONTENT STYLES (시네마틱 카드 내부 — 수정 최소화)
+   ================================================================ */
+
 .card-content p {
   margin-bottom: 0.6rem;
   line-height: 1.75;
@@ -110,7 +274,10 @@ body {
   margin: 0.75rem 0;
 }
 
-/* ======== Story Card Styles ======== */
+/* ================================================================
+   STORY CARD (시네마틱 카드 — 변경 금지)
+   ================================================================ */
+
 .story-text-shadow {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 1px 4px rgba(0, 0, 0, 0.6);
 }
@@ -121,13 +288,89 @@ body {
   -webkit-backdrop-filter: blur(24px);
 }
 
-/* ======== Focus ======== */
+/* ================================================================
+   FOCUS
+   ================================================================ */
+
 :focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
-/* ===== Cinematic V3 Styles ===== */
+/* ================================================================
+   SAVED PAGE — 리스트 아이템
+   ================================================================ */
+
+.saved-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-sub);
+  transition: background var(--duration-fast) var(--ease-smooth),
+              border-color var(--duration-fast) var(--ease-smooth),
+              box-shadow var(--duration-fast) var(--ease-smooth);
+  cursor: pointer;
+}
+
+.saved-item:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ================================================================
+   DASHBOARD — 공통 패턴
+   ================================================================ */
+
+.dash-card {
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-sub);
+  overflow: hidden;
+}
+
+.dash-stat {
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-sub);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: box-shadow var(--duration-fast) var(--ease-smooth);
+}
+
+.dash-stat:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.dash-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  transition: background var(--duration-fast) var(--ease-smooth);
+}
+
+.dash-row:hover {
+  background: var(--color-surface-2);
+}
+
+.section-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ================================================================
+   CINEMATIC V3 STYLES (변경 금지)
+   ================================================================ */
 
 /* Dialogue bubble tail */
 .dialogue-tail-left::before {
@@ -159,8 +402,8 @@ body {
 
 /* Reveal animation */
 @keyframes reveal-glow {
-  0% { text-shadow: 0 0 0 transparent; transform: scale(0.8); opacity: 0; }
-  50% { text-shadow: 0 0 60px rgba(255,255,255,0.4); }
+  0%   { text-shadow: 0 0 0 transparent; transform: scale(0.8); opacity: 0; }
+  50%  { text-shadow: 0 0 60px rgba(255,255,255,0.4); }
   100% { text-shadow: 0 0 20px rgba(255,255,255,0.2); transform: scale(1); opacity: 1; }
 }
 
@@ -171,7 +414,7 @@ body {
 /* Character speaking pulse */
 @keyframes speaking-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
-  50% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  50%       { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
 }
 
 .speaking-pulse {

@@ -24,52 +24,69 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-black/70 backdrop-blur-xl border-b border-white/30 dark:border-white/10">
+    <nav
+      className="fixed top-0 left-0 right-0 z-50"
+      style={{
+        background: 'var(--color-overlay)',
+        backdropFilter: 'blur(20px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+        borderBottom: '1px solid var(--color-border)',
+      }}
+    >
       <div
         ref={scrollRef}
         onWheel={handleWheel}
         className="overflow-x-auto hide-scrollbar"
       >
-        <div className="flex gap-2 p-3 min-w-max">
+        <div className="flex gap-1.5 px-3 py-2.5 min-w-max">
+
           {/* 전체 pill */}
-          <Link href="/">
+          <Link href="/" aria-label="전체 카드 보기">
             <motion.div
               layout
-              animate={isAllSelected ? { scale: [1.05, 1.0] } : { scale: 1.0 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                isAllSelected
-                  ? 'bg-gray-900 dark:bg-white text-white dark:text-black'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
+              animate={isAllSelected ? { scale: [1.04, 1.0] } : { scale: 1.0 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+              className="nav-pill"
               style={
                 isAllSelected
-                  ? { boxShadow: '0 0 12px rgba(0,0,0,0.4), 0 0 4px rgba(0,0,0,0.25)' }
-                  : undefined
+                  ? {
+                      background: 'var(--color-accent)',
+                      color: 'var(--color-accent-inv)',
+                      boxShadow: 'var(--shadow-sm)',
+                    }
+                  : {
+                      background: 'var(--color-surface-2)',
+                      color: 'var(--color-text-sub)',
+                    }
               }
             >
-              🌟 전체
+              <span aria-hidden="true">🌟</span>
+              <span>전체</span>
             </motion.div>
           </Link>
 
           {/* 저장됨 pill */}
-          <Link href="/saved">
+          <Link href="/saved" aria-label="저장한 카드 보기">
             <motion.div
               layout
-              animate={isSavedPage ? { scale: [1.05, 1.0] } : { scale: 1.0 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                isSavedPage
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
+              animate={isSavedPage ? { scale: [1.04, 1.0] } : { scale: 1.0 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+              className="nav-pill"
               style={
                 isSavedPage
-                  ? { boxShadow: '0 0 12px #F59E0B66, 0 0 4px #F59E0B44' }
-                  : undefined
+                  ? {
+                      background: '#D97706',
+                      color: '#fff',
+                      boxShadow: '0 0 12px #D9770644, var(--shadow-xs)',
+                    }
+                  : {
+                      background: 'var(--color-surface-2)',
+                      color: 'var(--color-text-sub)',
+                    }
               }
             >
-              🔖 저장됨
+              <span aria-hidden="true">🔖</span>
+              <span>저장됨</span>
             </motion.div>
           </Link>
 
@@ -79,26 +96,27 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
             const isSelected = currentCategory === key;
 
             return (
-              <Link key={key} href={`/category/${key}`}>
+              <Link key={key} href={`/category/${key}`} aria-label={`${info.label} 카테고리`}>
                 <motion.div
                   layout
-                  animate={isSelected ? { scale: [1.05, 1.0] } : { scale: 1.0 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
+                  animate={isSelected ? { scale: [1.04, 1.0] } : { scale: 1.0 }}
+                  transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+                  className="nav-pill"
                   style={
                     isSelected
                       ? {
                           backgroundColor: info.accent,
-                          boxShadow: `0 0 12px ${info.accent}66, 0 0 4px ${info.accent}44`,
+                          color: '#fff',
+                          boxShadow: `0 0 12px ${info.accent}55, var(--shadow-xs)`,
                         }
-                      : undefined
+                      : {
+                          background: 'var(--color-surface-2)',
+                          color: 'var(--color-text-sub)',
+                        }
                   }
                 >
-                  {info.emoji} {info.label}
+                  <span aria-hidden="true">{info.emoji}</span>
+                  <span>{info.label}</span>
                 </motion.div>
               </Link>
             );
