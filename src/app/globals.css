@@ -190,3 +190,19 @@ body {
 .step-overlay-light {
   background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
 }
+
+/* ========================================
+   접근성: 모션 감소 설정 대응
+   prefers-reduced-motion: reduce 설정 시
+   모든 애니메이션/트랜지션 비활성화
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
