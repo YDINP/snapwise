@@ -91,9 +91,18 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     bgDark: '#0C4A6E',
     accent: '#38BDF8',
   },
+  tmi: {
+    key: 'tmi',
+    label: 'TMI',
+    emoji: '💬',
+    gradient: 'from-violet-900 to-indigo-950',
+    bgLight: '#EDE9FE',
+    bgDark: '#1E1B4B',
+    accent: '#A78BFA',
+  },
 };
 
-export const ALL_CATEGORY_KEYS: CategoryKey[] = ['science', 'psychology', 'people', 'history', 'koreanhistory', 'life', 'business', 'culture', 'origins', 'etc'];
+export const ALL_CATEGORY_KEYS: CategoryKey[] = ['science', 'psychology', 'people', 'history', 'koreanhistory', 'life', 'business', 'culture', 'origins', 'etc', 'tmi'];
 
 export function getCategoryInfo(key: CategoryKey): CategoryInfo {
   return CATEGORIES[key];

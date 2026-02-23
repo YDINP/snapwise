@@ -1,4 +1,4 @@
-export type CategoryKey = 'science' | 'psychology' | 'people' | 'history' | 'koreanhistory' | 'life' | 'business' | 'culture' | 'origins' | 'etc';
+export type CategoryKey = 'science' | 'psychology' | 'people' | 'history' | 'koreanhistory' | 'life' | 'business' | 'culture' | 'origins' | 'etc' | 'tmi';
 export type CardStyle = 'gradient' | 'solid' | 'glass';
 export type Difficulty = 1 | 2 | 3;
 
@@ -53,7 +53,13 @@ export interface CardMeta {
   characters?: Character[];
   isCinematic?: boolean;  // true if card uses v3 step types
   glossary?: GlossaryItem[];
-  coverImage?: string;    // URL for reveal-title background image
+  coverImage?: string;         // URL for reveal-title background image
+  coverImageCaption?: string;  // Attribution text shown below the image
+  // 챕터 시리즈 내비게이션
+  nextChapter?: string;     // 다음 챕터 카드의 slug
+  seriesId?: string;        // 시리즈 식별자 (예: "gyeyujeongnan")
+  part?: number;            // 챕터 번호 (1, 2, 3…)
+  totalParts?: number;      // 시리즈 전체 챕터 수
 }
 
 export interface CategoryInfo {

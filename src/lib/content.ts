@@ -122,6 +122,11 @@ export function getAllCards(): CardMeta[] {
           isCinematic: hasCinematicSteps(steps),
           glossary,
           coverImage: data.coverImage as string | undefined,
+          coverImageCaption: data.coverImageCaption as string | undefined,
+          nextChapter: data.nextChapter as string | undefined,
+          seriesId: data.seriesId as string | undefined,
+          part: data.part as number | undefined,
+          totalParts: data.totalParts as number | undefined,
         });
       }
     }

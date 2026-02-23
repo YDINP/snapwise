@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import Link from 'next/link';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
@@ -110,7 +111,8 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           <span className="text-sm font-bold text-white/90">{card.title}</span>
         </motion.div>
 
-        {/* Related quote — italic sweep entrance */}
+        {/* Related quote — italic sweep entrance (koreanhistory 제외) */}
+        {card.category !== 'koreanhistory' && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
@@ -137,6 +139,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             </motion.p>
           </div>
         </motion.div>
+        )}
 
         {/* Summary glass card with shimmer */}
         <motion.div
@@ -232,6 +235,17 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             </motion.span>
             {saved ? '저장됨' : '저장'}
           </motion.button>
+
+          {/* 다음 챕터 버튼 — 챕터 시리즈 카드에서만 표시 */}
+          {card.nextChapter && (
+            <Link
+              href={`/card/${card.nextChapter}`}
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1.5 rounded-full bg-white/90 px-5 py-3 text-sm font-bold text-gray-900 backdrop-blur-sm transition-colors hover:bg-white"
+            >
+              다음 챕터 →
+            </Link>
+          )}
         </motion.div>
 
         {/* Next card CTA with expanding ring pulse */}

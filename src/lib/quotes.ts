@@ -76,6 +76,13 @@ const CATEGORY_QUOTES: Record<CategoryKey, Quote[]> = {
     { text: '아는 만큼 보인다.', author: '유홍준' },
     { text: '질문하는 자가 5분 바보라면, 질문하지 않는 자는 영원한 바보다.', author: '중국 속담' },
   ],
+  tmi: [
+    { text: '알고 보면 세상은 온통 이야기다.', author: '작자 미상' },
+    { text: '사소한 것들이 모여 위대함을 만든다.', author: '미켈란젤로' },
+    { text: '아는 것이 힘이다.', author: '프란시스 베이컨' },
+    { text: '가장 흥미로운 사실은 아직 발견되지 않은 것이다.', author: '칼 세이건' },
+    { text: '호기심이 없는 사람은 살아 있는 것이 아니다.', author: '아리스토텔레스' },
+  ],
 };
 
 const CARD_QUOTES: Record<string, Quote> = {
