@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useRef } from 'react';
 import { motion } from 'motion/react';
 import { ALL_CATEGORY_KEYS, getCategoryInfo } from '@/lib/categories';
 import type { CategoryKey } from '@/types/content';
@@ -14,10 +15,21 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
   const pathname = usePathname();
   const isSavedPage = pathname === '/saved';
   const isAllSelected = currentCategory === undefined && !isSavedPage;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!scrollRef.current) return;
+    e.preventDefault();
+    scrollRef.current.scrollLeft += e.deltaY;
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-black/70 backdrop-blur-xl border-b border-white/30 dark:border-white/10">
-      <div className="overflow-x-auto hide-scrollbar">
+      <div
+        ref={scrollRef}
+        onWheel={handleWheel}
+        className="overflow-x-auto hide-scrollbar"
+      >
         <div className="flex gap-2 p-3 min-w-max">
           {/* 전체 pill */}
           <Link href="/">
