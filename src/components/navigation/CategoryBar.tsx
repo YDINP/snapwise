@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ALL_CATEGORY_KEYS, getCategoryInfo } from '@/lib/categories';
 import type { CategoryKey } from '@/types/content';
@@ -16,6 +16,20 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
   const isSavedPage = pathname === '/saved';
   const isAllSelected = currentCategory === undefined && !isSavedPage;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const activeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    const activeEl = activeRef.current;
+    if (!container || !activeEl) return;
+
+    const containerWidth = container.offsetWidth;
+    const elLeft = activeEl.offsetLeft;
+    const elWidth = activeEl.offsetWidth;
+    const targetScrollLeft = elLeft - containerWidth / 2 + elWidth / 2;
+
+    container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+  }, [currentCategory, isSavedPage]);
 
   const handleWheel = (e: React.WheelEvent) => {
     if (!scrollRef.current) return;
@@ -34,6 +48,7 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
           {/* 전체 pill */}
           <Link href="/">
             <motion.div
+              ref={isAllSelected ? activeRef : undefined}
               layout
               animate={isAllSelected ? { scale: [1.05, 1.0] } : { scale: 1.0 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -55,6 +70,7 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
           {/* 저장됨 pill */}
           <Link href="/saved">
             <motion.div
+              ref={isSavedPage ? activeRef : undefined}
               layout
               animate={isSavedPage ? { scale: [1.05, 1.0] } : { scale: 1.0 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -81,6 +97,7 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
             return (
               <Link key={key} href={`/category/${key}`}>
                 <motion.div
+                  ref={isSelected ? activeRef : undefined}
                   layout
                   animate={isSelected ? { scale: [1.05, 1.0] } : { scale: 1.0 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
