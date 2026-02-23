@@ -1,10 +1,37 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import type { CardMeta } from '@/types/content';
 import { fisherYatesShuffle } from '@/lib/shuffle';
 import { useSeenCards } from '@/hooks/useSeenCards';
 import StoryCard from './StoryCard';
+import AdCard from './AdCard';
+
+/** 피드 아이템: 카드 또는 광고 */
+type FeedItem =
+  | { type: 'card'; card: CardMeta }
+  | { type: 'ad'; id: string };
+
+/** 카드 배열에 5개마다 광고 1개 삽입 (마지막 카드 뒤 광고 제외) */
+function buildFeedList(cards: CardMeta[]): FeedItem[] {
+  const result: FeedItem[] = [];
+  cards.forEach((card, i) => {
+    result.push({ type: 'card', card });
+    if ((i + 1) % 5 === 0 && i < cards.length - 1) {
+      result.push({ type: 'ad', id: `ad-${Math.floor(i / 5)}` });
+    }
+  });
+  return result;
+}
+
+/** 현재 피드 위치 이후 가장 가까운 CardMeta 반환 */
+function getNextCard(feedList: FeedItem[], feedIndex: number): CardMeta | undefined {
+  for (let i = feedIndex + 1; i < feedList.length; i++) {
+    const item = feedList[i];
+    if (item.type === 'card') return item.card;
+  }
+  return undefined;
+}
 
 interface CardFeedProps {
   cards: CardMeta[];
@@ -26,16 +53,21 @@ export default function CardFeed({ cards }: CardFeedProps) {
     setShuffled([...fisherYatesShuffle(unseen), ...fisherYatesShuffle(seen)]);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Mark current card as seen
-  useEffect(() => {
-    if (shuffled.length > 0 && shuffled[currentIndex]) {
-      markSeen(shuffled[currentIndex].slug);
-    }
-  }, [currentIndex, shuffled, markSeen]);
+  // 피드 리스트 (카드 + 광고 삽입)
+  const feedList = useMemo(() => buildFeedList(shuffled), [shuffled]);
 
-  // Intersection Observer to track current card
+  // Mark current card as seen (광고 아이템은 제외)
   useEffect(() => {
-    if (!containerRef.current || shuffled.length === 0) return;
+    if (feedList.length === 0) return;
+    const item = feedList[currentIndex];
+    if (item?.type === 'card') {
+      markSeen(item.card.slug);
+    }
+  }, [currentIndex, feedList, markSeen]);
+
+  // Intersection Observer to track current feed item
+  useEffect(() => {
+    if (!containerRef.current || feedList.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -58,7 +90,7 @@ export default function CardFeed({ cards }: CardFeedProps) {
     cardElements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [shuffled]);
+  }, [feedList]);
 
   const scrollToCard = useCallback((index: number) => {
     if (!containerRef.current) return;
@@ -68,12 +100,12 @@ export default function CardFeed({ cards }: CardFeedProps) {
     }
   }, []);
 
-  // Called when StoryCard completes all steps
-  const handleCardComplete = useCallback((index: number) => {
-    if (index < shuffled.length - 1) {
-      setTimeout(() => scrollToCard(index + 1), 300);
+  // StoryCard가 모든 스텝을 완료하면 다음 피드 아이템으로 이동
+  const handleCardComplete = useCallback((feedIndex: number) => {
+    if (feedIndex < feedList.length - 1) {
+      setTimeout(() => scrollToCard(feedIndex + 1), 300);
     }
-  }, [shuffled.length, scrollToCard]);
+  }, [feedList.length, scrollToCard]);
 
   // Desktop wheel navigation
   useEffect(() => {
@@ -90,7 +122,7 @@ export default function CardFeed({ cards }: CardFeedProps) {
         isScrollingRef.current = false;
       }, 600);
 
-      if (e.deltaY > 0 && currentIndex < shuffled.length - 1) {
+      if (e.deltaY > 0 && currentIndex < feedList.length - 1) {
         scrollToCard(currentIndex + 1);
       } else if (e.deltaY < 0 && currentIndex > 0) {
         scrollToCard(currentIndex - 1);
@@ -102,14 +134,14 @@ export default function CardFeed({ cards }: CardFeedProps) {
       container.removeEventListener('wheel', handleWheel);
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
-  }, [currentIndex, shuffled.length, scrollToCard]);
+  }, [currentIndex, feedList.length, scrollToCard]);
 
-  // Keyboard: ArrowDown/ArrowUp for card-level navigation
+  // Keyboard: ArrowDown/ArrowUp for feed-level navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        if (currentIndex < shuffled.length - 1) scrollToCard(currentIndex + 1);
+        if (currentIndex < feedList.length - 1) scrollToCard(currentIndex + 1);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         if (currentIndex > 0) scrollToCard(currentIndex - 1);
@@ -118,10 +150,10 @@ export default function CardFeed({ cards }: CardFeedProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, shuffled.length, scrollToCard]);
+  }, [currentIndex, feedList.length, scrollToCard]);
 
   // Show loading until client-side shuffle completes (prevents hydration mismatch)
-  if (shuffled.length === 0) {
+  if (feedList.length === 0) {
     return (
       <div className="snap-container hide-scrollbar">
         <div className="snap-card flex items-center justify-center">
@@ -133,17 +165,30 @@ export default function CardFeed({ cards }: CardFeedProps) {
 
   return (
     <div ref={containerRef} className="snap-container hide-scrollbar">
-      {shuffled.map((card, index) => (
-        <div key={card.slug} data-index={index} className="snap-card">
-          <StoryCard
-            card={card}
-            isActive={index === currentIndex}
-            nextCard={shuffled[index + 1]}
-            onComplete={() => handleCardComplete(index)}
-            topOffset={52}
-          />
-        </div>
-      ))}
+      {feedList.map((item, index) => {
+        if (item.type === 'ad') {
+          return (
+            <div key={item.id} data-index={index} className="snap-card">
+              <AdCard
+                isActive={index === currentIndex}
+                onSkip={() => scrollToCard(index + 1)}
+              />
+            </div>
+          );
+        }
+        // type === 'card'
+        return (
+          <div key={item.card.slug} data-index={index} className="snap-card">
+            <StoryCard
+              card={item.card}
+              isActive={index === currentIndex}
+              nextCard={getNextCard(feedList, index)}
+              onComplete={() => handleCardComplete(index)}
+              topOffset={52}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

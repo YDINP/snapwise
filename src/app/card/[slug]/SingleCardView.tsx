@@ -22,7 +22,7 @@ export default function SingleCardView({ card }: SingleCardViewProps) {
       </div>
 
       <div className="w-full h-full">
-        <StoryCard card={card} isActive={true} topOffset={44} showAd={false} />
+        <StoryCard card={card} isActive={true} topOffset={44} />
       </div>
     </main>
   );

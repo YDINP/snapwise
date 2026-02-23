@@ -10,9 +10,11 @@ declare global {
 
 interface AdCardProps {
   isActive: boolean;
+  /** 탭하여 다음 피드 아이템으로 이동 */
+  onSkip?: () => void;
 }
 
-export default function AdCard({ isActive }: AdCardProps) {
+export default function AdCard({ isActive, onSkip }: AdCardProps) {
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -26,13 +28,16 @@ export default function AdCard({ isActive }: AdCardProps) {
   }, [isActive]);
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-zinc-950">
+    <div
+      className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-zinc-950 cursor-pointer"
+      onClick={onSkip}
+    >
       {/* 광고 레이블 */}
       <p className="mb-4 text-[10px] font-medium uppercase tracking-widest text-white/25">
         광고
       </p>
 
-      {/* AdSense 광고 유닛 */}
+      {/* AdSense 광고 유닛 — 클릭 이벤트 격리 */}
       <div className="w-full max-w-sm px-4" onClick={(e) => e.stopPropagation()}>
         <ins
           className="adsbygoogle"
