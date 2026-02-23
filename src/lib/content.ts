@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
@@ -77,7 +78,7 @@ function hasCinematicSteps(steps: CardStep[]): boolean {
   return steps.some(s => VALID_V3_TYPES.includes(s.type));
 }
 
-export function getAllCards(): CardMeta[] {
+export const getAllCards = cache(function getAllCards(): CardMeta[] {
   const cards: CardMeta[] = [];
 
   function readDirectory(dir: string) {
@@ -137,7 +138,7 @@ export function getAllCards(): CardMeta[] {
   }
 
   return cards.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-}
+});
 
 export function getCardsByCategory(category: CategoryKey): CardMeta[] {
   return getAllCards().filter((card) => card.category === category);
