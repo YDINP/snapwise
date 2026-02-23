@@ -1,11 +1,23 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
-import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
+import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from '@/lib/constants';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: SITE_NAME,
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
+  },
   description: SITE_DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    locale: 'ko_KR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
   verification: {
     other: {
       'naver-site-verification': '103d0b50c20ba2c49bb45837edbbd816177c18f1',
@@ -17,6 +29,14 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+};
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  url: SITE_URL,
 };
 
 export default function RootLayout({
@@ -47,6 +67,10 @@ export default function RootLayout({
               })();
             `,
           }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
       </head>
       <body className="bg-[var(--color-bg)] text-[var(--color-text)]" suppressHydrationWarning>
