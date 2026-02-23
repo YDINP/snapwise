@@ -10,9 +10,11 @@
     "fetch-images": "npx tsx scripts/fetch-images.ts"
   },
   "dependencies": {
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.58",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.564.0",
-    "motion": "^12.0.0",
+    "motion": "^12.34.3",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

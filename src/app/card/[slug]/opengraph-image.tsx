@@ -14,10 +14,10 @@ export default async function Image({ params }: Props) {
   const { slug } = await params;
   const card = getCardBySlug(slug);
 
-  let fonts: ConstructorParameters<typeof ImageResponse>[1]['fonts'] = [];
+  let fonts: NonNullable<ConstructorParameters<typeof ImageResponse>[1]>['fonts'] = [];
   try {
     const res = await fetch(
-      'https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static/Pretendard-Bold.woff'
+      'https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static/Pretendard-Bold.otf'
     );
     if (res.ok) {
       const fontData = await res.arrayBuffer();

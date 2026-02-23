@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
+import { fadeInUp, fadeIn, stagger } from '@/lib/motionVariants';
 
 interface CinematicHookProps {
   step: CardStep;
@@ -13,6 +14,10 @@ interface CinematicHookProps {
 
 export default function CinematicHook({ step, card, isActive }: CinematicHookProps) {
   const categoryInfo = getCategoryInfo(card.category);
+
+  // 단어 단위 분할 (줄바꿈 기호 제거 후 공백 분리)
+  const rawText = step.content.replace(/\\n/g, ' ').trim();
+  const words = rawText.split(/\s+/).filter(Boolean);
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
@@ -70,16 +75,38 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           </motion.div>
         </div>
 
-        {/* Short narration text with accent bold */}
+        {/* Title: 단어별 stagger fadeInUp */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.3, duration: 0.6 }}
+          variants={stagger}
+          initial="hidden"
+          animate={isActive ? 'visible' : 'hidden'}
           className="max-w-xs text-center text-xl font-bold text-white"
-          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all', textWrap: 'balance' }}
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all' }}
+          aria-label={rawText}
         >
-          {renderWithLineBreaks(step.content, categoryInfo.accent)}
+          {words.map((word, i) => (
+            <motion.span
+              key={i}
+              variants={fadeInUp}
+              className="inline-block"
+              style={{ marginRight: i < words.length - 1 ? '0.3em' : 0 }}
+            >
+              {word}
+            </motion.span>
+          ))}
         </motion.p>
+
+        {/* 보조 텍스트: 카테고리 배지 — 단어 stagger 완료 후 fadeIn */}
+        <motion.span
+          variants={fadeIn}
+          initial="hidden"
+          animate={isActive ? 'visible' : 'hidden'}
+          transition={{ delay: 0.1 + words.length * 0.08 + 0.2 }}
+          className="rounded-full px-3 py-1 text-xs font-semibold tracking-wide text-white/80"
+          style={{ backgroundColor: `${categoryInfo.accent}30`, border: `1px solid ${categoryInfo.accent}50` }}
+        >
+          {categoryInfo.label}
+        </motion.span>
       </div>
 
       {/* Pulsing CTA at bottom with arrow bounce */}

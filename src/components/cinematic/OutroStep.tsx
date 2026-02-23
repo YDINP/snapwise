@@ -10,6 +10,7 @@ import { useLikes } from '@/hooks/useLikes';
 import { useSaved } from '@/hooks/useSaved';
 import { Heart, Share2, Bookmark, ChevronDown, Quote } from 'lucide-react';
 import { getQuoteForCard } from '@/lib/quotes';
+import { scaleIn, stagger, fadeInUp } from '@/lib/motionVariants';
 
 interface OutroStepProps {
   step: CardStep;

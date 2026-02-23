@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import TypingText from '@/components/cinematic/TypingText';
+import { slideInLeft, slideInRight, scaleIn } from '@/lib/motionVariants';
 
 interface DialogueStepProps {
   step: CardStep;
@@ -18,6 +19,13 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
   const character = card.characters?.find(c => c.id === step.characterId)
     ?? { id: 'unknown', name: '화자', emoji: '💬' };
 
+  // 캐릭터 배열 내 인덱스로 좌/우 방향 결정
+  // index 0 = 왼쪽 캐릭터, 1 이상 = 오른쪽/내레이터
+  const characterIndex = card.characters?.findIndex(c => c.id === step.characterId) ?? 0;
+  const isLeft = characterIndex === 0;
+
+  const bubbleVariant = isLeft ? slideInLeft : slideInRight;
+
   return (
     <div className="relative flex h-full w-full items-center overflow-hidden px-5">
       {/* Category gradient background */}
@@ -27,29 +35,36 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
       <div className="relative z-10 flex w-full flex-col items-start gap-3">
         {/* Character row: avatar + name badge */}
         <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          animate={isActive ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.4 }}
+          variants={slideInLeft}
+          initial="hidden"
+          animate={isActive ? 'visible' : 'hidden'}
           className="flex items-center gap-3"
         >
-          {character.image ? (
-            <div
-              className="h-14 w-14 overflow-hidden rounded-full shadow-lg"
-              style={{ border: `3px solid ${categoryInfo.accent}` }}
-            >
-              <img src={character.image} alt={character.name} className="h-full w-full object-cover" />
-            </div>
-          ) : (
-            <div
-              className="flex h-14 w-14 items-center justify-center rounded-full text-3xl shadow-lg"
-              style={{
-                background: `linear-gradient(135deg, ${categoryInfo.accent}40, ${categoryInfo.accent}20)`,
-                border: `3px solid ${categoryInfo.accent}80`,
-              }}
-            >
-              {character.emoji}
-            </div>
-          )}
+          {/* 캐릭터 아바타: scaleIn으로 강조 등장 */}
+          <motion.div
+            variants={scaleIn}
+            initial="hidden"
+            animate={isActive ? 'visible' : 'hidden'}
+          >
+            {character.image ? (
+              <div
+                className="h-14 w-14 overflow-hidden rounded-full shadow-lg"
+                style={{ border: `3px solid ${categoryInfo.accent}` }}
+              >
+                <img src={character.image} alt={character.name} className="h-full w-full object-cover" />
+              </div>
+            ) : (
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-full text-3xl shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${categoryInfo.accent}40, ${categoryInfo.accent}20)`,
+                  border: `3px solid ${categoryInfo.accent}80`,
+                }}
+              >
+                {character.emoji}
+              </div>
+            )}
+          </motion.div>
           <span
             className="rounded-full px-3 py-1 text-xs font-bold text-white"
             style={{ backgroundColor: `${categoryInfo.accent}90` }}
@@ -58,11 +73,12 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
           </span>
         </motion.div>
 
-        {/* Comic speech bubble */}
+        {/* Comic speech bubble — 방향별 slideIn */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 8 }}
-          animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
-          transition={{ delay: 0.15, duration: 0.5, type: 'spring', damping: 20 }}
+          variants={bubbleVariant}
+          initial="hidden"
+          animate={isActive ? 'visible' : 'hidden'}
+          transition={{ delay: 0.15 }}
           className="relative ml-4 w-full"
           style={{ maxWidth: 'calc(100% - 16px)' }}
         >

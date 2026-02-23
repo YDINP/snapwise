@@ -6,10 +6,10 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 export default async function Image() {
-  let fonts: ConstructorParameters<typeof ImageResponse>[1]['fonts'] = [];
+  let fonts: NonNullable<ConstructorParameters<typeof ImageResponse>[1]>['fonts'] = [];
   try {
     const res = await fetch(
-      'https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static/Pretendard-Bold.woff'
+      'https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static/Pretendard-Bold.otf'
     );
     if (res.ok) {
       const fontData = await res.arrayBuffer();
