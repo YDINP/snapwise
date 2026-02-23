@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
@@ -37,7 +38,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
               className="h-14 w-14 overflow-hidden rounded-full shadow-lg"
               style={{ border: `3px solid ${categoryInfo.accent}` }}
             >
-              <img src={character.image} alt={character.name} className="h-full w-full object-cover" />
+              <Image src={character.image} alt={character.name} fill className="object-cover" unoptimized />
             </div>
           ) : (
             <div

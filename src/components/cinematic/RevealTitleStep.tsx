@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
@@ -157,10 +158,12 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
               className="relative h-44 w-44 overflow-hidden rounded-2xl shadow-2xl"
               style={{ border: `3px solid ${categoryInfo.accent}60` }}
             >
-              <img
+              <Image
                 src={card.coverImage}
                 alt={card.title}
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
+                unoptimized
               />
               {/* ── Shine sweep across image ── */}
               <motion.div
