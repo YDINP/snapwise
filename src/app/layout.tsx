@@ -6,6 +6,11 @@ import './globals.css';
 export const metadata: Metadata = {
   title: SITE_NAME,
   description: SITE_DESCRIPTION,
+  verification: {
+    other: {
+      'naver-site-verification': '103d0b50c20ba2c49bb45837edbbd816177c18f1',
+    },
+  },
 };
 
 export const viewport: Viewport = {
