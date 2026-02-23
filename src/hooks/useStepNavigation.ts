@@ -30,6 +30,7 @@ interface UseStepNavigationOptions {
 
 export function useStepNavigation({ totalSteps, isActive, slug, onComplete }: UseStepNavigationOptions) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isBoundary, setIsBoundary] = useState(false);
 
   // Load saved progress when card becomes active
   useEffect(() => {
@@ -61,7 +62,15 @@ export function useStepNavigation({ totalSteps, isActive, slug, onComplete }: Us
   }, [totalSteps, onComplete]);
 
   const goPrev = useCallback(() => {
-    setCurrentStep(prev => Math.max(0, prev - 1));
+    setCurrentStep(prev => {
+      if (prev <= 0) {
+        // 스텝 0 경계 피드백 트리거
+        setIsBoundary(true);
+        setTimeout(() => setIsBoundary(false), 500);
+        return prev;
+      }
+      return prev - 1;
+    });
   }, []);
 
   const goToStep = useCallback((step: number) => {
@@ -102,5 +111,6 @@ export function useStepNavigation({ totalSteps, isActive, slug, onComplete }: Us
     isFirstStep: currentStep === 0,
     isLastStep: currentStep >= totalSteps - 1,
     totalSteps,
+    isBoundary,
   };
 }

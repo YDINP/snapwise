@@ -4,6 +4,7 @@ import { useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import type { CardMeta } from '@/types/content';
 import { useStepNavigation } from '@/hooks/useStepNavigation';
+import { shake } from '@/lib/motionVariants';
 import StepProgressBar from '@/components/story/StepProgressBar';
 import StepRenderer from '@/components/story/StepRenderer';
 import CinematicRenderer from '@/components/cinematic/CinematicRenderer';
@@ -19,7 +20,7 @@ interface StoryCardProps {
 }
 
 export default function StoryCard({ card, isActive, nextCard, onComplete, topOffset = 0 }: StoryCardProps) {
-  const { currentStep, goNext, goPrev, goToStart, isFirstStep, totalSteps } = useStepNavigation({
+  const { currentStep, goNext, goPrev, goToStart, isFirstStep, totalSteps, isBoundary } = useStepNavigation({
     totalSteps: card.steps.length,
     isActive,
     slug: card.slug,
@@ -65,7 +66,15 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
   if (!step) return null;
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden" onClick={handleTap} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <motion.div
+      ref={containerRef}
+      className="relative w-full h-full overflow-hidden"
+      onClick={handleTap}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      variants={shake}
+      animate={isBoundary ? 'animate' : undefined}
+    >
       {/* Progress bar */}
       <div className="absolute left-0 right-0 z-50" style={{ top: topOffset }}>
         <StepProgressBar totalSteps={card.steps.length} currentStep={currentStep} />
@@ -128,6 +137,6 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
           )}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
