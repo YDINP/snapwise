@@ -38,7 +38,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const categoryInfo = getCategoryInfo(categoryKey);
 
   return (
-    <main className="relative h-screen overflow-hidden">
+    <main className="relative h-dvh overflow-hidden">
       <CategoryBar currentCategory={categoryKey} />
       {cards.length === 0 ? (
         <div className="flex items-center justify-center h-full">

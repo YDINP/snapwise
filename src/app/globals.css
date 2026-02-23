@@ -25,13 +25,14 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
+  height: 100%;
 }
 
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
   overflow: hidden;
-  height: 100dvh;
+  height: 100%;
 }
 
 /* ======== Scroll Snap ======== */

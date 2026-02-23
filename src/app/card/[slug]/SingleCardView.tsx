@@ -10,7 +10,7 @@ interface SingleCardViewProps {
 
 export default function SingleCardView({ card }: SingleCardViewProps) {
   return (
-    <main className="relative h-screen overflow-hidden">
+    <main className="relative h-dvh overflow-hidden">
       {/* Back link */}
       <div className="absolute top-3 left-3 z-[60]">
         <Link

@@ -1,37 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { CardMeta } from '@/types/content';
 import { fisherYatesShuffle } from '@/lib/shuffle';
 import { useSeenCards } from '@/hooks/useSeenCards';
 import StoryCard from './StoryCard';
-import AdCard from './AdCard';
-
-/** 피드 아이템: 카드 또는 광고 */
-type FeedItem =
-  | { type: 'card'; card: CardMeta }
-  | { type: 'ad'; id: string };
-
-/** 카드 배열에 5개마다 광고 1개 삽입 (마지막 카드 뒤 광고 제외) */
-function buildFeedList(cards: CardMeta[]): FeedItem[] {
-  const result: FeedItem[] = [];
-  cards.forEach((card, i) => {
-    result.push({ type: 'card', card });
-    if ((i + 1) % 5 === 0 && i < cards.length - 1) {
-      result.push({ type: 'ad', id: `ad-${Math.floor(i / 5)}` });
-    }
-  });
-  return result;
-}
-
-/** 현재 피드 위치 이후 가장 가까운 CardMeta 반환 */
-function getNextCard(feedList: FeedItem[], feedIndex: number): CardMeta | undefined {
-  for (let i = feedIndex + 1; i < feedList.length; i++) {
-    const item = feedList[i];
-    if (item.type === 'card') return item.card;
-  }
-  return undefined;
-}
+import AdPopup from './AdPopup';
 
 interface CardFeedProps {
   cards: CardMeta[];
@@ -45,6 +19,10 @@ export default function CardFeed({ cards }: CardFeedProps) {
   const isScrollingRef = useRef(false);
   const { markSeen, getSeenSet } = useSeenCards();
 
+  const [showAdPopup, setShowAdPopup] = useState(false);
+  // 이미 팝업을 보여준 카드 인덱스 추적 (같은 위치에서 중복 표시 방지)
+  const shownAdAtRef = useRef<Set<number>>(new Set());
+
   // Client-side shuffle on mount with seen cards pushed to back
   useEffect(() => {
     const seenSet = getSeenSet();
@@ -53,59 +31,73 @@ export default function CardFeed({ cards }: CardFeedProps) {
     setShuffled([...fisherYatesShuffle(unseen), ...fisherYatesShuffle(seen)]);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 피드 리스트 (카드 + 광고 삽입)
-  const feedList = useMemo(() => buildFeedList(shuffled), [shuffled]);
-
-  // Mark current card as seen (광고 아이템은 제외)
+  // Mark current card as seen
   useEffect(() => {
-    if (feedList.length === 0) return;
-    const item = feedList[currentIndex];
-    if (item?.type === 'card') {
-      markSeen(item.card.slug);
+    if (shuffled.length === 0) return;
+    const card = shuffled[currentIndex];
+    if (card) markSeen(card.slug);
+  }, [currentIndex, shuffled, markSeen]);
+
+  // 5카드마다 광고 팝업 표시 (currentIndex가 5, 10, 15... 일 때)
+  useEffect(() => {
+    if (
+      currentIndex > 0 &&
+      currentIndex % 5 === 0 &&
+      !shownAdAtRef.current.has(currentIndex)
+    ) {
+      shownAdAtRef.current.add(currentIndex);
+      // 카드 전환 애니메이션이 완료된 후 팝업 표시
+      const timer = setTimeout(() => setShowAdPopup(true), 500);
+      return () => clearTimeout(timer);
     }
-  }, [currentIndex, feedList, markSeen]);
+  }, [currentIndex]);
 
-  // Intersection Observer to track current feed item
+  // Intersection Observer to track current card index
   useEffect(() => {
-    if (!containerRef.current || feedList.length === 0) return;
+    if (!containerRef.current || shuffled.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const index = Number(entry.target.getAttribute('data-index'));
-            if (!isNaN(index)) {
-              setCurrentIndex(index);
-            }
+            if (!isNaN(index)) setCurrentIndex(index);
           }
         });
       },
-      {
-        root: containerRef.current,
-        threshold: 0.6,
-      }
+      { root: containerRef.current, threshold: 0.6 }
     );
 
     const cardElements = containerRef.current.querySelectorAll('[data-index]');
     cardElements.forEach((el) => observer.observe(el));
-
     return () => observer.disconnect();
-  }, [feedList]);
+  }, [shuffled]);
 
   const scrollToCard = useCallback((index: number) => {
     if (!containerRef.current) return;
-    const target = containerRef.current.children[index] as HTMLElement;
+    const container = containerRef.current;
+    const target = container.children[index] as HTMLElement;
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
+      isScrollingRef.current = true;
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 800);
+
+      const containerTop = container.getBoundingClientRect().top;
+      const targetTop = target.getBoundingClientRect().top;
+      container.scrollTo({
+        top: container.scrollTop + (targetTop - containerTop),
+        behavior: 'smooth',
+      });
     }
   }, []);
 
-  // StoryCard가 모든 스텝을 완료하면 다음 피드 아이템으로 이동
-  const handleCardComplete = useCallback((feedIndex: number) => {
-    if (feedIndex < feedList.length - 1) {
-      setTimeout(() => scrollToCard(feedIndex + 1), 300);
+  const handleCardComplete = useCallback((index: number) => {
+    if (index < shuffled.length - 1) {
+      setTimeout(() => scrollToCard(index + 1), 300);
     }
-  }, [feedList.length, scrollToCard]);
+  }, [shuffled.length, scrollToCard]);
 
   // Desktop wheel navigation
   useEffect(() => {
@@ -115,14 +107,8 @@ export default function CardFeed({ cards }: CardFeedProps) {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (isScrollingRef.current) return;
-      isScrollingRef.current = true;
 
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => {
-        isScrollingRef.current = false;
-      }, 600);
-
-      if (e.deltaY > 0 && currentIndex < feedList.length - 1) {
+      if (e.deltaY > 0 && currentIndex < shuffled.length - 1) {
         scrollToCard(currentIndex + 1);
       } else if (e.deltaY < 0 && currentIndex > 0) {
         scrollToCard(currentIndex - 1);
@@ -134,26 +120,24 @@ export default function CardFeed({ cards }: CardFeedProps) {
       container.removeEventListener('wheel', handleWheel);
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
-  }, [currentIndex, feedList.length, scrollToCard]);
+  }, [currentIndex, shuffled.length, scrollToCard]);
 
-  // Keyboard: ArrowDown/ArrowUp for feed-level navigation
+  // Keyboard: ArrowDown/ArrowUp
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        if (currentIndex < feedList.length - 1) scrollToCard(currentIndex + 1);
+        if (currentIndex < shuffled.length - 1) scrollToCard(currentIndex + 1);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         if (currentIndex > 0) scrollToCard(currentIndex - 1);
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, feedList.length, scrollToCard]);
+  }, [currentIndex, shuffled.length, scrollToCard]);
 
-  // Show loading until client-side shuffle completes (prevents hydration mismatch)
-  if (feedList.length === 0) {
+  if (shuffled.length === 0) {
     return (
       <div className="snap-container hide-scrollbar">
         <div className="snap-card flex items-center justify-center">
@@ -164,31 +148,22 @@ export default function CardFeed({ cards }: CardFeedProps) {
   }
 
   return (
-    <div ref={containerRef} className="snap-container hide-scrollbar">
-      {feedList.map((item, index) => {
-        if (item.type === 'ad') {
-          return (
-            <div key={item.id} data-index={index} className="snap-card">
-              <AdCard
-                isActive={index === currentIndex}
-                onSkip={() => scrollToCard(index + 1)}
-              />
-            </div>
-          );
-        }
-        // type === 'card'
-        return (
-          <div key={item.card.slug} data-index={index} className="snap-card">
+    <>
+      <div ref={containerRef} className="snap-container hide-scrollbar">
+        {shuffled.map((card, index) => (
+          <div key={card.slug} data-index={index} className="snap-card">
             <StoryCard
-              card={item.card}
+              card={card}
               isActive={index === currentIndex}
-              nextCard={getNextCard(feedList, index)}
+              nextCard={shuffled[index + 1]}
               onComplete={() => handleCardComplete(index)}
-              topOffset={52}
+              topOffset={61}
             />
           </div>
-        );
-      })}
-    </div>
+        ))}
+      </div>
+
+      <AdPopup isVisible={showAdPopup} onDismiss={() => setShowAdPopup(false)} />
+    </>
   );
 }
