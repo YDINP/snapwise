@@ -151,7 +151,7 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
             initial={{ opacity: 0, scale: 0.85 }}
             animate={isActive ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.7, duration: 0.6, type: 'spring', damping: 18 }}
-            className="relative"
+            className="relative flex flex-col items-center"
           >
             <div
               className="relative h-44 w-44 overflow-hidden rounded-2xl shadow-2xl"
@@ -179,6 +179,12 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
               className="absolute -inset-4 -z-10 rounded-3xl blur-2xl"
               style={{ backgroundColor: `${categoryInfo.accent}15` }}
             />
+            {/* Image caption */}
+            {card.coverImageCaption && (
+              <p className="mt-2 w-44 text-center text-[10px] leading-tight text-white/40">
+                {card.coverImageCaption}
+              </p>
+            )}
           </motion.div>
         )}
 

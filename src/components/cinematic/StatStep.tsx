@@ -38,6 +38,14 @@ function looksLikeStat(line: string): boolean {
     /[%배명원개×]/.test(line.trim());
 }
 
+/** 값이 긴 텍스트인지 감지 — 15자 초과이거나 숫자 비율이 20% 미만이면 텍스트 값으로 판단 */
+function isTextValue(value: string): boolean {
+  if (value.length > 15) return true;
+  const digitCount = (value.match(/\d/g) ?? []).length;
+  const digitRatio = digitCount / value.length;
+  return digitRatio < 0.2;
+}
+
 function parseStatContent(content: string): ParsedStat {
   const rawLines = content.split('\n').map(l => l.trim()).filter(Boolean);
 
@@ -184,6 +192,21 @@ interface MultiStatsProps {
 }
 
 function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
+  // 모든 아이템 값이 텍스트 값인지 판단
+  const allTextValues = items.length > 0 && items.every(item => isTextValue(item.value));
+
+  if (allTextValues) {
+    return (
+      <TextListStats
+        items={items}
+        description={description}
+        accent={accent}
+        isActive={isActive}
+      />
+    );
+  }
+
+  // 기존 hero + secondary cards 레이아웃 (숫자 값 유지)
   const hero = items[0];
   const rest = items.slice(1);
 
@@ -220,19 +243,6 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
           >
             {hero.value}
           </motion.p>
-
-          {/* Context label under hero */}
-          {description && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={isActive ? { opacity: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-center text-sm font-medium text-white/30"
-              style={{ wordBreak: 'keep-all' }}
-            >
-              {description}
-            </motion.p>
-          )}
 
           {/* Accent bar under hero */}
           <motion.div
@@ -292,6 +302,105 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
         </div>
       )}
 
+      {/* description: hero 모드에서도 하단 표시 */}
+      {description && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={isActive ? { opacity: 1 } : {}}
+          transition={{ duration: 0.5, delay: 0.9 }}
+          className="text-center text-[12px] font-medium text-white/30 leading-relaxed"
+          style={{ wordBreak: 'keep-all' }}
+        >
+          {description}
+        </motion.p>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Text list stats — 모든 값이 텍스트일 때의 클린 리스트 레이아웃       */
+/* ------------------------------------------------------------------ */
+
+interface TextListStatsProps {
+  items: StatItem[];
+  description: string;
+  accent: string;
+  isActive: boolean;
+}
+
+function TextListStats({ items, description, accent, isActive }: TextListStatsProps) {
+  return (
+    <div className="flex w-full flex-col">
+      {/* Stat rows with dividers */}
+      <div className="flex w-full flex-col">
+        {items.map((item, i) => (
+          <div key={i} className="flex flex-col">
+            {/* Divider — accent color, 첫 번째 행 위에도 표시 */}
+            <motion.div
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.1 + i * 0.1 }}
+              className="h-px w-full origin-left"
+              style={{
+                background: `linear-gradient(90deg, ${accent}30, transparent 80%)`,
+              }}
+            />
+
+            {/* Row content */}
+            <motion.div
+              initial={{ opacity: 0, x: -12 }}
+              animate={isActive ? { opacity: 1, x: 0 } : {}}
+              transition={{
+                duration: 0.5,
+                delay: 0.15 + i * 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="flex flex-col py-5 px-2"
+            >
+              {/* Label */}
+              <span
+                className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35"
+                style={{ wordBreak: 'keep-all' }}
+              >
+                {item.label}
+              </span>
+
+              {/* Value */}
+              <span
+                className="mt-1.5 text-[15px] font-semibold leading-snug text-white/85"
+                style={{ wordBreak: 'keep-all' }}
+              >
+                {item.value}
+              </span>
+            </motion.div>
+          </div>
+        ))}
+
+        {/* 마지막 항목 하단 구분선 */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.5, delay: 0.1 + items.length * 0.1 }}
+          className="h-px w-full origin-left"
+          style={{
+            background: `linear-gradient(90deg, ${accent}30, transparent 80%)`,
+          }}
+        />
+      </div>
+
+      {/* Description */}
+      {description && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={isActive ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.2 + items.length * 0.1 }}
+          className="mt-6 text-[12px] font-medium text-white/30 leading-relaxed"
+          style={{ wordBreak: 'keep-all' }}
+        >
+          {description}
+        </motion.p>
+      )}
     </div>
   );
 }

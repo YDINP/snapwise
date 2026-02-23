@@ -19,6 +19,18 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
       {/* Category gradient background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
 
+      {/* Film grain texture */}
+      {isActive && (
+        <div
+          className="pointer-events-none absolute inset-0 z-20 opacity-[0.04]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: '128px 128px',
+          }}
+        />
+      )}
+
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-6 px-6">
         {/* Emoji with halo glow */}
@@ -39,11 +51,10 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           {/* Floating emoji */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={isActive ? {
-              opacity: 1,
-              scale: 1,
-              y: [0, -10, 0]
-            } : {}}
+            animate={isActive
+              ? { opacity: 1, scale: 1, y: [0, -10, 0] }
+              : { opacity: 0, scale: 0.5 }
+            }
             transition={{
               opacity: { duration: 0.5 },
               scale: { duration: 0.5, type: 'spring' },
@@ -64,7 +75,7 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           initial={{ opacity: 0, y: 20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="max-w-xs text-center text-lg font-medium text-white"
+          className="max-w-xs text-center text-xl font-bold text-white"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all', textWrap: 'balance' }}
         >
           {renderWithLineBreaks(step.content, categoryInfo.accent)}

@@ -8,6 +8,7 @@ import StepProgressBar from '@/components/story/StepProgressBar';
 import StepRenderer from '@/components/story/StepRenderer';
 import CinematicRenderer from '@/components/cinematic/CinematicRenderer';
 import StepGlossary from '@/components/cinematic/StepGlossary';
+import AdCard from './AdCard';
 
 interface StoryCardProps {
   card: CardMeta;
@@ -20,11 +21,14 @@ interface StoryCardProps {
 
 export default function StoryCard({ card, isActive, nextCard, onComplete, topOffset = 0 }: StoryCardProps) {
   const { currentStep, goNext, goPrev, goToStart, isFirstStep, totalSteps } = useStepNavigation({
-    totalSteps: card.steps.length,
+    totalSteps: card.steps.length + 1,   // +1 for ad step
     isActive,
     slug: card.slug,
     onComplete,
+    progressMax: card.steps.length - 1, // 광고 스텝 인덱스 저장 방지
   });
+
+  const isAdStep = currentStep === card.steps.length;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
@@ -62,17 +66,19 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
   }, [goNext, goPrev]);
 
   const step = card.steps[currentStep];
-  if (!step) return null;
+  if (!step && !isAdStep) return null;
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden" onClick={handleTap} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-      {/* Progress bar */}
-      <div className="absolute left-0 right-0 z-50" style={{ top: topOffset }}>
-        <StepProgressBar totalSteps={totalSteps} currentStep={currentStep} />
-      </div>
+      {/* Progress bar — hide on ad step */}
+      {!isAdStep && (
+        <div className="absolute left-0 right-0 z-50" style={{ top: topOffset }}>
+          <StepProgressBar totalSteps={card.steps.length} currentStep={currentStep} />
+        </div>
+      )}
 
-      {/* 처음으로 button — only visible after step 0 */}
-      {!isFirstStep && (
+      {/* 처음으로 button — 카드 스텝에서만, step 0 이후에만 표시 */}
+      {!isFirstStep && !isAdStep && (
         <button
           onClick={(e) => { e.stopPropagation(); goToStart(); }}
           className="absolute left-3 z-50 flex items-center gap-2 rounded-full bg-black/30 px-5 py-2.5 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
@@ -82,13 +88,15 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
         </button>
       )}
 
-      {/* Step type badge */}
-      <div
-        className="absolute right-3 z-50 rounded-full bg-black/30 px-3 py-1 text-[10px] font-medium text-white/60 backdrop-blur-sm"
-        style={{ top: topOffset + 16 }}
-      >
-        {step.type}
-      </div>
+      {/* Step type badge — hide on ad step */}
+      {totalSteps > 0 && !isAdStep && (
+        <div
+          className="absolute right-3 z-50 min-w-[48px] rounded-full bg-black/30 px-3 py-1 text-center text-[10px] font-medium tabular-nums text-white/60 backdrop-blur-sm"
+          style={{ top: topOffset + 16 }}
+        >
+          {currentStep + 1}/{card.steps.length}
+        </div>
+      )}
 
       {/* Step content with smooth crossfade — minimal opacity change to reduce eye strain */}
       <AnimatePresence mode="popLayout">
@@ -100,23 +108,25 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
           transition={{ duration: 0.15, ease: 'easeOut' }}
           className="w-full h-full"
         >
-          {card.isCinematic ? (
+          {isAdStep ? (
+            <AdCard isActive={isActive} />
+          ) : card.isCinematic ? (
             <CinematicRenderer
-              step={step}
+              step={step!}
               card={card}
               isActive={isActive}
               nextCard={nextCard}
             />
           ) : (
             <StepRenderer
-              step={step}
+              step={step!}
               card={card}
               isActive={isActive}
               nextCard={nextCard}
             />
           )}
           {/* Glossary — shown per step when technical terms are detected */}
-          {card.isCinematic && step.type !== 'cinematic-hook' && step.type !== 'reveal-title' && step.type !== 'outro' && (
+          {!isAdStep && card.isCinematic && step && step.type !== 'cinematic-hook' && step.type !== 'reveal-title' && step.type !== 'outro' && (
             <StepGlossary
               stepContent={step.content}
               cardTitle={card.title}

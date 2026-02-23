@@ -26,9 +26,11 @@ interface UseStepNavigationOptions {
   isActive: boolean;
   slug?: string;
   onComplete?: () => void;
+  /** progress 저장 시 이 값으로 상한 처리 (광고 스텝 인덱스 저장 방지) */
+  progressMax?: number;
 }
 
-export function useStepNavigation({ totalSteps, isActive, slug, onComplete }: UseStepNavigationOptions) {
+export function useStepNavigation({ totalSteps, isActive, slug, onComplete, progressMax }: UseStepNavigationOptions) {
   const [currentStep, setCurrentStep] = useState(0);
 
   // Load saved progress when card becomes active
@@ -43,12 +45,15 @@ export function useStepNavigation({ totalSteps, isActive, slug, onComplete }: Us
     }
   }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Save progress on step change
+  // Save progress on step change (광고 스텝 인덱스는 저장하지 않음)
   useEffect(() => {
     if (slug && isActive) {
-      saveProgress(slug, currentStep);
+      const stepToSave = progressMax !== undefined
+        ? Math.min(currentStep, progressMax)
+        : currentStep;
+      saveProgress(slug, stepToSave);
     }
-  }, [slug, currentStep, isActive]);
+  }, [slug, currentStep, isActive, progressMax]);
 
   const goNext = useCallback(() => {
     setCurrentStep(prev => {

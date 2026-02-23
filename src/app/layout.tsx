@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
 import './globals.css';
 
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        <meta name="google-adsense-account" content="ca-pub-9400779918671270" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
@@ -44,6 +46,12 @@ export default function RootLayout({
       </head>
       <body className="bg-[var(--color-bg)] text-[var(--color-text)]" suppressHydrationWarning>
         {children}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9400779918671270"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
