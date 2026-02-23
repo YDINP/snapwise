@@ -8,7 +8,7 @@
 - **설명**: 심리학·과학·역사·비즈니스 개념을 시네마틱 스토리카드로 전달하는 숏폼 블로그
 - **기술 스택**: Next.js 15 / React 19 / TypeScript / Tailwind CSS / MDX
 - **카드 포맷 규격**: `CARD_FORMAT_SPEC.md`
-- **PRD**: `docs/PRD.md`
+- **PRD**: `docs/PRD.md` (기존) / `docs/PRD-redesign-2026.md` (2026 개편)
 
 ## 디렉토리 구조
 
@@ -34,7 +34,7 @@ shortform-blog/
 └── CARD_FORMAT_SPEC.md  # 카드 포맷 규격서
 ```
 
-## 카테고리 (9개)
+## 카테고리 (11개)
 
 | key | label |
 |-----|-------|
@@ -47,6 +47,8 @@ shortform-blog/
 | culture | 문화 |
 | origins | 어원 |
 | etc | 상식 |
+| koreanhistory | 한국사 |
+| tmi | TMI |
 
 ## 개발 명령어
 
