@@ -29,8 +29,8 @@ function parseShowcase(content: string): { intro: string; items: ShowcaseItem[] 
     const lines = sections[i].split('\n').map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) continue;
 
-    // [Fix] 복수 이모지(⭐⭐⭐) 전체 캡처: 비캡처 그룹 + alternation
-    const emojiRegex = /^((?:\p{Emoji_Presentation}|\p{Extended_Pictographic})+)\s+(.+)$/u;
+    // [Fix] 복수 이모지(⭐⭐⭐) + variation selector(FE0F, ZWJ 시퀀스) 전체 캡처
+    const emojiRegex = /^((?:(?:\p{Emoji_Presentation}|\p{Extended_Pictographic})[\uFE0F\u20D0-\u20FF]?(?:\u200D(?:\p{Emoji_Presentation}|\p{Extended_Pictographic})[\uFE0F\u20D0-\u20FF]?)*)+)\s+(.+)$/u;
     let currentItem: ShowcaseItem | null = null;
 
     for (const line of lines) {
