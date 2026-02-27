@@ -129,16 +129,18 @@ function selectCategories() {
   return ALL_CATEGORIES.flatMap(cat => Array(CARDS_PER_CATEGORY).fill(cat));
 }
 
-/** 씨앗 주제에서 미사용 주제 선택 */
-function pickTopic(category, seeds, usedTopics) {
-  const available = seeds[category]?.filter(t => !usedTopics.has(t)) || [];
+/** 씨앗 주제에서 미사용 주제 선택 — usedSeeds에 선택한 씨앗을 기록 */
+function pickTopic(category, seeds, usedSeeds) {
+  const available = seeds[category]?.filter(t => !usedSeeds.has(t)) || [];
   if (available.length === 0) {
     // 씨앗 소진 시 null 반환 → AI가 자유롭게 생성
     return null;
   }
-  // 날짜 기반 결정론적 선택
+  // 날짜 기반 결정론적 선택 (같은 실행 내 중복 방지는 usedSeeds가 담당)
   const idx = Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % available.length;
-  return available[idx];
+  const topic = available[idx];
+  usedSeeds.add(topic);
+  return topic;
 }
 
 // ─── YAML 직렬화 ─────────────────────────────────────────────────────────────
@@ -446,6 +448,7 @@ async function main() {
   console.log(`   총 목표: ${totalCount}장 (${ALL_CATEGORIES.length}카테고리 × ${CARDS_PER_CATEGORY}장)\n`);
 
   const usedTopics = new Set(existingTitles);
+  const usedSeeds = new Set();  // 이번 실행 내 씨앗 키워드 중복 방지
   const newSlugs = new Set();
 
   let successCount = 0;
@@ -454,7 +457,7 @@ async function main() {
 
   for (let i = 0; i < totalCount; i++) {
     const category = categories[i];
-    const topic = pickTopic(category, seeds, usedTopics);
+    const topic = pickTopic(category, seeds, usedSeeds);
 
     console.log(`[${i + 1}/${totalCount}] ${category} — ${topic || '(자유 주제)'}`);
 
