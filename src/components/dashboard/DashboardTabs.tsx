@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -25,6 +25,7 @@ import { CATEGORIES } from '@/lib/categories';
 import CategoryTabs from './CategoryTabs';
 import { getAllLikedCards, type LikedCardInfo } from '@/hooks/useLikes';
 import { getAllSavedCards, type SavedCardInfo } from '@/hooks/useSaved';
+import { supabase } from '@/lib/supabase';
 
 /* ── 유틸 ─────────────────────────────────────────────── */
 function formatDate(dateStr: string): string {
@@ -120,6 +121,17 @@ export default function DashboardTabs({
 }: DashboardTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [likeTop5, setLikeTop5]   = useState<{ slug: string; count: number }[]>([]);
+  const [saveTop5, setSaveTop5]   = useState<{ slug: string; count: number }[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
+
+  const cardLookup = useMemo(
+    () => Object.values(cardsByCategory).flat().reduce(
+      (acc, card) => { acc[card.slug] = card; return acc; },
+      {} as Record<string, CardMeta>
+    ),
+    [cardsByCategory]
+  );
 
   useEffect(() => {
     const liked = getAllLikedCards().map<ActivityItem>((c: LikedCardInfo) => ({
@@ -139,6 +151,51 @@ export default function DashboardTabs({
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 10);
     setActivity(combined);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) { setDbLoading(false); return; }
+
+    async function fetchAggregates() {
+      try {
+        const [likesResult, savesResult] = await Promise.all([
+          supabase!.from('card_likes').select('slug').limit(2000), // TODO: 사용자 확장 시 Supabase RPC(GROUP BY)로 교체
+          supabase!.from('card_saves').select('slug').limit(2000), // TODO: 사용자 확장 시 Supabase RPC(GROUP BY)로 교체
+        ]);
+
+        if (likesResult.data) {
+          const counts: Record<string, number> = {};
+          for (const { slug } of likesResult.data) {
+            counts[slug] = (counts[slug] || 0) + 1;
+          }
+          setLikeTop5(
+            Object.entries(counts)
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 5)
+              .map(([slug, count]) => ({ slug, count }))
+          );
+        }
+
+        if (savesResult.data) {
+          const counts: Record<string, number> = {};
+          for (const { slug } of savesResult.data) {
+            counts[slug] = (counts[slug] || 0) + 1;
+          }
+          setSaveTop5(
+            Object.entries(counts)
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 5)
+              .map(([slug, count]) => ({ slug, count }))
+          );
+        }
+      } catch (err) {
+        console.warn('[SnapWise] 대시보드 집계 로드 실패:', err);
+      } finally {
+        setDbLoading(false);
+      }
+    }
+
+    fetchAggregates();
   }, []);
 
   return (
@@ -238,6 +295,10 @@ export default function DashboardTabs({
                 sortedCategories={sortedCategories}
                 maxCount={maxCount}
                 qualityIssues={qualityIssues}
+                likeTop5={likeTop5}
+                saveTop5={saveTop5}
+                dbLoading={dbLoading}
+                cardLookup={cardLookup}
               />
             </motion.div>
           )}
@@ -280,6 +341,10 @@ function OverviewTab({
   sortedCategories,
   maxCount,
   qualityIssues,
+  likeTop5,
+  saveTop5,
+  dbLoading,
+  cardLookup,
 }: {
   totalCards:          number;
   recentCount:         number;
@@ -293,6 +358,10 @@ function OverviewTab({
   sortedCategories:    CategoryKey[];
   maxCount:            number;
   qualityIssues:       QualityIssue[];
+  likeTop5:            { slug: string; count: number }[];
+  saveTop5:            { slug: string; count: number }[];
+  dbLoading:           boolean;
+  cardLookup:          Record<string, CardMeta>;
 }) {
   return (
     <>
@@ -331,65 +400,115 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 2: 인기 카드 TOP 5 ──────────────────── */}
+      {/* ── 섹션 2: 유저 좋아요 TOP 5 (Supabase 실제 집계) ── */}
       <section>
-        <SectionHeader icon={<Flame size={13} />} title="인기 카드 TOP 5" />
+        <SectionHeader icon={<Heart size={13} fill="currentColor" />} title="유저 좋아요 TOP 5" />
         <div className="dash-card">
-          {popularCards.map((card, i) => {
-            const info  = CATEGORIES[card.category];
-            const score = getPopularityScore(card.slug);
-            return (
-              <Link
-                key={card.slug}
-                href={`/card/${card.slug}`}
-                className="dash-row"
-                style={{
-                  borderBottom: i < popularCards.length - 1 ? '1px solid var(--color-divider)' : 'none',
-                }}
-              >
-                {/* 순위 뱃지 */}
-                <span
-                  className="text-xs font-black w-5 shrink-0 text-center tabular-nums"
-                  style={{
-                    color: i === 0 ? '#F59E0B' : i === 1 ? '#94A3B8' : i === 2 ? '#CD7C3A' : 'var(--color-border)',
-                  }}
+          {dbLoading ? (
+            [0, 1, 2].map((i) => (
+              <div key={i} className="dash-row animate-pulse" style={{ borderBottom: i < 2 ? '1px solid var(--color-divider)' : 'none' }}>
+                <div className="w-5 h-5 rounded" style={{ background: 'var(--color-surface-2)' }} />
+                <div className="w-7 h-7 rounded" style={{ background: 'var(--color-surface-2)' }} />
+                <div className="flex-1 h-4 rounded" style={{ background: 'var(--color-surface-2)' }} />
+              </div>
+            ))
+          ) : likeTop5.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-sm" style={{ color: 'var(--color-muted)' }}>아직 좋아요 데이터가 없어요</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>카드를 좋아요하면 여기에 표시됩니다</p>
+            </div>
+          ) : (
+            likeTop5.map(({ slug, count }, i) => {
+              const card = cardLookup[slug];
+              const info = card ? CATEGORIES[card.category as CategoryKey] : null;
+              return (
+                <Link
+                  key={slug}
+                  href={`/card/${slug}`}
+                  className="dash-row"
+                  style={{ borderBottom: i < likeTop5.length - 1 ? '1px solid var(--color-divider)' : 'none' }}
                 >
-                  {i + 1}
-                </span>
-                <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
-                  {card.emoji}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="text-sm font-medium truncate"
-                    style={{ color: 'var(--color-text)' }}
-                  >
-                    {card.title}
-                  </p>
-                  <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
-                    {info?.label}
-                  </p>
-                </div>
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <div
-                    className="w-16 h-1.5 rounded-full overflow-hidden"
-                    style={{ background: 'var(--color-surface-2)' }}
-                  >
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${score}%`, backgroundColor: info?.accent }}
-                    />
-                  </div>
-                  <span
-                    className="text-[11px] font-bold tabular-nums"
-                    style={{ color: info?.accent }}
-                  >
-                    {score}점
+                  <span className="text-xs font-black w-5 shrink-0 text-center tabular-nums"
+                    style={{ color: i === 0 ? '#F59E0B' : i === 1 ? '#94A3B8' : i === 2 ? '#CD7C3A' : 'var(--color-border)' }}>
+                    {i + 1}
                   </span>
-                </div>
-              </Link>
-            );
-          })}
+                  <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
+                    {card?.emoji ?? '📄'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>
+                      {card?.title ?? slug}
+                    </p>
+                    <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                      {info?.label ?? ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Heart size={11} fill="#EF4444" style={{ color: '#EF4444' }} />
+                    <span className="text-[11px] font-bold tabular-nums" style={{ color: '#EF4444' }}>
+                      {count}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })
+          )}
+        </div>
+      </section>
+
+      {/* ── 섹션 2.5: 유저 저장 TOP 5 (Supabase 실제 집계) ── */}
+      <section>
+        <SectionHeader icon={<Bookmark size={13} fill="currentColor" />} title="유저 저장 TOP 5" />
+        <div className="dash-card">
+          {dbLoading ? (
+            [0, 1, 2].map((i) => (
+              <div key={i} className="dash-row animate-pulse" style={{ borderBottom: i < 2 ? '1px solid var(--color-divider)' : 'none' }}>
+                <div className="w-5 h-5 rounded" style={{ background: 'var(--color-surface-2)' }} />
+                <div className="w-7 h-7 rounded" style={{ background: 'var(--color-surface-2)' }} />
+                <div className="flex-1 h-4 rounded" style={{ background: 'var(--color-surface-2)' }} />
+              </div>
+            ))
+          ) : saveTop5.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-sm" style={{ color: 'var(--color-muted)' }}>아직 저장 데이터가 없어요</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>카드를 저장하면 여기에 표시됩니다</p>
+            </div>
+          ) : (
+            saveTop5.map(({ slug, count }, i) => {
+              const card = cardLookup[slug];
+              const info = card ? CATEGORIES[card.category as CategoryKey] : null;
+              return (
+                <Link
+                  key={slug}
+                  href={`/card/${slug}`}
+                  className="dash-row"
+                  style={{ borderBottom: i < saveTop5.length - 1 ? '1px solid var(--color-divider)' : 'none' }}
+                >
+                  <span className="text-xs font-black w-5 shrink-0 text-center tabular-nums"
+                    style={{ color: i === 0 ? '#F59E0B' : i === 1 ? '#94A3B8' : i === 2 ? '#CD7C3A' : 'var(--color-border)' }}>
+                    {i + 1}
+                  </span>
+                  <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
+                    {card?.emoji ?? '📄'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>
+                      {card?.title ?? slug}
+                    </p>
+                    <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                      {info?.label ?? ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Bookmark size={11} fill="#F97316" style={{ color: '#F97316' }} />
+                    <span className="text-[11px] font-bold tabular-nums" style={{ color: '#F97316' }}>
+                      {count}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })
+          )}
         </div>
       </section>
 
