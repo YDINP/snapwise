@@ -481,49 +481,8 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 3: 최근 추가 카드 ───────────────────── */}
-      <section>
-        <SectionHeader icon={<Clock size={13} />} title="최근 추가" />
-        <div className="dash-card">
-          {recentCards.map((card, i) => {
-            const info = CATEGORIES[card.category];
-            return (
-              <Link
-                key={card.slug}
-                href={`/card/${card.slug}`}
-                className="dash-row"
-                style={{
-                  borderBottom: i < recentCards.length - 1 ? '1px solid var(--color-divider)' : 'none',
-                }}
-              >
-                <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
-                  {card.emoji}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="text-sm font-medium truncate"
-                    style={{ color: 'var(--color-text)' }}
-                  >
-                    {card.title}
-                  </p>
-                  <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
-                    {formatDate(card.pubDate)}
-                  </p>
-                </div>
-                <span
-                  className="text-[11px] px-2 py-0.5 rounded-full font-medium shrink-0"
-                  style={{
-                    background: `${info?.accent}18`,
-                    color: info?.accent,
-                  }}
-                >
-                  {info?.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+      {/* ── 섹션 3: 최근 추가 카드 (날짜 드롭다운) ────── */}
+      <RecentCardsSection recentCards={recentCards} />
 
       {/* ── 섹션 5: 카테고리 현황 바 차트 ───────────── */}
       <section>
@@ -636,6 +595,132 @@ function OverviewTab({
         )}
       </section>
     </>
+  );
+}
+
+/* ── 최근 추가 섹션 (날짜 드롭다운) ──────────────────── */
+function RecentCardsSection({ recentCards }: { recentCards: CardMeta[] }) {
+  const [selectedDate, setSelectedDate] = useState<string>('all');
+
+  // pubDate(YYYY-MM-DD) 기준 중복 제거 + 최신순 날짜 목록
+  const dateOptions = useMemo(() => {
+    const dates = Array.from(
+      new Set(recentCards.map((c) => c.pubDate.slice(0, 10)))
+    );
+    return dates.sort((a, b) => b.localeCompare(a));
+  }, [recentCards]);
+
+  // 선택 날짜에 맞는 카드 필터링
+  const filteredCards = useMemo(() => {
+    if (selectedDate === 'all') return recentCards.slice(0, 10);
+    return recentCards.filter((c) => c.pubDate.startsWith(selectedDate));
+  }, [recentCards, selectedDate]);
+
+  return (
+    <section>
+      {/* 헤더 + 드롭다운 */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span style={{ color: 'var(--color-muted)' }}>
+            <Clock size={13} />
+          </span>
+          <h2 className="text-sm font-bold tracking-tight" style={{ color: 'var(--color-text)' }}>
+            최근 추가
+          </h2>
+        </div>
+        {/* 날짜 드롭다운 */}
+        <div className="relative">
+          <select
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="appearance-none text-xs font-medium pl-2.5 pr-6 py-1 rounded-lg cursor-pointer focus:outline-none"
+            style={{
+              background: 'var(--color-surface)',
+              color: 'var(--color-text-sub)',
+              border: '1px solid var(--color-border)',
+            }}
+            aria-label="날짜 선택"
+          >
+            <option value="all">전체 (최근 10개)</option>
+            {dateOptions.map((date) => (
+              <option key={date} value={date}>
+                {formatDate(date)}
+              </option>
+            ))}
+          </select>
+          {/* 드롭다운 화살표 아이콘 */}
+          <span
+            className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2"
+            style={{ color: 'var(--color-muted)' }}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      {/* 카드 목록 */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={selectedDate}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          className="dash-card"
+        >
+          {filteredCards.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                해당 날짜에 추가된 카드가 없어요
+              </p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>
+                다른 날짜를 선택해 보세요
+              </p>
+            </div>
+          ) : (
+            filteredCards.map((card, i) => {
+              const info = CATEGORIES[card.category];
+              return (
+                <Link
+                  key={card.slug}
+                  href={`/card/${card.slug}`}
+                  className="dash-row"
+                  style={{
+                    borderBottom: i < filteredCards.length - 1 ? '1px solid var(--color-divider)' : 'none',
+                  }}
+                >
+                  <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
+                    {card.emoji}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-sm font-medium truncate"
+                      style={{ color: 'var(--color-text)' }}
+                    >
+                      {card.title}
+                    </p>
+                    <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                      {formatDate(card.pubDate)}
+                    </p>
+                  </div>
+                  <span
+                    className="text-[11px] px-2 py-0.5 rounded-full font-medium shrink-0"
+                    style={{
+                      background: `${info?.accent}18`,
+                      color: info?.accent,
+                    }}
+                  >
+                    {info?.label}
+                  </span>
+                </Link>
+              );
+            })
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </section>
   );
 }
 

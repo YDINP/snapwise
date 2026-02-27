@@ -71,6 +71,16 @@
   --space-10: 40px;
   --space-12: 48px;
 
+  /* ─── Card Typography (시네마틱 카드 전용) ─────────── */
+  --card-text-body:    var(--text-base);    /* 15px — 본문 기본 */
+  --card-text-body-lg: var(--text-md);      /* 17px — 짧은 본문/강조 */
+  --card-text-caption: var(--text-sm);      /* 13px — 캡션/레이블 */
+  --card-text-title:   var(--text-xl);      /* 22px — 스텝 타이틀 */
+  --card-text-hero:    var(--text-2xl);     /* 26px — 히어로/임팩트 */
+  --card-line-height:       1.75;
+  --card-line-height-tight: 1.45;
+  --card-max-width: 22rem;                  /* 352px — 본문 최대 폭 */
+
   /* ─── Animation ────────────────────────────────── */
   --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth:   cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -438,4 +448,14 @@ body {
 
 .step-overlay-light {
   background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
+}
+
+/* ================================================================
+   CARD UTILITY — 시네마틱 카드 공통 패턴
+   ================================================================ */
+
+/* 한국어 텍스트 최적화 — 인라인 style 중복 제거용 */
+.card-text-balanced {
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }

@@ -48,7 +48,9 @@ export default function DashboardPage() {
 
   const maxCount = Math.max(...ALL_CATEGORY_KEYS.map((k) => categoryCounts[k]), 1);
 
-  const recentCards = cards.slice(0, 5);
+  const recentCards = [...cards].sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+  );
 
   const cardsByCategory = Object.fromEntries(
     ALL_CATEGORY_KEYS.map((k) => [k, cards.filter((c) => c.category === k)])
