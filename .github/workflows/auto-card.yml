@@ -1,0 +1,61 @@
+name: Auto Card Generator
+
+on:
+  schedule:
+    # 월/수/금 KST 09:00 (UTC 00:00)
+    - cron: '0 0 * * 1,3,5'
+  workflow_dispatch:
+    inputs:
+      category:
+        description: 'Category (auto|science|psychology|people|history|koreanhistory|life|business|culture|origins|etc|tmi)'
+        required: false
+        default: 'auto'
+      cards_per_category:
+        description: 'Cards per category (1-5, default: 2) — 11카테고리 × N장'
+        required: false
+        default: '2'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate cards
+        run: node scripts/generate-cards.mjs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          INPUT_CATEGORY: ${{ github.event.inputs.category || 'auto' }}
+          CARDS_PER_CATEGORY: ${{ github.event.inputs.cards_per_category || '2' }}
+
+      - name: Check for new cards
+        id: check_changes
+        run: |
+          git diff --staged --quiet && \
+          git diff --quiet && \
+          echo "changed=false" >> "$GITHUB_OUTPUT" || \
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push new cards
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/
+          if git diff --staged --quiet; then
+            echo "No staged changes to commit"
+          else
+            CARD_COUNT="${CARD_COUNT:-카드}"
+            git commit -m "[auto] SnapWise 카드 ${CARD_COUNT}장 자동 생성 ($(date '+%Y-%m-%d'))"
+            git push
+            echo "✅ 커밋 완료"
+          fi
