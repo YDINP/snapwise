@@ -242,6 +242,48 @@ function validateCard(card) {
   return { valid: errors.length === 0, errors };
 }
 
+// ─── 줄바꿈 정규화 ────────────────────────────────────────────────────────────
+
+/**
+ * 줄바꿈 없이 긴 단일행으로 생성된 step content를 문장 경계에서 분리합니다.
+ * renderWithLineBreaks는 \n 기준으로 <br /> 삽입하므로 줄바꿈이 없으면 텍스트가 뭉침.
+ *
+ * 처리 기준:
+ *  - 이미 \n이 있으면 통과
+ *  - 80자 미만이면 통과
+ *  - 문장 종결 부호(. ! ?) 뒤 공백 + 한국어/볼드 시작 → \n 삽입
+ */
+function normalizeLineBreaks(content) {
+  if (!content || content.includes('\n')) return content;
+  if (content.length <= 80) return content;
+
+  return content
+    // ". " / "! " / "? " 뒤에 한국어, 볼드(**), 따옴표("') 시작이면 줄바꿈
+    .replace(/([.!?])\s+(?=[가-힣\*"'\[⚡📖🎬💥📊])/g, '$1\n')
+    // "다 " / "요 " 등 한국어 종결어미 + 공백 + 한국어 시작이면 줄바꿈 (위에서 못 잡은 경우)
+    .replace(/([다요까죠야네며]\s)(?=[가-힣\*"'])/g, (m, p1) => p1.trimEnd() + '\n');
+}
+
+/**
+ * 카드의 모든 step content에 줄바꿈 정규화를 적용하고 경고를 반환합니다.
+ */
+function normalizeCardLineBreaks(card) {
+  const warnings = [];
+  for (const step of card.steps) {
+    const before = step.content;
+    step.content = normalizeLineBreaks(step.content);
+    // 정규화 후에도 100자 초과 단일행이 남으면 경고
+    if (!step.content.includes('\n') && step.content.length > 100) {
+      warnings.push(`[${step.type}] 줄바꿈 없는 긴 텍스트 (${step.content.length}자)`);
+    } else if (step.content !== before) {
+      // 정규화가 적용된 경우 로그
+      const lineCount = step.content.split('\n').length;
+      warnings.push(`[${step.type}] 줄바꿈 자동 삽입 → ${lineCount}줄`);
+    }
+  }
+  return warnings;
+}
+
 // ─── Claude API 호출 ──────────────────────────────────────────────────────────
 
 async function callClaude(systemPrompt, userPrompt) {
@@ -304,6 +346,13 @@ SnapWise는 복잡한 지식을 10~14개의 시네마틱 스텝으로 전달하�
 - 첫 스텝(cinematic-hook): 역설적 상황이나 미스터리로 시작
 - reveal-title: 핵심 개념 이름 + 간단 설명
 - outro: 실생활 적용 또는 인사이트
+
+### 줄바꿈 규칙 (필수)
+- content 내 문장은 반드시 \\n(줄바꿈)으로 구분할 것
+- 한 content에 여러 문장이 있으면 각 문장마다 새 줄로 시작
+- 절대로 여러 문장을 한 줄에 이어 쓰지 말 것
+- 나쁜 예: "첫 문장이다. 두 번째 문장이다. 세 번째 문장이다."
+- 좋은 예: "첫 문장이다.\\n두 번째 문장이다.\\n세 번째 문장이다."
 
 ## 출력 형식 (JSON만 출력, 다른 텍스트 없음)
 
@@ -395,6 +444,14 @@ async function generateCard(category, topic, existingSlugs, retryCount = 0) {
       return generateCard(category, topic, existingSlugs, retryCount + 1);
     }
     return null;
+  }
+
+  // 줄바꿈 정규화 — 문장 경계에서 \n 자동 삽입
+  const lineBreakWarnings = normalizeCardLineBreaks(parsed);
+  if (lineBreakWarnings.length > 0) {
+    for (const w of lineBreakWarnings) {
+      console.log(`  ⚠ 줄바꿈: ${w}`);
+    }
   }
 
   return parsed;
