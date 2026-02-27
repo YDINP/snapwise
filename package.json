@@ -12,6 +12,7 @@
   "dependencies": {
     "@splinetool/react-spline": "^4.1.0",
     "@splinetool/runtime": "^1.12.58",
+    "@supabase/supabase-js": "^2.98.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.564.0",
     "motion": "^12.34.3",

@@ -8,6 +8,7 @@ import StepProgressBar from '@/components/story/StepProgressBar';
 import StepRenderer from '@/components/story/StepRenderer';
 import CinematicRenderer from '@/components/cinematic/CinematicRenderer';
 import StepGlossary from '@/components/cinematic/StepGlossary';
+import WordCountBadge from '@/components/ui/WordCountBadge';
 
 interface StoryCardProps {
   card: CardMeta;
@@ -82,13 +83,16 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
         </button>
       )}
 
-      {/* Step type badge */}
+      {/* Step type badge + word count badge */}
       {totalSteps > 0 && step && (
         <div
-          className="absolute right-3 z-50 rounded-full bg-black/30 px-3 py-1 text-center text-[10px] font-medium text-white/60 backdrop-blur-sm"
+          className="absolute right-3 z-50 flex items-center gap-1.5"
           style={{ top: topOffset + 16 }}
         >
-          {step.type}
+          <WordCountBadge content={step.content} />
+          <div className="rounded-full bg-black/30 px-3 py-1 text-center text-[10px] font-medium text-white/60 backdrop-blur-sm">
+            {step.type}
+          </div>
         </div>
       )}
 

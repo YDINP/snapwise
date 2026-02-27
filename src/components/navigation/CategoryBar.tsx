@@ -9,9 +9,10 @@ import type { CategoryKey } from '@/types/content';
 
 interface CategoryBarProps {
   currentCategory?: CategoryKey;
+  cardCounts?: Record<string, number>;
 }
 
-export default function CategoryBar({ currentCategory }: CategoryBarProps) {
+export default function CategoryBar({ currentCategory, cardCounts }: CategoryBarProps) {
   const pathname = usePathname();
   const isSavedPage = pathname === '/saved';
   const isAllSelected = currentCategory === undefined && !isSavedPage;
@@ -117,6 +118,19 @@ export default function CategoryBar({ currentCategory }: CategoryBarProps) {
                 >
                   <span aria-hidden="true">{info.emoji}</span>
                   <span>{info.label}</span>
+                  {cardCounts?.[key] !== undefined && (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        lineHeight: 1,
+                        fontWeight: 400,
+                        opacity: isSelected ? 0.85 : 0.55,
+                        marginLeft: '1px',
+                      }}
+                    >
+                      {cardCounts[key]}
+                    </span>
+                  )}
                 </motion.div>
               </Link>
             );

@@ -1,4 +1,4 @@
-import { getAllCards } from '@/lib/content';
+import { getAllCards, getCardCountsAllCategories } from '@/lib/content';
 import CardFeed from '@/components/feed/CardFeed';
 import CategoryBar from '@/components/navigation/CategoryBar';
 import type { Metadata } from 'next';
@@ -23,10 +23,11 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const allCards = getAllCards();
+  const cardCounts = getCardCountsAllCategories();
 
   return (
     <main className="relative h-dvh overflow-hidden">
-      <CategoryBar currentCategory={undefined} />
+      <CategoryBar currentCategory={undefined} cardCounts={cardCounts} />
       <CardFeed cards={allCards} />
     </main>
   );

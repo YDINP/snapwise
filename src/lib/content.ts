@@ -144,6 +144,14 @@ export function getCardsByCategory(category: CategoryKey): CardMeta[] {
   return getAllCards().filter((card) => card.category === category);
 }
 
+export function getCardCountsAllCategories(): Record<string, number> {
+  const cards = getAllCards();
+  return cards.reduce<Record<string, number>>((acc, card) => {
+    acc[card.category] = (acc[card.category] ?? 0) + 1;
+    return acc;
+  }, {});
+}
+
 export function getCardBySlug(slug: string): CardMeta | undefined {
   return getAllCards().find((card) => card.slug === slug);
 }
