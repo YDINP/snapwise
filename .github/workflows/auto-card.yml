@@ -37,22 +37,13 @@ jobs:
           INPUT_CATEGORY: ${{ github.event.inputs.category || 'auto' }}
           CARDS_PER_CATEGORY: ${{ github.event.inputs.cards_per_category || '2' }}
 
-      - name: Check for new cards
-        id: check_changes
-        run: |
-          git diff --staged --quiet && \
-          git diff --quiet && \
-          echo "changed=false" >> "$GITHUB_OUTPUT" || \
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-
       - name: Commit and push new cards
-        if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add content/
           if git diff --staged --quiet; then
-            echo "No staged changes to commit"
+            echo "No new cards to commit"
           else
             CARD_COUNT="${CARD_COUNT:-카드}"
             git commit -m "[auto] SnapWise 카드 ${CARD_COUNT}장 자동 생성 ($(date '+%Y-%m-%d'))"
