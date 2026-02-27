@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -15,13 +15,16 @@ import {
   Flame,
   Clock,
   ExternalLink,
-  Bookmark,
   Heart,
+  Bookmark,
+  Activity,
 } from 'lucide-react';
 import type { CardMeta, CategoryKey } from '@/types/content';
 import type { QualityIssue } from '@/app/dashboard/page';
 import { CATEGORIES } from '@/lib/categories';
 import CategoryTabs from './CategoryTabs';
+import { getAllLikedCards, type LikedCardInfo } from '@/hooks/useLikes';
+import { getAllSavedCards, type SavedCardInfo } from '@/hooks/useSaved';
 
 /* ── 유틸 ─────────────────────────────────────────────── */
 function formatDate(dateStr: string): string {
@@ -36,6 +39,11 @@ function getPopularityScore(slug: string): number {
   }
   return 12 + Math.abs(hash % 78);
 }
+
+/* ── 활동 타입 ────────────────────────────────────────── */
+type ActivityItem =
+  | { type: 'like'; slug: string; date: string }
+  | { type: 'save'; slug: string; title: string; emoji: string; category: string; date: string };
 
 /* ── 섹션 헤더 ────────────────────────────────────────── */
 function SectionHeader({
@@ -79,24 +87,6 @@ const TABS = [
 
 type TabKey = 'overview' | 'category';
 
-/* ── 저장 점수 (시드: hash + 7919) ──────────────────── */
-function getSaveScore(slug: string): number {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
-  }
-  return 20 + Math.abs((hash + 7919) % 73);
-}
-
-/* ── 좋아요 점수 (시드: hash ^ 31337) ───────────────── */
-function getLikeScore(slug: string): number {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
-  }
-  return 15 + Math.abs((hash ^ 31337) % 68);
-}
-
 /* ── Props ────────────────────────────────────────────── */
 export interface DashboardTabsProps {
   totalCards:           number;
@@ -106,8 +96,6 @@ export interface DashboardTabsProps {
   avgCardsPerCategory:  number;
   popularCards:         CardMeta[];
   recentCards:          CardMeta[];
-  savedCards:           CardMeta[];
-  recentLikedCards:     CardMeta[];
   cardsByCategory:      Record<string, CardMeta[]>;
   categoryCounts:       Record<string, number>;
   sortedCategories:     CategoryKey[];
@@ -124,8 +112,6 @@ export default function DashboardTabs({
   avgCardsPerCategory,
   popularCards,
   recentCards,
-  savedCards,
-  recentLikedCards,
   cardsByCategory,
   categoryCounts,
   sortedCategories,
@@ -133,6 +119,27 @@ export default function DashboardTabs({
   qualityIssues,
 }: DashboardTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+
+  useEffect(() => {
+    const liked = getAllLikedCards().map<ActivityItem>((c: LikedCardInfo) => ({
+      type: 'like',
+      slug: c.slug,
+      date: c.likedAt,
+    }));
+    const saved = getAllSavedCards().map<ActivityItem>((c: SavedCardInfo) => ({
+      type: 'save',
+      slug: c.slug,
+      title: c.title,
+      emoji: c.emoji,
+      category: c.category,
+      date: c.savedAt,
+    }));
+    const combined = [...liked, ...saved]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 10);
+    setActivity(combined);
+  }, []);
 
   return (
     <div
@@ -226,8 +233,7 @@ export default function DashboardTabs({
                 avgCardsPerCategory={avgCardsPerCategory}
                 popularCards={popularCards}
                 recentCards={recentCards}
-                savedCards={savedCards}
-                recentLikedCards={recentLikedCards}
+                activity={activity}
                 categoryCounts={categoryCounts}
                 sortedCategories={sortedCategories}
                 maxCount={maxCount}
@@ -269,8 +275,7 @@ function OverviewTab({
   avgCardsPerCategory,
   popularCards,
   recentCards,
-  savedCards,
-  recentLikedCards,
+  activity,
   categoryCounts,
   sortedCategories,
   maxCount,
@@ -283,8 +288,7 @@ function OverviewTab({
   avgCardsPerCategory: number;
   popularCards:        CardMeta[];
   recentCards:         CardMeta[];
-  savedCards:          CardMeta[];
-  recentLikedCards:    CardMeta[];
+  activity:            ActivityItem[];
   categoryCounts:      Record<string, number>;
   sortedCategories:    CategoryKey[];
   maxCount:            number;
@@ -389,106 +393,92 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 3: 저장 많은 카드 TOP 5 ────────────── */}
+      {/* ── 섹션 3: 내 최근 활동 (실제 localStorage) ── */}
       <section>
-        <SectionHeader icon={<Bookmark size={13} />} title="저장 많은 카드 TOP 5" />
-        <div className="dash-card">
-          {savedCards.map((card, i) => {
-            const info      = CATEGORIES[card.category];
-            const saveScore = getSaveScore(card.slug);
-            return (
+        <SectionHeader icon={<Activity size={13} />} title="내 최근 활동" />
+        {activity.length === 0 ? (
+          <div
+            className="dash-card px-4 py-8 text-center flex flex-col items-center gap-3"
+          >
+            <div className="flex items-center gap-2" style={{ color: 'var(--color-border)' }}>
+              <Heart size={18} />
+              <Bookmark size={18} />
+            </div>
+            <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
+              아직 활동이 없어요
+            </p>
+            <p className="text-xs" style={{ color: 'var(--color-placeholder)' }}>
+              카드를 좋아요하거나 저장해보세요
+            </p>
+            <Link
+              href="/"
+              className="text-xs px-3 py-1.5 rounded-full transition-opacity hover:opacity-70 mt-1"
+              style={{ background: 'var(--color-surface-2)', color: 'var(--color-text-sub)' }}
+            >
+              카드 보러가기
+            </Link>
+          </div>
+        ) : (
+          <div className="dash-card">
+            {activity.map((item, i) => (
               <Link
-                key={card.slug}
-                href={`/card/${card.slug}`}
+                key={`${item.type}-${item.slug}-${i}`}
+                href={`/card/${item.slug}`}
                 className="dash-row"
                 style={{
-                  borderBottom: i < savedCards.length - 1 ? '1px solid var(--color-divider)' : 'none',
+                  borderBottom: i < activity.length - 1 ? '1px solid var(--color-divider)' : 'none',
                 }}
               >
-                {/* 순위 뱃지 */}
+                {/* 타입 아이콘 */}
                 <span
-                  className="text-xs font-black w-5 shrink-0 text-center tabular-nums"
-                  style={{
-                    color: i === 0 ? '#F59E0B' : i === 1 ? '#94A3B8' : i === 2 ? '#CD7C3A' : 'var(--color-border)',
-                  }}
+                  className="w-7 flex items-center justify-center shrink-0"
+                  style={{ color: item.type === 'like' ? '#EF4444' : '#F97316' }}
                 >
-                  {i + 1}
+                  {item.type === 'like' ? (
+                    <Heart size={15} fill="currentColor" />
+                  ) : (
+                    <Bookmark size={15} fill="currentColor" />
+                  )}
                 </span>
-                <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
-                  {card.emoji}
-                </span>
+
+                {/* 내용 */}
                 <div className="flex-1 min-w-0">
-                  <p
-                    className="text-sm font-medium truncate"
-                    style={{ color: 'var(--color-text)' }}
-                  >
-                    {card.title}
-                  </p>
-                  <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
-                    {info?.label}
-                  </p>
+                  {item.type === 'save' ? (
+                    <>
+                      <p className="text-sm font-medium truncate flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
+                        <span aria-hidden="true">{item.emoji}</span>
+                        <span className="truncate">{item.title}</span>
+                      </p>
+                      <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                        {CATEGORIES[item.category as CategoryKey]?.label ?? item.category}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>
+                        {item.slug}
+                      </p>
+                      <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                        좋아요한 카드
+                      </p>
+                    </>
+                  )}
                 </div>
+
+                {/* 날짜 */}
                 <span
-                  className="text-[11px] font-bold tabular-nums shrink-0"
+                  className="text-[11px] tabular-nums shrink-0"
                   style={{ color: 'var(--color-muted)' }}
                 >
-                  🔖 {saveScore}
+                  {formatDate(item.date)}
                 </span>
               </Link>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* ── 섹션 4: 최근 좋아요 카드 ─────────────────── */}
-      <section>
-        <SectionHeader icon={<Heart size={13} />} title="최근 좋아요" />
-        <div className="dash-card">
-          {recentLikedCards.map((card, i) => {
-            const info      = CATEGORIES[card.category];
-            const likeScore = getLikeScore(card.slug);
-            return (
-              <Link
-                key={card.slug}
-                href={`/card/${card.slug}`}
-                className="dash-row"
-                style={{
-                  borderBottom: i < recentLikedCards.length - 1 ? '1px solid var(--color-divider)' : 'none',
-                }}
-              >
-                <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
-                  {card.emoji}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="text-sm font-medium truncate"
-                    style={{ color: 'var(--color-text)' }}
-                  >
-                    {card.title}
-                  </p>
-                  <span
-                    className="text-[11px] px-2 py-0.5 rounded-full font-medium"
-                    style={{
-                      background: `${info?.accent}18`,
-                      color: info?.accent,
-                    }}
-                  >
-                    {info?.label}
-                  </span>
-                </div>
-                <span
-                  className="text-[11px] font-bold tabular-nums shrink-0"
-                  style={{ color: 'var(--color-muted)' }}
-                >
-                  ❤️ {likeScore}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── 섹션 5: 최근 추가 카드 ───────────────────── */}
+      {/* ── 섹션 4: 최근 추가 카드 ───────────────────── */}
       <section>
         <SectionHeader icon={<Clock size={13} />} title="최근 추가" />
         <div className="dash-card">
@@ -532,7 +522,7 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 6: 카테고리 현황 바 차트 ───────────── */}
+      {/* ── 섹션 5: 카테고리 현황 바 차트 ───────────── */}
       <section>
         <SectionHeader icon={<BarChart2 size={13} />} title="카테고리 현황" />
         <div className="dash-card">
@@ -583,7 +573,7 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 7: 콘텐츠 품질 체크 ────────────────── */}
+      {/* ── 섹션 6: 콘텐츠 품질 체크 ────────────────── */}
       <section>
         <SectionHeader icon={<AlertTriangle size={13} />} title="품질 체크" />
         {qualityIssues.length === 0 ? (

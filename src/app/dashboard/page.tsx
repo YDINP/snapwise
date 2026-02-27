@@ -23,23 +23,6 @@ function getPopularityScore(slug: string): number {
   return 12 + Math.abs(hash % 78);
 }
 
-/** 저장 점수 (시드: hash + 7919, 범위 20–92) */
-function getSaveScore(slug: string): number {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
-  }
-  return 20 + Math.abs((hash + 7919) % 73);
-}
-
-/** 좋아요 점수 (시드: hash ^ 31337, 범위 15–82) */
-function getLikeScore(slug: string): number {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
-  }
-  return 15 + Math.abs((hash ^ 31337) % 68);
-}
 
 export interface QualityIssue {
   slug:   string;
@@ -75,15 +58,6 @@ export default function DashboardPage() {
     .sort((a, b) => getPopularityScore(b.slug) - getPopularityScore(a.slug))
     .slice(0, 5);
 
-  const savedCards = [...cards]
-    .sort((a, b) => getSaveScore(b.slug) - getSaveScore(a.slug))
-    .slice(0, 5);
-
-  const recentCards14 = cards.filter((c) => isWithinLastNDays(c.pubDate, 14));
-  const recentLikedCards = (recentCards14.length > 0 ? [...recentCards14] : [...cards])
-    .sort((a, b) => getLikeScore(b.slug) - getLikeScore(a.slug))
-    .slice(0, 5);
-
   /** 평균 카드 수 / 카테고리 */
   const avgCardsPerCategory = categoryCounts
     ? Math.round(cards.length / (ALL_CATEGORY_KEYS.length || 1))
@@ -115,8 +89,6 @@ export default function DashboardPage() {
       avgCardsPerCategory={avgCardsPerCategory}
       popularCards={popularCards}
       recentCards={recentCards}
-      savedCards={savedCards}
-      recentLikedCards={recentLikedCards}
       cardsByCategory={cardsByCategory}
       categoryCounts={categoryCounts}
       sortedCategories={sortedCategories}
