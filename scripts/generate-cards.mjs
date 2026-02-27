@@ -39,7 +39,7 @@ const ALL_CATEGORIES = [
 
 const VALID_STEP_TYPES = [
   'cinematic-hook', 'scene', 'dialogue', 'narration', 'impact',
-  'vs', 'stat', 'quote', 'timeline', 'showcase', 'panel', 'splash',
+  'vs', 'stat', 'quote', 'showcase',
   'reveal-title', 'outro'
 ];
 
@@ -329,13 +329,10 @@ SnapWise는 복잡한 지식을 10~14개의 시네마틱 스텝으로 전달하�
 - dialogue: 캐릭터 대사 (characterId 필수)
 - narration: 📖 사실/개념 설명
 - impact: ⚡ 핵심 강조 (짧고 강하게)
-- vs: 비교 대결 (항목|설명\\n항목|설명 형식)
+- vs: 비교 대결 (반드시 첫 행=열머리글, 이후=데이터 행. 형식: 좌열명|우열명\\n항목A|항목B\\n항목C|항목D)
 - stat: 통계/수치 (📊 아이콘 포함)
 - quote: 명언 인용
-- timeline: 시간순 나열
-- showcase: 목록 데이터
-- panel: 다인 대화 (여러 캐릭터)
-- splash: 💥 만화 스플래시 효과
+- showcase: 목록 데이터 (───구분자 섹션)
 - reveal-title: 제목/개념 공개 (끝에서 두 번째)
 - outro: 마무리 메시지
 
