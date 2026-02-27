@@ -15,6 +15,8 @@ import {
   Flame,
   Clock,
   ExternalLink,
+  Bookmark,
+  Heart,
 } from 'lucide-react';
 import type { CardMeta, CategoryKey } from '@/types/content';
 import type { QualityIssue } from '@/app/dashboard/page';
@@ -77,6 +79,24 @@ const TABS = [
 
 type TabKey = 'overview' | 'category';
 
+/* ── 저장 점수 (시드: hash + 7919) ──────────────────── */
+function getSaveScore(slug: string): number {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
+  }
+  return 20 + Math.abs((hash + 7919) % 73);
+}
+
+/* ── 좋아요 점수 (시드: hash ^ 31337) ───────────────── */
+function getLikeScore(slug: string): number {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = ((hash << 5) - hash + slug.charCodeAt(i)) | 0;
+  }
+  return 15 + Math.abs((hash ^ 31337) % 68);
+}
+
 /* ── Props ────────────────────────────────────────────── */
 export interface DashboardTabsProps {
   totalCards:           number;
@@ -86,6 +106,8 @@ export interface DashboardTabsProps {
   avgCardsPerCategory:  number;
   popularCards:         CardMeta[];
   recentCards:          CardMeta[];
+  savedCards:           CardMeta[];
+  recentLikedCards:     CardMeta[];
   cardsByCategory:      Record<string, CardMeta[]>;
   categoryCounts:       Record<string, number>;
   sortedCategories:     CategoryKey[];
@@ -102,6 +124,8 @@ export default function DashboardTabs({
   avgCardsPerCategory,
   popularCards,
   recentCards,
+  savedCards,
+  recentLikedCards,
   cardsByCategory,
   categoryCounts,
   sortedCategories,
@@ -112,7 +136,7 @@ export default function DashboardTabs({
 
   return (
     <div
-      className="min-h-screen"
+      className="page-scrollable"
       style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
       {/* ─── 스티키 헤더 + 탭바 ──────────────────────── */}
@@ -202,6 +226,8 @@ export default function DashboardTabs({
                 avgCardsPerCategory={avgCardsPerCategory}
                 popularCards={popularCards}
                 recentCards={recentCards}
+                savedCards={savedCards}
+                recentLikedCards={recentLikedCards}
                 categoryCounts={categoryCounts}
                 sortedCategories={sortedCategories}
                 maxCount={maxCount}
@@ -243,6 +269,8 @@ function OverviewTab({
   avgCardsPerCategory,
   popularCards,
   recentCards,
+  savedCards,
+  recentLikedCards,
   categoryCounts,
   sortedCategories,
   maxCount,
@@ -255,6 +283,8 @@ function OverviewTab({
   avgCardsPerCategory: number;
   popularCards:        CardMeta[];
   recentCards:         CardMeta[];
+  savedCards:          CardMeta[];
+  recentLikedCards:    CardMeta[];
   categoryCounts:      Record<string, number>;
   sortedCategories:    CategoryKey[];
   maxCount:            number;
@@ -359,7 +389,106 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 3: 최근 추가 카드 ───────────────────── */}
+      {/* ── 섹션 3: 저장 많은 카드 TOP 5 ────────────── */}
+      <section>
+        <SectionHeader icon={<Bookmark size={13} />} title="저장 많은 카드 TOP 5" />
+        <div className="dash-card">
+          {savedCards.map((card, i) => {
+            const info      = CATEGORIES[card.category];
+            const saveScore = getSaveScore(card.slug);
+            return (
+              <Link
+                key={card.slug}
+                href={`/card/${card.slug}`}
+                className="dash-row"
+                style={{
+                  borderBottom: i < savedCards.length - 1 ? '1px solid var(--color-divider)' : 'none',
+                }}
+              >
+                {/* 순위 뱃지 */}
+                <span
+                  className="text-xs font-black w-5 shrink-0 text-center tabular-nums"
+                  style={{
+                    color: i === 0 ? '#F59E0B' : i === 1 ? '#94A3B8' : i === 2 ? '#CD7C3A' : 'var(--color-border)',
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
+                  {card.emoji}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-sm font-medium truncate"
+                    style={{ color: 'var(--color-text)' }}
+                  >
+                    {card.title}
+                  </p>
+                  <p className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                    {info?.label}
+                  </p>
+                </div>
+                <span
+                  className="text-[11px] font-bold tabular-nums shrink-0"
+                  style={{ color: 'var(--color-muted)' }}
+                >
+                  🔖 {saveScore}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── 섹션 4: 최근 좋아요 카드 ─────────────────── */}
+      <section>
+        <SectionHeader icon={<Heart size={13} />} title="최근 좋아요" />
+        <div className="dash-card">
+          {recentLikedCards.map((card, i) => {
+            const info      = CATEGORIES[card.category];
+            const likeScore = getLikeScore(card.slug);
+            return (
+              <Link
+                key={card.slug}
+                href={`/card/${card.slug}`}
+                className="dash-row"
+                style={{
+                  borderBottom: i < recentLikedCards.length - 1 ? '1px solid var(--color-divider)' : 'none',
+                }}
+              >
+                <span className="text-xl w-7 text-center shrink-0" aria-hidden="true">
+                  {card.emoji}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-sm font-medium truncate"
+                    style={{ color: 'var(--color-text)' }}
+                  >
+                    {card.title}
+                  </p>
+                  <span
+                    className="text-[11px] px-2 py-0.5 rounded-full font-medium"
+                    style={{
+                      background: `${info?.accent}18`,
+                      color: info?.accent,
+                    }}
+                  >
+                    {info?.label}
+                  </span>
+                </div>
+                <span
+                  className="text-[11px] font-bold tabular-nums shrink-0"
+                  style={{ color: 'var(--color-muted)' }}
+                >
+                  ❤️ {likeScore}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── 섹션 5: 최근 추가 카드 ───────────────────── */}
       <section>
         <SectionHeader icon={<Clock size={13} />} title="최근 추가" />
         <div className="dash-card">
@@ -403,7 +532,7 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 4: 카테고리 현황 바 차트 ───────────── */}
+      {/* ── 섹션 6: 카테고리 현황 바 차트 ───────────── */}
       <section>
         <SectionHeader icon={<BarChart2 size={13} />} title="카테고리 현황" />
         <div className="dash-card">
@@ -454,7 +583,7 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 5: 콘텐츠 품질 체크 ────────────────── */}
+      {/* ── 섹션 7: 콘텐츠 품질 체크 ────────────────── */}
       <section>
         <SectionHeader icon={<AlertTriangle size={13} />} title="품질 체크" />
         {qualityIssues.length === 0 ? (
