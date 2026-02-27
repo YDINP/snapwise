@@ -8,8 +8,11 @@ export type V2StepType = 'hook' | 'story' | 'detail' | 'example' | 'reveal' | 't
 // v3 cinematic step types
 export type V3StepType = 'cinematic-hook' | 'scene' | 'dialogue' | 'narration' | 'impact' | 'reveal-title' | 'outro' | 'showcase' | 'vs' | 'stat' | 'quote' | 'steps' | 'timeline' | 'panel' | 'splash' | 'manga-scene';
 
+// v4 enhanced step types — 2026 리듬 리디자인
+export type V4StepType = 'fact' | 'cliffhanger' | 'data-viz';
+
 // Union of all step types
-export type StepType = V2StepType | V3StepType;
+export type StepType = V2StepType | V3StepType | V4StepType;
 
 export type StoryType = 'realStory' | 'whatIf' | 'fable' | 'firstPerson' | 'twist';
 

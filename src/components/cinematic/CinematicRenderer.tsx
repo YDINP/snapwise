@@ -17,6 +17,9 @@ import TimelineStep from './TimelineStep';
 import PanelStep from './PanelStep';
 import SplashStep from './SplashStep';
 import MangaSceneStep from './MangaSceneStep';
+import FactStep from './FactStep';
+import CliffhangerStep from './CliffhangerStep';
+import DataVizStep from './DataVizStep';
 
 // v2 fallback components
 import HookStep from '@/components/story/HookStep';
@@ -78,6 +81,16 @@ export default function CinematicRenderer({ step, card, isActive, nextCard }: Ci
 
     case 'manga-scene':
       return <MangaSceneStep step={safeStep} card={card} isActive={isActive} />;
+
+    // v4 enhanced types
+    case 'fact':
+      return <FactStep step={safeStep} card={card} isActive={isActive} />;
+
+    case 'cliffhanger':
+      return <CliffhangerStep step={safeStep} card={card} isActive={isActive} />;
+
+    case 'data-viz':
+      return <DataVizStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'impact':
       return <ImpactStep step={safeStep} card={card} isActive={isActive} />;
