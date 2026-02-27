@@ -73,8 +73,12 @@ export default function FactStep({ step, card, isActive }: FactStepProps) {
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ duration: 0.4, delay: 0.22 }}
-            className="text-sm font-medium leading-relaxed text-white/50"
-            style={{ wordBreak: 'keep-all' }}
+            className="font-medium text-white/50"
+            style={{
+              fontSize: 'var(--card-text-caption)',
+              lineHeight: 'var(--card-line-height)',
+              wordBreak: 'keep-all',
+            }}
           >
             {subtext}
           </motion.p>

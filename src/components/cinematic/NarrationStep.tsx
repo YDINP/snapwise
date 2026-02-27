@@ -86,15 +86,14 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="rounded-2xl bg-white/10 p-6 backdrop-blur-md ring-1 ring-white/20"
-          style={{ border: '1px solid rgba(255,255,255,0.15)' }}
+          className="rounded-2xl bg-white/10 p-7 backdrop-blur-md"
         >
           {/* 본문 텍스트 */}
           <p
-            className={`text-center ${fontSize} font-medium leading-relaxed text-white/90`}
+            className={`text-center ${fontSize} font-medium text-white/90`}
             style={{
               wordBreak: 'keep-all',
-              textWrap: 'balance',
+              lineHeight: 'var(--card-line-height)',
               textShadow: '0 1px 4px rgba(0,0,0,0.15)',
             }}
           >

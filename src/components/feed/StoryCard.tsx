@@ -9,6 +9,7 @@ import StepRenderer from '@/components/story/StepRenderer';
 import CinematicRenderer from '@/components/cinematic/CinematicRenderer';
 import StepGlossary from '@/components/cinematic/StepGlossary';
 import WordCountBadge from '@/components/ui/WordCountBadge';
+import { getCategoryInfo } from '@/lib/categories';
 
 interface StoryCardProps {
   card: CardMeta;
@@ -77,6 +78,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
     onComplete,
   });
 
+  const categoryInfo = getCategoryInfo(card.category);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
@@ -171,6 +173,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
           totalSteps={card.steps.length}
           currentStep={currentStep}
           onJump={goToStep}
+          accentColor={categoryInfo.accent}
         />
       </div>
 

@@ -97,7 +97,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
 
           {/* Bubble body */}
           <div
-            className="relative rounded-2xl px-5 py-4"
+            className="relative rounded-2xl px-6 py-5"
             style={{
               backgroundColor: 'rgba(255,255,255,0.95)',
               boxShadow: `0 4px 20px rgba(0,0,0,0.15), 0 0 0 2px ${categoryInfo.accent}20`,
@@ -105,8 +105,12 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
             }}
           >
             <p
-              className="text-sm font-medium leading-relaxed text-gray-800"
-              style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
+              className="font-medium text-gray-800"
+              style={{
+                fontSize: 'var(--card-text-body)',
+                lineHeight: 'var(--card-line-height)',
+                wordBreak: 'keep-all',
+              }}
             >
               <TypingText text={step.content} isActive={isActive} />
             </p>

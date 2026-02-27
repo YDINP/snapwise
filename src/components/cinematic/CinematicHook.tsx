@@ -79,15 +79,19 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           variants={stagger}
           initial="hidden"
           animate={isActive ? 'visible' : 'hidden'}
-          className="max-w-xs flex flex-col items-center gap-1.5 text-center"
+          className="max-w-[22rem] flex flex-col items-center gap-1.5 text-center"
           aria-label={step.content.replace(/\*\*/g, '')}
         >
           {lines.map((line, i) => (
             <motion.p
               key={i}
               variants={fadeInUp}
-              className="text-xl font-bold text-white leading-snug"
-              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all' }}
+              className="text-xl font-bold text-white"
+              style={{
+                textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                wordBreak: 'keep-all',
+                lineHeight: 'var(--card-line-height-tight)',
+              }}
             >
               {parseInline(line.trim())}
             </motion.p>

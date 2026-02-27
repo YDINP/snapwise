@@ -7,6 +7,8 @@ interface StepProgressBarProps {
   currentStep: number;
   /** 세그먼트 클릭 시 해당 스텝으로 점프 (선택적) */
   onJump?: (step: number) => void;
+  /** 카테고리 accent 색상 (선택적) */
+  accentColor?: string;
 }
 
 /**
@@ -18,7 +20,7 @@ interface StepProgressBarProps {
  * - 우측 "N/M" 숫자 카운터
  * - 각 세그먼트 클릭 → 해당 스텝 점프
  */
-export default function StepProgressBar({ totalSteps, currentStep, onJump }: StepProgressBarProps) {
+export default function StepProgressBar({ totalSteps, currentStep, onJump, accentColor }: StepProgressBarProps) {
   const barHeight = totalSteps > 12 ? 'h-[2px]' : totalSteps > 8 ? 'h-[2.5px]' : 'h-[3px]';
   const gapSize = totalSteps > 10 ? 'gap-[3px]' : 'gap-1';
 
@@ -35,24 +37,33 @@ export default function StepProgressBar({ totalSteps, currentStep, onJump }: Ste
               key={index}
               onClick={onJump ? () => onJump(index) : undefined}
               disabled={!onJump}
-              className={`${barHeight} flex-1 rounded-full overflow-hidden bg-white/20 relative ${onJump ? 'cursor-pointer' : 'cursor-default'}`}
-              style={{ minWidth: '2px' }}
+              className={`relative flex h-11 flex-1 items-center ${onJump ? 'cursor-pointer' : 'cursor-default'}`}
               aria-label={`${index + 1}번째 스텝으로 이동`}
             >
-              {/* 읽은 스텝: 즉시 채워진 흰색 */}
-              {isPast && (
-                <div className="absolute inset-0 bg-white" />
-              )}
+              {/* 시각적 바 — 버튼 중앙에 위치 */}
+              <div
+                className={`${barHeight} w-full rounded-full overflow-hidden bg-white/20 relative`}
+                style={{ minWidth: '2px' }}
+              >
+                {/* 읽은 스텝: 즉시 채워진 accent/흰색 */}
+                {isPast && (
+                  <div
+                    className="absolute inset-0 rounded-full"
+                    style={{ backgroundColor: accentColor ?? 'white' }}
+                  />
+                )}
 
-              {/* 현재 스텝: 애니메이션으로 채워짐 */}
-              {isCurrent && (
-                <motion.div
-                  className="absolute inset-y-0 left-0 bg-white rounded-full"
-                  initial={{ width: '0%' }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: 0.4, ease: 'easeOut' }}
-                />
-              )}
+                {/* 현재 스텝: 애니메이션으로 채워짐 */}
+                {isCurrent && (
+                  <motion.div
+                    className="absolute inset-y-0 left-0 rounded-full"
+                    style={{ backgroundColor: accentColor ?? 'white' }}
+                    initial={{ width: '0%' }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                  />
+                )}
+              </div>
             </button>
           );
         })}

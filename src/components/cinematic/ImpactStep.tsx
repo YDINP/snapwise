@@ -67,7 +67,7 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-10 flex max-w-xs flex-col items-center gap-6 px-8">
+      <div className="relative z-10 flex max-w-sm flex-col items-center gap-6 px-8">
         {/* Top accent line */}
         <motion.div
           initial={{ scaleX: 0 }}
@@ -124,7 +124,7 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
                         animate={isActive ? { opacity: 1, y: 0 } : {}}
                         transition={{ duration: 0.5, delay: 0.2 + idx * 0.08, ease: 'easeOut' }}
                         className={`text-center ${isSecondary ? secondaryFontSize : fontSize} font-bold ${isSecondary ? 'text-white/70' : 'text-white/90'}`}
-                        style={{ wordBreak: 'keep-all', textWrap: 'balance' as any }}
+                        style={{ wordBreak: 'keep-all', lineHeight: 'var(--card-line-height-tight)' }}
                       >
                         {parseInlineAccent(trimmed, categoryInfo.accent)}
                       </motion.p>

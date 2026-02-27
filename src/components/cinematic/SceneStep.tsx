@@ -55,7 +55,8 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="absolute top-0 left-0 right-0 h-12 bg-black z-20"
+          className="absolute top-0 left-0 right-0 h-10 z-20"
+          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.80) 0%, transparent 100%)' }}
         />
       )}
 
@@ -65,7 +66,8 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="absolute bottom-0 left-0 right-0 h-12 bg-black z-20"
+          className="absolute bottom-0 left-0 right-0 h-10 z-20"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, transparent 100%)' }}
         />
       )}
 

@@ -166,7 +166,10 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
                 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%)',
             }}
           />
-          <p className="relative text-center text-sm leading-relaxed text-white/90">
+          <p
+            className="relative text-center text-white/90"
+            style={{ fontSize: 'var(--card-text-body)', lineHeight: 'var(--card-line-height)' }}
+          >
             {renderWithLineBreaks(step.content)}
           </p>
         </motion.div>
