@@ -110,7 +110,7 @@ export function getAllCards(): CardMeta[] {
           tags: data.tags || [],
           difficulty: data.difficulty || 1,
           style: data.style || 'gradient',
-          pubDate: data.pubDate || new Date().toISOString(),
+          pubDate: data.pubDate ? String(data.pubDate).slice(0, 10) : new Date().toISOString().slice(0, 10),
           source: data.source,
           draft: false,
           readingTime,
