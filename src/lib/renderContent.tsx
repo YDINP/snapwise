@@ -1,7 +1,7 @@
 import React from 'react';
 
 /** Parse inline markdown: **bold** and ───(divider) */
-function parseInline(text: string, accentColor?: string): React.ReactNode[] {
+export function parseInline(text: string, accentColor?: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
   const boldRegex = /\*\*(.+?)\*\*/g;
   let lastIndex = 0;

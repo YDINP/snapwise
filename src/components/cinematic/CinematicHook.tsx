@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
-import { renderWithLineBreaks } from '@/lib/renderContent';
+import { parseInline } from '@/lib/renderContent';
 import { fadeInUp, fadeIn, stagger } from '@/lib/motionVariants';
 
 interface CinematicHookProps {
@@ -15,9 +15,8 @@ interface CinematicHookProps {
 export default function CinematicHook({ step, card, isActive }: CinematicHookProps) {
   const categoryInfo = getCategoryInfo(card.category);
 
-  // 단어 단위 분할 (줄바꿈 기호 제거 후 공백 분리)
-  const rawText = step.content.replace(/\\n/g, ' ').trim();
-  const words = rawText.split(/\s+/).filter(Boolean);
+  // 줄 단위 분할 — \n 기준으로 줄바꿈 구조 유지
+  const lines = step.content.split('\n').filter(line => line.trim() !== '');
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
@@ -75,33 +74,32 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           </motion.div>
         </div>
 
-        {/* Title: 단어별 stagger fadeInUp */}
-        <motion.p
+        {/* Title: 줄 단위 stagger fadeInUp + 볼드 마크다운 렌더링 */}
+        <motion.div
           variants={stagger}
           initial="hidden"
           animate={isActive ? 'visible' : 'hidden'}
-          className="max-w-xs text-center text-xl font-bold text-white"
-          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all' }}
-          aria-label={rawText}
+          className="max-w-xs flex flex-col items-center gap-1.5 text-center"
+          aria-label={step.content.replace(/\*\*/g, '')}
         >
-          {words.map((word, i) => (
-            <motion.span
+          {lines.map((line, i) => (
+            <motion.p
               key={i}
               variants={fadeInUp}
-              className="inline-block"
-              style={{ marginRight: i < words.length - 1 ? '0.3em' : 0 }}
+              className="text-xl font-bold text-white leading-snug"
+              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)', wordBreak: 'keep-all' }}
             >
-              {word}
-            </motion.span>
+              {parseInline(line.trim())}
+            </motion.p>
           ))}
-        </motion.p>
+        </motion.div>
 
-        {/* 보조 텍스트: 카테고리 배지 — 단어 stagger 완료 후 fadeIn */}
+        {/* 보조 텍스트: 카테고리 배지 — 줄 stagger 완료 후 fadeIn */}
         <motion.span
           variants={fadeIn}
           initial="hidden"
           animate={isActive ? 'visible' : 'hidden'}
-          transition={{ delay: 0.1 + words.length * 0.08 + 0.2 }}
+          transition={{ delay: 0.1 + lines.length * 0.15 + 0.2 }}
           className="rounded-full px-3 py-1 text-xs font-semibold tracking-wide text-white/80"
           style={{ backgroundColor: `${categoryInfo.accent}30`, border: `1px solid ${categoryInfo.accent}50` }}
         >
