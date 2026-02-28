@@ -250,9 +250,10 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
         aria-label="다음 스텝"
       />
 
-      {/* 탭 힌트 오버레이 — 첫 스텝에서만 3초 표시 후 fade-out */}
+      {/* 탭 힌트 오버레이 — 첫 스텝에서만 3초 표시 후 fade-out
+           cinematic-hook 타입은 컴포넌트 내부에 "탭하여 시작" 힌트가 있으므로 제외 */}
       <AnimatePresence>
-        {showTapHint && (
+        {showTapHint && stepType !== 'cinematic-hook' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
