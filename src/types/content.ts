@@ -1,4 +1,4 @@
-export type CategoryKey = 'science' | 'psychology' | 'people' | 'history' | 'koreanhistory' | 'life' | 'business' | 'culture' | 'origins' | 'etc' | 'tmi';
+export type CategoryKey = 'science' | 'psychology' | 'people' | 'history' | 'koreanhistory' | 'life' | 'business' | 'culture' | 'origins' | 'etc' | 'tmi' | 'ocean' | 'space' | 'body';
 export type CardStyle = 'gradient' | 'solid' | 'glass';
 export type Difficulty = 1 | 2 | 3;
 

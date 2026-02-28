@@ -213,11 +213,11 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             initial={{ opacity: 0, y: -20 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="w-full rounded-t-2xl border border-b-0 border-blue-500/20 bg-blue-950/20 px-5 py-4 backdrop-blur-sm"
+            className="w-full rounded-t-2xl border border-b-0 border-white/10 bg-zinc-800/25 px-5 py-4 backdrop-blur-sm"
           >
             {leftTitle && (
               <p
-                className="mb-2 text-sm font-black text-blue-300"
+                className="mb-2 text-sm font-black text-white/85"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {leftTitle}
@@ -257,8 +257,8 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
             className="w-full rounded-b-2xl border border-t-0 px-5 py-4 backdrop-blur-sm"
             style={{
-              borderColor: `${categoryInfo.accent}30`,
-              backgroundColor: `${categoryInfo.accent}08`,
+              borderColor: `${categoryInfo.accent}50`,
+              backgroundColor: `${categoryInfo.accent}25`,
             }}
           >
             {rightTitle && (

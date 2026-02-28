@@ -111,10 +111,12 @@ export default function DashboardTabs({
   maxCount,
   qualityIssues,
 }: DashboardTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [likeTop5, setLikeTop5]   = useState<{ slug: string; count: number }[]>([]);
-  const [saveTop5, setSaveTop5]   = useState<{ slug: string; count: number }[]>([]);
-  const [dbLoading, setDbLoading] = useState(true);
+  const [activeTab, setActiveTab]         = useState<TabKey>('overview');
+  const [likeTop5, setLikeTop5]           = useState<{ slug: string; count: number }[]>([]);
+  const [saveTop5, setSaveTop5]           = useState<{ slug: string; count: number }[]>([]);
+  const [dbLoading, setDbLoading]         = useState(true);
+  const [isLikeFallback, setIsLikeFallback] = useState(false);
+  const [isSaveFallback, setIsSaveFallback] = useState(false);
 
   const cardLookup = useMemo(
     () => Object.values(cardsByCategory).flat().reduce(
@@ -126,45 +128,87 @@ export default function DashboardTabs({
 
 
   useEffect(() => {
-    if (!supabase) { setDbLoading(false); return; }
-
     async function fetchAggregates() {
-      try {
-        const [likesResult, savesResult] = await Promise.all([
-          supabase!.from('card_likes').select('slug').limit(2000), // TODO: 사용자 확장 시 Supabase RPC(GROUP BY)로 교체
-          supabase!.from('card_saves').select('slug').limit(2000), // TODO: 사용자 확장 시 Supabase RPC(GROUP BY)로 교체
-        ]);
+      let likesFromDB  = false;
+      let savesFromDB  = false;
 
-        if (likesResult.data) {
-          const counts: Record<string, number> = {};
-          for (const { slug } of likesResult.data) {
-            counts[slug] = (counts[slug] || 0) + 1;
-          }
-          setLikeTop5(
-            Object.entries(counts)
-              .sort(([, a], [, b]) => b - a)
-              .slice(0, 5)
-              .map(([slug, count]) => ({ slug, count }))
-          );
-        }
+      // ── Supabase 집계 시도 ────────────────────────────────────
+      if (supabase) {
+        try {
+          const [likesResult, savesResult] = await Promise.all([
+            supabase.from('card_likes').select('slug').limit(2000), // TODO: 사용자 확장 시 Supabase RPC(GROUP BY)로 교체
+            supabase.from('card_saves').select('slug').limit(2000), // TODO: 사용자 확장 시 Supabase RPC(GROUP BY)로 교체
+          ]);
 
-        if (savesResult.data) {
-          const counts: Record<string, number> = {};
-          for (const { slug } of savesResult.data) {
-            counts[slug] = (counts[slug] || 0) + 1;
+          if (likesResult.data && likesResult.data.length > 0) {
+            const counts: Record<string, number> = {};
+            for (const { slug } of likesResult.data) {
+              counts[slug] = (counts[slug] || 0) + 1;
+            }
+            setLikeTop5(
+              Object.entries(counts)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([slug, count]) => ({ slug, count }))
+            );
+            likesFromDB = true;
           }
-          setSaveTop5(
-            Object.entries(counts)
-              .sort(([, a], [, b]) => b - a)
-              .slice(0, 5)
-              .map(([slug, count]) => ({ slug, count }))
-          );
+
+          if (savesResult.data && savesResult.data.length > 0) {
+            const counts: Record<string, number> = {};
+            for (const { slug } of savesResult.data) {
+              counts[slug] = (counts[slug] || 0) + 1;
+            }
+            setSaveTop5(
+              Object.entries(counts)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([slug, count]) => ({ slug, count }))
+            );
+            savesFromDB = true;
+          }
+        } catch (err) {
+          console.warn('[SnapWise] 대시보드 집계 로드 실패:', err);
         }
-      } catch (err) {
-        console.warn('[SnapWise] 대시보드 집계 로드 실패:', err);
-      } finally {
-        setDbLoading(false);
       }
+
+      // ── localStorage fallback (Supabase 없거나 데이터 0건) ────
+      if (!likesFromDB) {
+        try {
+          const raw = localStorage.getItem('snapwise-likes');
+          const data: Record<string, unknown> = raw ? JSON.parse(raw) : {};
+          const slugs = Object.keys(data);
+          if (slugs.length > 0) {
+            // 각 slug당 count=1 (1인 사용자 기기 → 중복 없음)
+            const top5 = slugs
+              .map((slug) => ({ slug, count: 1 }))
+              .slice(0, 5);
+            setLikeTop5(top5);
+            setIsLikeFallback(true);
+          }
+        } catch (e) {
+          console.warn('[SnapWise] localStorage likes 읽기 실패:', e);
+        }
+      }
+
+      if (!savesFromDB) {
+        try {
+          const raw = localStorage.getItem('snapwise-saved');
+          const data: Record<string, unknown> = raw ? JSON.parse(raw) : {};
+          const slugs = Object.keys(data);
+          if (slugs.length > 0) {
+            const top5 = slugs
+              .map((slug) => ({ slug, count: 1 }))
+              .slice(0, 5);
+            setSaveTop5(top5);
+            setIsSaveFallback(true);
+          }
+        } catch (e) {
+          console.warn('[SnapWise] localStorage saved 읽기 실패:', e);
+        }
+      }
+
+      setDbLoading(false);
     }
 
     fetchAggregates();
@@ -270,6 +314,8 @@ export default function DashboardTabs({
                 saveTop5={saveTop5}
                 dbLoading={dbLoading}
                 cardLookup={cardLookup}
+                isLikeFallback={isLikeFallback}
+                isSaveFallback={isSaveFallback}
               />
             </motion.div>
           )}
@@ -315,6 +361,8 @@ function OverviewTab({
   saveTop5,
   dbLoading,
   cardLookup,
+  isLikeFallback,
+  isSaveFallback,
 }: {
   totalCards:          number;
   recentCount:         number;
@@ -331,6 +379,8 @@ function OverviewTab({
   saveTop5:            { slug: string; count: number }[];
   dbLoading:           boolean;
   cardLookup:          Record<string, CardMeta>;
+  isLikeFallback:      boolean;
+  isSaveFallback:      boolean;
 }) {
   return (
     <>
@@ -369,9 +419,12 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 2: 유저 좋아요 TOP 5 (Supabase 실제 집계) ── */}
+      {/* ── 섹션 2: 유저 좋아요 TOP 5 (Supabase 실제 집계 or localStorage fallback) ── */}
       <section>
-        <SectionHeader icon={<Heart size={13} fill="currentColor" />} title="유저 좋아요 TOP 5" />
+        <SectionHeader
+          icon={<Heart size={13} fill="currentColor" />}
+          title={isLikeFallback ? '인기 카드 TOP 5 (내 기록 기준)' : '유저 좋아요 TOP 5'}
+        />
         <div className="dash-card">
           {dbLoading ? (
             [0, 1, 2].map((i) => (
@@ -425,9 +478,12 @@ function OverviewTab({
         </div>
       </section>
 
-      {/* ── 섹션 2.5: 유저 저장 TOP 5 (Supabase 실제 집계) ── */}
+      {/* ── 섹션 2.5: 유저 저장 TOP 5 (Supabase 실제 집계 or localStorage fallback) ── */}
       <section>
-        <SectionHeader icon={<Bookmark size={13} fill="currentColor" />} title="유저 저장 TOP 5" />
+        <SectionHeader
+          icon={<Bookmark size={13} fill="currentColor" />}
+          title={isSaveFallback ? '인기 카드 TOP 5 (내 기록 기준)' : '유저 저장 TOP 5'}
+        />
         <div className="dash-card">
           {dbLoading ? (
             [0, 1, 2].map((i) => (

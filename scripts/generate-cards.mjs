@@ -34,7 +34,8 @@ const API_DELAY_MS = 300; // rate limit 대비
 
 const ALL_CATEGORIES = [
   'science', 'psychology', 'people', 'history', 'koreanhistory',
-  'life', 'business', 'culture', 'origins', 'etc', 'tmi'
+  'life', 'business', 'culture', 'origins', 'etc', 'tmi',
+  'ocean', 'space', 'body'
 ];
 
 // 방식 A(시네마틱) + 방식 B(만화) + 방식 C(리듬형) 전체 유효 스텝 타입
