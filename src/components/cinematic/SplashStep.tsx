@@ -4,31 +4,12 @@ import React from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { parseInline } from '@/lib/renderContent';
 
 interface SplashStepProps {
   step: CardStep;
   card: CardMeta;
   isActive: boolean;
-}
-
-/** Parse **bold** for accent coloring */
-function parseInlineAccent(text: string, accentColor: string): React.ReactNode[] {
-  const parts: React.ReactNode[] = [];
-  const boldRegex = /\*\*(.+?)\*\*/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = boldRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
-    parts.push(
-      <span key={`b-${match.index}`} className="font-black" style={{ color: accentColor }}>
-        {match[1]}
-      </span>
-    );
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return parts.length > 0 ? parts : [text];
 }
 
 /**
@@ -118,7 +99,7 @@ export default function SplashStep({ step, card, isActive }: SplashStepProps) {
             className="text-center text-2xl font-black leading-tight text-white md:text-3xl"
             style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
           >
-            {parseInlineAccent(heroText, categoryInfo.accent)}
+            {parseInline(heroText, categoryInfo.accent)}
           </p>
         </motion.div>
 
@@ -147,7 +128,7 @@ export default function SplashStep({ step, card, isActive }: SplashStepProps) {
                   className="text-center text-base font-bold leading-snug text-white/80 md:text-lg"
                   style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                 >
-                  {parseInlineAccent(line, categoryInfo.accent)}
+                  {parseInline(line, categoryInfo.accent)}
                 </motion.p>
               );
             })}

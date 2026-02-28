@@ -13,14 +13,14 @@ interface RevealStepProps {
 }
 
 const stepHeaders: Record<string, string> = {
-  reveal: '💡 핵심 포인트',
-  tip: '✅ 실전 팁',
-  compare: '⚖️ 비교',
+  reveal: '핵심 포인트',
+  tip: '실전 팁',
+  compare: '비교',
 };
 
 export default function RevealStep({ step, card, isActive }: RevealStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
-  const header = stepHeaders[step.type] || '💡 핵심 포인트';
+  const header = stepHeaders[step.type] || '핵심 포인트';
 
   return (
     <div className="relative w-full h-full flex items-center justify-center px-5">

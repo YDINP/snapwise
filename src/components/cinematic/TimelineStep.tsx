@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { parseInline } from '@/lib/renderContent';
 
 interface TimelineStepProps {
   step: CardStep;
@@ -84,7 +85,7 @@ export default function TimelineStep({ step, card, isActive }: TimelineStepProps
             className="mb-5 text-center text-xs font-medium text-white/50"
             style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
           >
-            {intro}
+            {parseInline(intro, categoryInfo.accent)}
           </motion.p>
         )}
 
@@ -147,7 +148,7 @@ export default function TimelineStep({ step, card, isActive }: TimelineStepProps
                       className="text-sm leading-snug text-white/80"
                       style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                     >
-                      {item.event}
+                      {parseInline(item.event, categoryInfo.accent)}
                     </span>
                   </div>
                 </motion.div>

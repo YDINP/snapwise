@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { parseInline } from '@/lib/renderContent';
 
 interface CliffhangerStepProps {
   step: CardStep;
@@ -58,7 +59,7 @@ export default function CliffhangerStep({ step, card, isActive }: CliffhangerSte
             className="text-xl font-bold leading-snug text-white/90"
             style={{ wordBreak: 'keep-all', textWrap: 'balance' as React.CSSProperties['textWrap'] }}
           >
-            {line}
+            {parseInline(line, categoryInfo.accent)}
           </motion.p>
         ))}
 

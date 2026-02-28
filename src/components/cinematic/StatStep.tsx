@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { renderWithLineBreaks } from '@/lib/renderContent';
 
 interface StatStepProps {
   step: CardStep;
@@ -173,7 +174,7 @@ function SingleStat({ bigStat, description, accent, isActive }: SingleStatProps)
           className="text-center text-base font-medium leading-relaxed text-white/60"
           style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
         >
-          {description}
+          {renderWithLineBreaks(description, accent)}
         </motion.p>
       )}
     </div>
@@ -311,7 +312,7 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
           className="text-center text-[12px] font-medium text-white/30 leading-relaxed"
           style={{ wordBreak: 'keep-all' }}
         >
-          {description}
+          {renderWithLineBreaks(description, accent)}
         </motion.p>
       )}
     </div>
@@ -398,7 +399,7 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
           className="mt-6 text-[12px] font-medium text-white/30 leading-relaxed"
           style={{ wordBreak: 'keep-all' }}
         >
-          {description}
+          {renderWithLineBreaks(description, accent)}
         </motion.p>
       )}
     </div>

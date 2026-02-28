@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta, Character } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { parseInline } from '@/lib/renderContent';
 
 interface PanelStepProps {
   step: CardStep;
@@ -52,25 +53,6 @@ function parsePanelLines(content: string): PanelLine[] {
   return result;
 }
 
-/** Parse **bold** inline */
-function parseInlineBold(text: string, accentColor: string): React.ReactNode[] {
-  const parts: React.ReactNode[] = [];
-  const boldRegex = /\*\*(.+?)\*\*/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = boldRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
-    parts.push(
-      <strong key={`b-${match.index}`} className="font-bold" style={{ color: accentColor }}>
-        {match[1]}
-      </strong>
-    );
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return parts.length > 0 ? parts : [text];
-}
 
 export default function PanelStep({ step, card, isActive }: PanelStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
@@ -133,7 +115,7 @@ export default function PanelStep({ step, card, isActive }: PanelStepProps) {
                 className="text-center text-xs font-medium text-white/60"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
-                {parseInlineBold(line.text, categoryInfo.accent)}
+                {parseInline(line.text, categoryInfo.accent)}
               </motion.p>
             );
           }
@@ -188,7 +170,7 @@ export default function PanelStep({ step, card, isActive }: PanelStepProps) {
                   >
                     {line.text.split('\n').map((textLine, j, arr) => (
                       <React.Fragment key={j}>
-                        {parseInlineBold(textLine, isRight ? '#fff' : categoryInfo.accent)}
+                        {parseInline(textLine, isRight ? '#fff' : categoryInfo.accent)}
                         {j < arr.length - 1 && <br />}
                       </React.Fragment>
                     ))}

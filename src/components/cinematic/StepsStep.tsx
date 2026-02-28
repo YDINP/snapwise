@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { parseInline } from '@/lib/renderContent';
 
 interface StepsStepProps {
   step: CardStep;
@@ -124,14 +125,14 @@ export default function StepsStep({ step, card, isActive }: StepsStepProps) {
                   className="text-sm font-bold leading-snug text-white"
                   style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                 >
-                  {item.title}
+                  {parseInline(item.title, categoryInfo.accent)}
                 </p>
                 {item.description && (
                   <p
                     className="mt-1 text-xs leading-relaxed text-white/60"
                     style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                   >
-                    {item.description}
+                    {parseInline(item.description, categoryInfo.accent)}
                   </p>
                 )}
               </motion.div>
