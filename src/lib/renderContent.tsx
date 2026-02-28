@@ -1,6 +1,6 @@
 import React from 'react';
 
-/** Parse inline markdown: **bold** and ───(divider) */
+/** Parse inline markdown: **bold** only (single line, no divider check) */
 export function parseInline(text: string, accentColor?: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
   const boldRegex = /\*\*(.+?)\*\*/g;
@@ -31,6 +31,29 @@ export function parseInline(text: string, accentColor?: string): React.ReactNode
   }
 
   return parts.length > 0 ? parts : [text];
+}
+
+/**
+ * Parse a single line that may be a divider (───, ━━━, ———, ---) or inline bold text.
+ * Returns a divider element or parsed inline nodes.
+ * accentColor: optional color for bold spans.
+ */
+export function parseLine(
+  line: string,
+  key: number | string,
+  accentColor?: string
+): React.ReactNode {
+  const trimmed = line.trim();
+  if (/^[─━—-]{2,}$/.test(trimmed)) {
+    return (
+      <span
+        key={key}
+        className="my-2 block h-px w-12 mx-auto bg-white/30"
+        aria-hidden="true"
+      />
+    );
+  }
+  return <React.Fragment key={key}>{parseInline(trimmed, accentColor)}</React.Fragment>;
 }
 
 export function renderWithLineBreaks(content: string, accentColor?: string): React.ReactNode {

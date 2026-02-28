@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { renderWithLineBreaks } from '@/lib/renderContent';
 
 interface DataVizStepProps {
   step: CardStep;
@@ -222,7 +223,7 @@ export default function DataVizStep({ step, card, isActive }: DataVizStepProps) 
             className="text-center text-sm font-medium leading-relaxed text-white/50"
             style={{ wordBreak: 'keep-all', textWrap: 'balance' as React.CSSProperties['textWrap'] }}
           >
-            {parsed.description}
+            {renderWithLineBreaks(parsed.description, categoryInfo.accent)}
           </motion.p>
         )}
       </div>

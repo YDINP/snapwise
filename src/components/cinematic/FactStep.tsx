@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { parseInline } from '@/lib/renderContent';
 
 interface FactStepProps {
   step: CardStep;
@@ -64,7 +65,7 @@ export default function FactStep({ step, card, isActive }: FactStepProps) {
           className="text-3xl font-black leading-tight text-white"
           style={{ wordBreak: 'keep-all', textWrap: 'balance' as React.CSSProperties['textWrap'] }}
         >
-          {headline}
+          {parseInline(headline, categoryInfo.accent)}
         </motion.p>
 
         {/* 부가 설명 */}
@@ -80,7 +81,7 @@ export default function FactStep({ step, card, isActive }: FactStepProps) {
               wordBreak: 'keep-all',
             }}
           >
-            {subtext}
+            {parseInline(subtext, categoryInfo.accent)}
           </motion.p>
         )}
 

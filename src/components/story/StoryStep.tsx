@@ -14,8 +14,8 @@ interface StoryStepProps {
 
 const stepLabels: Record<string, string> = {
   story: '',
-  detail: '📖 자세히',
-  example: '💡 예시',
+  detail: '자세히',
+  example: '예시',
 };
 
 export default function StoryStep({ step, card, isActive }: StoryStepProps) {
