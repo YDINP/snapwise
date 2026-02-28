@@ -31,15 +31,10 @@ interface UseStepNavigationOptions {
 export function useStepNavigation({ totalSteps, isActive, slug, onComplete }: UseStepNavigationOptions) {
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Load saved progress when card becomes active
+  // Reset to first step whenever card becomes active (re-visit always starts from step 0)
   useEffect(() => {
     if (isActive) {
-      if (slug) {
-        const saved = loadProgress(slug);
-        setCurrentStep(Math.min(saved, totalSteps - 1));
-      } else {
-        setCurrentStep(0);
-      }
+      setCurrentStep(0);
     }
   }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
