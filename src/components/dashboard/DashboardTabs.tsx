@@ -172,8 +172,9 @@ export default function DashboardTabs({
         }
       }
 
-      // ── localStorage fallback (Supabase 없거나 데이터 0건) ────
-      if (!likesFromDB) {
+      // ── localStorage fallback (Supabase 연결 자체가 없을 때만) ────
+      // Supabase 연결 됐지만 데이터 0건인 경우: 빈 상태 표시 (글로벌 집계 모드)
+      if (!likesFromDB && !supabase) {
         try {
           const raw = localStorage.getItem('snapwise-likes');
           const data: Record<string, unknown> = raw ? JSON.parse(raw) : {};
@@ -191,7 +192,7 @@ export default function DashboardTabs({
         }
       }
 
-      if (!savesFromDB) {
+      if (!savesFromDB && !supabase) {
         try {
           const raw = localStorage.getItem('snapwise-saved');
           const data: Record<string, unknown> = raw ? JSON.parse(raw) : {};
@@ -437,7 +438,7 @@ function OverviewTab({
           ) : likeTop5.length === 0 ? (
             <div className="px-4 py-6 text-center">
               <p className="text-sm" style={{ color: 'var(--color-muted)' }}>아직 좋아요 데이터가 없어요</p>
-              <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>카드를 좋아요하면 여기에 표시됩니다</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>카드를 좋아요하면 전체 유저 집계에 반영됩니다</p>
             </div>
           ) : (
             likeTop5.map(({ slug, count }, i) => {
@@ -496,7 +497,7 @@ function OverviewTab({
           ) : saveTop5.length === 0 ? (
             <div className="px-4 py-6 text-center">
               <p className="text-sm" style={{ color: 'var(--color-muted)' }}>아직 저장 데이터가 없어요</p>
-              <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>카드를 저장하면 여기에 표시됩니다</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>카드를 저장하면 전체 유저 집계에 반영됩니다</p>
             </div>
           ) : (
             saveTop5.map(({ slug, count }, i) => {
