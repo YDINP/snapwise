@@ -27,7 +27,7 @@ export default function CategoryTabs({ cardsByCategory }: CategoryTabsProps) {
     >
       {/* 카테고리 pill 스크롤 */}
       <div
-        className="flex overflow-x-auto gap-1.5 px-3 py-3 hide-scrollbar"
+        className="flex flex-nowrap overflow-x-auto gap-1.5 px-3 py-3 hide-scrollbar scroll-smooth"
         style={{ borderBottom: '1px solid var(--color-divider)' }}
       >
         {ALL_CATEGORY_KEYS.map((key) => {
