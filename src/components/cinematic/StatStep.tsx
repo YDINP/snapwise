@@ -256,7 +256,7 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
         </div>
       )}
 
-      {/* ── Secondary stats: glass cards ── */}
+      {/* ── Secondary stats: glass cards (grid 2-col aligned) ── */}
       {rest.length > 0 && (
         <div className="flex w-full flex-col gap-3">
           {rest.map((item, i) => (
@@ -269,8 +269,10 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
                 delay: 0.75 + i * 0.15,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="relative flex items-center justify-between rounded-xl px-4 py-3.5 overflow-hidden"
+              className="relative grid items-center rounded-xl px-4 py-3.5 overflow-hidden"
               style={{
+                gridTemplateColumns: '1fr auto',
+                columnGap: '12px',
                 background: 'rgba(255,255,255,0.04)',
                 borderLeft: `3px solid ${accent}`,
                 backdropFilter: 'blur(8px)',
@@ -284,13 +286,13 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
                 }}
               />
               <span
-                className="relative text-[13px] font-medium text-white/55"
+                className="relative text-[13px] font-medium text-white/55 min-w-0"
                 style={{ wordBreak: 'keep-all' }}
               >
                 {item.label}
               </span>
               <span
-                className="relative text-lg font-extrabold tracking-tight"
+                className="relative text-lg font-extrabold tracking-tight text-right shrink-0"
                 style={{
                   color: accent,
                   textShadow: `0 0 16px ${accent}30`,
