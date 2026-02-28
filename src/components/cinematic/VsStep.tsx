@@ -13,7 +13,6 @@ function renderFooterWithHighlight(text: string, accent: string): React.ReactNod
 
   return lines.map((line, lineIdx) => {
     const trimmed = line.trim();
-    // Split by number patterns: digits with optional %p, %, 배, 만, 억, 원, 명, 개, km, kg, 초, 분, 시간, etc.
     const parts: React.ReactNode[] = [];
     const numRegex = /(\d[\d,.]*\s*(?:%p|%|배|만|억|원|명|개|km|kg|초|분|시간|x|×)?)/g;
     let lastIdx = 0;
@@ -50,134 +49,139 @@ interface VsStepProps {
   isActive: boolean;
 }
 
+/**
+ * Parsed result for VS comparison:
+ * - leftTitle / rightTitle: labels shown above each panel (bold colored header)
+ * - leftBody / rightBody:   main descriptive content of each panel
+ * - footer:                 extra lines after the comparison (stats, notes, etc.)
+ */
 interface VsParsed {
   leftTitle: string;
   rightTitle: string;
-  rows: Array<{ left: string; right: string }>;
+  leftBody: string;
+  rightBody: string;
   footer: string[];
 }
 
-/**
- * Detect if content uses standalone `|` separator (on its own line).
- * Format:  left block text \n | \n right block text
- */
-function isStandalonePipeFormat(lines: string[]): boolean {
-  return lines.some(l => l === '|');
+/** Strip horizontal rule markers (───, ---, ===) from a line */
+function isHorizontalRule(line: string): boolean {
+  return /^[─\-=]{3,}$/.test(line.trim());
 }
 
 /**
- * Extract a short title from a block of text.
- * Uses text before first `:` or `—`, or first line if short enough.
- */
-function extractTitle(block: string): { title: string; body: string } {
-  const firstLine = block.split('\n')[0].trim();
-
-  // Try splitting at colon or em-dash
-  for (const sep of [':', '—']) {
-    const idx = firstLine.indexOf(sep);
-    if (idx > 0 && idx <= 30) {
-      return {
-        title: firstLine.slice(0, idx).trim(),
-        body: (firstLine.slice(idx + 1).trim() + '\n' + block.split('\n').slice(1).join('\n')).trim(),
-      };
-    }
-  }
-
-  // If first line is short enough, use it as title
-  if (firstLine.length <= 20) {
-    return { title: firstLine, body: block.split('\n').slice(1).join('\n').trim() };
-  }
-
-  return { title: '', body: block };
-}
-
-/**
- * Parse the MDX-style content string.
+ * Parse vs step content into a unified VsParsed structure.
  *
- * Supports three formats:
- * 1. Standalone `|` separator: two blocks separated by `|` on its own line
- * 2. Inline pipe: `left|right` rows with first row as header
- * 3. Multi-line table: header row + data rows with inline pipes
+ * Supported formats (all rendered with the same stacked vertical layout):
+ *
+ * Format A — Standalone pipe separator (one or more lines above and below `|`):
+ *   Left block text (one or multiple lines)
+ *   |
+ *   Right block text (one or multiple lines)
+ *   Optional footer (detected when right side has one extra line vs left)
+ *
+ * Format B — Inline pipe table (first row is header, subsequent rows are data):
+ *   LeftTitle | RightTitle
+ *   left data | right data
+ *   left data | right data
+ *   Optional footer lines (no `|`)
+ *
+ * All formats produce:
+ *   leftTitle, rightTitle → panel labels (bold, colored header of each panel)
+ *   leftBody, rightBody  → multi-line content inside each panel
+ *   footer               → trailing notes / stats shown below the comparison
  */
 function parseVsContent(content: string): VsParsed {
-  const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+  // Normalize: trim each line, remove horizontal rules
+  const rawLines = content.split('\n').map(l => l.trim()).filter(l => !isHorizontalRule(l));
+  const lines = rawLines.filter(Boolean);
 
-  // ─── Format 1: Standalone pipe separator ───
-  if (isStandalonePipeFormat(lines)) {
-    // Count standalone pipes to detect 3-block format (title | left | right)
-    const pipeIndices = lines.reduce<number[]>((acc, l, i) => {
-      if (l === '|') acc.push(i);
-      return acc;
-    }, []);
+  // ─── Format A: Standalone pipe (at least one `|` on its own line) ───
+  const standalonePipeIdx = lines.findIndex(l => l === '|');
+  if (standalonePipeIdx !== -1) {
+    const leftLines = lines.slice(0, standalonePipeIdx);
+    const afterPipe = lines.slice(standalonePipeIdx + 1);
 
-    if (pipeIndices.length >= 2) {
-      // 3-block: title | leftBlock | rightBlock
-      const titleBlock = lines.slice(0, pipeIndices[0]).join('\n').trim();
-      const leftBlock = lines.slice(pipeIndices[0] + 1, pipeIndices[1]).join('\n').trim();
-      const rightBlock = lines.slice(pipeIndices[1] + 1).join('\n').trim();
+    // Check for a second standalone `|`
+    const secondPipeOffset = afterPipe.findIndex(l => l === '|');
 
-      const left = extractTitle(leftBlock);
-      const right = extractTitle(rightBlock);
-
-      return {
-        leftTitle: left.title || titleBlock,
-        rightTitle: right.title || '',
-        rows: [{ left: left.body || leftBlock, right: right.body || rightBlock }],
-        footer: titleBlock && left.title ? [titleBlock] : [],
-      };
+    let rightLines: string[];
+    let footerLines: string[];
+    if (secondPipeOffset !== -1) {
+      rightLines = afterPipe.slice(0, secondPipeOffset);
+      footerLines = afterPipe.slice(secondPipeOffset + 1);
+    } else {
+      rightLines = afterPipe;
+      footerLines = [];
     }
 
-    // 2-block: leftBlock | rightBlock
-    const pipeIdx = pipeIndices[0];
-    const leftBlock = lines.slice(0, pipeIdx).join('\n').trim();
-    const rightBlock = lines.slice(pipeIdx + 1).join('\n').trim();
+    // If right block has exactly one more line than left block, the extra trailing
+    // line is likely a summary/footer sentence rather than comparison data.
+    if (rightLines.length > leftLines.length && rightLines.length - leftLines.length === 1) {
+      footerLines = [rightLines[rightLines.length - 1], ...footerLines];
+      rightLines = rightLines.slice(0, -1);
+    }
 
-    const left = extractTitle(leftBlock);
-    const right = extractTitle(rightBlock);
+    const leftTitle = leftLines[0] ?? '';
+    const leftBody = leftLines.slice(1).join('\n').trim();
+    const rightTitle = rightLines[0] ?? '';
+    const rightBody = rightLines.slice(1).join('\n').trim();
 
+    return { leftTitle, rightTitle, leftBody, rightBody, footer: footerLines };
+  }
+
+  // ─── Format B: Inline pipe rows ───
+  // Separate piped rows from non-piped (footer) lines
+  const pipedRows: Array<{ left: string; right: string }> = [];
+  const footerLines: string[] = [];
+
+  for (const line of lines) {
+    const pipeIdx = line.indexOf('|');
+    if (pipeIdx !== -1) {
+      pipedRows.push({
+        left: line.slice(0, pipeIdx).trim(),
+        right: line.slice(pipeIdx + 1).trim(),
+      });
+    } else {
+      footerLines.push(line);
+    }
+  }
+
+  if (pipedRows.length === 0) {
+    // Fallback: no pipes at all — treat full content as left panel
     return {
-      leftTitle: left.title,
-      rightTitle: right.title,
-      rows: [{ left: left.body || leftBlock, right: right.body || rightBlock }],
+      leftTitle: '',
+      rightTitle: '',
+      leftBody: lines.join('\n'),
+      rightBody: '',
       footer: [],
     };
   }
 
-  // ─── Format 2 & 3: Inline pipe rows ───
-  let leftTitle = '';
-  let rightTitle = '';
-  const rows: Array<{ left: string; right: string }> = [];
-  const footer: string[] = [];
-
-  let headerFound = false;
-
-  for (const line of lines) {
-    if (line.includes('|')) {
-      const pipeIndex = line.indexOf('|');
-      const left = line.slice(0, pipeIndex).trim();
-      const right = line.slice(pipeIndex + 1).trim();
-
-      if (!headerFound) {
-        leftTitle = left;
-        rightTitle = right;
-        headerFound = true;
-      } else {
-        rows.push({ left, right });
-      }
-    } else {
-      footer.push(line);
-    }
+  if (pipedRows.length === 1) {
+    // Single piped row → treat as panel titles, no body
+    return {
+      leftTitle: pipedRows[0].left,
+      rightTitle: pipedRows[0].right,
+      leftBody: '',
+      rightBody: '',
+      footer: footerLines,
+    };
   }
 
-  return { leftTitle, rightTitle, rows, footer };
+  // Multiple rows: first row is the title/header row, rest are body data
+  const [header, ...dataRows] = pipedRows;
+  return {
+    leftTitle: header.left,
+    rightTitle: header.right,
+    leftBody: dataRows.map(r => r.left).join('\n'),
+    rightBody: dataRows.map(r => r.right).join('\n'),
+    footer: footerLines,
+  };
 }
 
 export default function VsStep({ step, card, isActive }: VsStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
-  const { leftTitle, rightTitle, rows, footer } = parseVsContent(step.content);
-
-  // Use stacked layout when rows have long text (standalone format)
-  const isStacked = rows.length === 1 && (rows[0].left.length > 25 || rows[0].right.length > 25);
+  const { leftTitle, rightTitle, leftBody, rightBody, footer } = parseVsContent(step.content);
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden">
@@ -200,177 +204,88 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
         }}
       />
 
-      {/* Main comparison area */}
+      {/* Main comparison area — always stacked vertical layout */}
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-6">
+        <div className="flex w-full flex-col items-center gap-0">
 
-        {isStacked ? (
-          /* ─── Stacked vertical layout (for standalone pipe format) ─── */
-          <div className="flex w-full flex-col items-center gap-0">
-            {/* Top panel (left/A side) */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={isActive ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="w-full rounded-t-2xl border border-b-0 border-blue-500/20 bg-blue-950/20 px-5 py-4 backdrop-blur-sm"
-            >
-              {leftTitle && (
-                <p className="mb-2 text-sm font-black text-blue-300" style={{ wordBreak: 'keep-all', textWrap: 'balance' }}>
-                  {leftTitle}
-                </p>
-              )}
+          {/* ── Top panel (left / A side) ── */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="w-full rounded-t-2xl border border-b-0 border-blue-500/20 bg-blue-950/20 px-5 py-4 backdrop-blur-sm"
+          >
+            {leftTitle && (
+              <p
+                className="mb-2 text-sm font-black text-blue-300"
+                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
+              >
+                {leftTitle}
+              </p>
+            )}
+            {leftBody && (
               <p
                 className="text-sm leading-relaxed text-white/80"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
-                {renderWithLineBreaks(rows[0].left)}
+                {renderWithLineBreaks(leftBody)}
               </p>
-            </motion.div>
+            )}
+          </motion.div>
 
-            {/* VS divider between panels */}
-            <div className="relative z-10 flex w-full items-center">
-              <div className="flex-1 border-t border-white/10" />
-              <motion.div
-                initial={{ opacity: 0, scale: 0.3 }}
-                animate={isActive ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.5, delay: 0.25, type: 'spring', stiffness: 280, damping: 18 }}
-                className="mx-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 bg-zinc-900"
-                style={{ borderColor: categoryInfo.accent }}
-              >
-                <span className="text-xs font-black tracking-tighter" style={{ color: categoryInfo.accent }}>
-                  VS
-                </span>
-              </motion.div>
-              <div className="flex-1 border-t border-white/10" />
-            </div>
-
-            {/* Bottom panel (right/B side) */}
+          {/* ── VS divider ── */}
+          <div className="relative z-10 flex w-full items-center">
+            <div className="flex-1 border-t border-white/10" />
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isActive ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
-              className="w-full rounded-b-2xl border border-t-0 bg-zinc-900/40 px-5 py-4 backdrop-blur-sm"
-              style={{
-                borderColor: `${categoryInfo.accent}30`,
-                backgroundColor: `${categoryInfo.accent}08`,
-              }}
+              initial={{ opacity: 0, scale: 0.3 }}
+              animate={isActive ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.25, type: 'spring', stiffness: 280, damping: 18 }}
+              className="mx-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 bg-zinc-900"
+              style={{ borderColor: categoryInfo.accent }}
             >
-              {rightTitle && (
-                <p className="mb-2 text-sm font-black" style={{ color: categoryInfo.accent, wordBreak: 'keep-all' }}>
-                  {rightTitle}
-                </p>
-              )}
-              <p
-                className="text-sm leading-relaxed text-white/80"
-                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-              >
-                {renderWithLineBreaks(rows[0].right)}
-              </p>
+              <span className="text-xs font-black tracking-tighter" style={{ color: categoryInfo.accent }}>
+                VS
+              </span>
             </motion.div>
+            <div className="flex-1 border-t border-white/10" />
           </div>
-        ) : (
-          /* ─── Side-by-side layout (for inline pipe format) ─── */
-          <>
-            {/* Header row: left title | VS badge | right title */}
-            <div className="flex w-full items-center gap-2 mb-4">
-              <motion.div
-                initial={{ opacity: 0, x: -32 }}
-                animate={isActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
-                className="flex-1 flex justify-center"
+
+          {/* ── Bottom panel (right / B side) ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
+            className="w-full rounded-b-2xl border border-t-0 px-5 py-4 backdrop-blur-sm"
+            style={{
+              borderColor: `${categoryInfo.accent}30`,
+              backgroundColor: `${categoryInfo.accent}08`,
+            }}
+          >
+            {rightTitle && (
+              <p
+                className="mb-2 text-sm font-black"
+                style={{ color: categoryInfo.accent, wordBreak: 'keep-all' }}
               >
-                <h2
-                  className="text-center text-sm font-black leading-tight text-blue-300 sm:text-base"
-                  style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-                >
-                  {leftTitle}
-                </h2>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.3 }}
-                animate={isActive ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.5, delay: 0.25, type: 'spring', stiffness: 280, damping: 18 }}
-                className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full border-2 bg-zinc-900"
-                style={{ borderColor: categoryInfo.accent }}
+                {rightTitle}
+              </p>
+            )}
+            {rightBody && (
+              <p
+                className="text-sm leading-relaxed text-white/80"
+                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
-                <span className="text-xs font-black tracking-tighter" style={{ color: categoryInfo.accent }}>
-                  VS
-                </span>
-              </motion.div>
+                {renderWithLineBreaks(rightBody)}
+              </p>
+            )}
+          </motion.div>
+        </div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 32 }}
-                animate={isActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
-                className="flex-1 flex justify-center"
-              >
-                <h2
-                  className="text-center text-sm font-black leading-tight sm:text-base"
-                  style={{ color: categoryInfo.accent, wordBreak: 'keep-all' }}
-                >
-                  {rightTitle}
-                </h2>
-              </motion.div>
-            </div>
-
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={isActive ? { scaleX: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.35 }}
-              className="mb-4 h-px w-full origin-center bg-white/10"
-            />
-
-            {/* Content rows */}
-            <div className="flex w-full flex-col gap-3">
-              {rows.map((row, i) => (
-                <div key={i} className="flex w-full items-stretch gap-2">
-                  <motion.div
-                    initial={{ opacity: 0, x: -24 }}
-                    animate={isActive ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.4 + i * 0.1, ease: 'easeOut' }}
-                    className="flex-1 rounded-xl border border-blue-500/20 bg-blue-950/30 px-3 py-3 backdrop-blur-sm"
-                  >
-                    <p
-                      className="text-center text-xs leading-snug text-white/85 sm:text-sm"
-                      style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-                    >
-                      {renderWithLineBreaks(row.left)}
-                    </p>
-                  </motion.div>
-
-                  <div className="flex w-9 shrink-0 items-center justify-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
-                  </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={isActive ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.4 + i * 0.1, ease: 'easeOut' }}
-                    className="flex-1 rounded-xl border bg-zinc-900/60 px-3 py-3 backdrop-blur-sm"
-                    style={{
-                      borderColor: `${categoryInfo.accent}30`,
-                      backgroundColor: `${categoryInfo.accent}0A`,
-                    }}
-                  >
-                    <p
-                      className="text-center text-xs leading-snug text-white/85 sm:text-sm"
-                      style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-                    >
-                      {renderWithLineBreaks(row.right)}
-                    </p>
-                  </motion.div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* Footer text */}
+        {/* ── Footer text (stats / notes) ── */}
         {footer.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.45 + rows.length * 0.1 }}
+            transition={{ duration: 0.5, delay: 0.45 }}
             className="mt-5 w-full border-t border-white/10 pt-4"
           >
             <p
