@@ -78,21 +78,14 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
           </motion.div>
         )}
 
-        {/* 인용구 스타일 레이아웃: 세로 accent 바 + 텍스트 */}
+        {/* 나레이션 레이아웃: 글래스 카드 */}
         <motion.div
           initial={{ opacity: 0, x: -12 }}
           animate={isActive ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.5, delay: hasPrefix ? 0.2 : 0.15, ease: 'easeOut' }}
-          className="flex items-stretch gap-4"
         >
-          {/* Accent 세로 바 */}
-          <div
-            className="w-1 shrink-0 rounded-full opacity-90"
-            style={{ backgroundColor: categoryInfo.accent }}
-          />
-
           {/* 글래스 카드 + 본문 */}
-          <div className="flex-1 rounded-2xl bg-white/10 px-5 py-6 backdrop-blur-md">
+          <div className="rounded-2xl bg-white/10 px-5 py-6 backdrop-blur-md">
             {/* 본문 텍스트 */}
             <p
               className={`${fontSize} font-medium text-white/90`}
