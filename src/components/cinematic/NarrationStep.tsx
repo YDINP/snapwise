@@ -50,55 +50,69 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
       {/* 카테고리 그라디언트 배경 */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
 
+      {/* 배경 미세 패턴 — 중앙 부분에 radial 글로우 */}
+      <div
+        className="absolute inset-0 opacity-20"
+        style={{
+          background: `radial-gradient(ellipse 70% 60% at 50% 50%, ${categoryInfo.accent}33, transparent)`,
+        }}
+      />
+
       {/* 메인 컨텐츠 래퍼 */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={isActive ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative z-10 mx-6 flex max-w-sm flex-col items-center"
+        transition={{ duration: 0.55, ease: 'easeOut' }}
+        className="relative z-10 mx-6 w-full max-w-sm"
       >
         {/* 이모지 헤더 — 📖 prefix가 있을 때만 렌더링 */}
         {hasPrefix && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={isActive ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.45, delay: 0.1, ease: 'easeOut' }}
-            className="mb-3 shrink-0 text-2xl leading-none"
+            initial={{ opacity: 0, y: -8 }}
+            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
+            className="mb-4 flex justify-center"
             aria-hidden="true"
           >
-            {NARRATION_EMOJI}
+            <span className="text-3xl leading-none drop-shadow-md">{NARRATION_EMOJI}</span>
           </motion.div>
         )}
 
-        {/* Accent dot — 상단 중앙 (이모지 없을 때) */}
-        {!hasPrefix && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={isActive ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.35, delay: 0.2 }}
-            className="mb-4 h-1 w-1 shrink-0 rounded-full"
+        {/* 인용구 스타일 레이아웃: 세로 accent 바 + 텍스트 */}
+        <motion.div
+          initial={{ opacity: 0, x: -12 }}
+          animate={isActive ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.5, delay: hasPrefix ? 0.2 : 0.15, ease: 'easeOut' }}
+          className="flex items-stretch gap-4"
+        >
+          {/* Accent 세로 바 */}
+          <div
+            className="w-1 shrink-0 rounded-full opacity-90"
             style={{ backgroundColor: categoryInfo.accent }}
           />
-        )}
 
-        {/* 글래스 카드 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isActive ? { opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          className="rounded-2xl bg-white/10 p-7 backdrop-blur-md"
-        >
-          {/* 본문 텍스트 */}
-          <p
-            className={`text-center ${fontSize} font-medium text-white/90`}
-            style={{
-              wordBreak: 'keep-all',
-              lineHeight: 'var(--card-line-height)',
-              textShadow: '0 1px 4px rgba(0,0,0,0.15)',
-            }}
-          >
-            {renderWithLineBreaks(bodyText, categoryInfo.accent)}
-          </p>
+          {/* 글래스 카드 + 본문 */}
+          <div className="flex-1 rounded-2xl bg-white/10 px-5 py-6 backdrop-blur-md">
+            {/* 본문 텍스트 */}
+            <p
+              className={`${fontSize} font-medium text-white/90`}
+              style={{
+                wordBreak: 'keep-all',
+                lineHeight: 'var(--card-line-height)',
+                textShadow: '0 1px 4px rgba(0,0,0,0.15)',
+              }}
+            >
+              {renderWithLineBreaks(bodyText, categoryInfo.accent)}
+            </p>
+
+            {/* 하단 구분선 */}
+            <motion.div
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
+              transition={{ duration: 0.6, delay: hasPrefix ? 0.4 : 0.35, ease: 'easeOut' }}
+              className="mt-5 h-px origin-left rounded-full bg-white/20"
+            />
+          </div>
         </motion.div>
       </motion.div>
     </div>
