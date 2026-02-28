@@ -178,11 +178,12 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
       </div>
 
       {/* 처음으로 버튼 — step 0 이후에만 표시 */}
+      {/* Progress bar 높이: pt-2(8px) + h-11(44px) = 52px → 버튼은 그 아래에 배치 */}
       {!isFirstStep && (
         <button
           onClick={(e) => { e.stopPropagation(); goToStart(); }}
           className="absolute left-3 z-50 flex items-center gap-2 rounded-full bg-black/30 px-5 py-2.5 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-black/50"
-          style={{ top: topOffset + 16 }}
+          style={{ top: topOffset + 52 + 8 }}
         >
           ← 처음으로
         </button>
@@ -192,7 +193,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
       {totalSteps > 0 && step && (
         <div
           className="absolute right-3 z-50 flex items-center gap-1.5"
-          style={{ top: topOffset + 16 }}
+          style={{ top: topOffset + 52 + 8 }}
         >
           <WordCountBadge content={step.content} />
           <div className="rounded-full bg-black/30 px-3 py-1 text-center text-[10px] font-medium text-white/60 backdrop-blur-sm">
