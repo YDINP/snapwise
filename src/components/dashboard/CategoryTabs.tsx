@@ -66,9 +66,9 @@ export default function CategoryTabs({ cardsByCategory }: CategoryTabsProps) {
       className="dash-card"
       style={{ overflow: 'hidden' }}
     >
-      {/* ── 카테고리 pill 가로 스크롤 탭바 ──────────── */}
+      {/* ── 카테고리 그리드 (3열) ─────────────────────────── */}
       <div
-        className="flex flex-nowrap overflow-x-auto gap-1.5 px-3 py-3 hide-scrollbar scroll-smooth"
+        className="grid grid-cols-3 gap-1.5 p-3"
         style={{ borderBottom: '1px solid var(--color-divider)' }}
       >
         {ALL_CATEGORY_KEYS.map((key) => {
@@ -81,13 +81,13 @@ export default function CategoryTabs({ cardsByCategory }: CategoryTabsProps) {
               key={key}
               onClick={() => setActiveKey(key)}
               aria-selected={isActive}
-              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+              className="flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg text-xs font-medium transition-all"
               style={
                 isActive
                   ? {
                       background: `${info.accent}18`,
                       color:      info.accent,
-                      outline:    `1px solid ${info.accent}35`,
+                      outline:    `1.5px solid ${info.accent}50`,
                     }
                   : {
                       background: 'var(--color-surface-2)',
@@ -95,10 +95,10 @@ export default function CategoryTabs({ cardsByCategory }: CategoryTabsProps) {
                     }
               }
             >
-              <span aria-hidden="true">{info.emoji}</span>
-              <span>{info.label}</span>
+              <span className="text-base" aria-hidden="true">{info.emoji}</span>
+              <span className="leading-tight">{info.label}</span>
               <span
-                className="text-[10px] rounded-full px-1.5 py-0.5 font-bold tabular-nums"
+                className="text-[9px] rounded-full px-1 font-bold tabular-nums"
                 style={
                   isActive
                     ? { background: `${info.accent}20`, color: info.accent }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -127,12 +127,12 @@ export default function DashboardTabs({
   );
 
 
-  useEffect(() => {
-    async function fetchAggregates() {
+  const fetchAggregates = useCallback(async () => {
       let likesFromDB  = false;
       let savesFromDB  = false;
 
       // ── Supabase 집계 시도 ────────────────────────────────────
+      console.log('[SnapWise Dashboard] supabase 연결 상태:', supabase ? '✅ 연결됨' : '❌ null (env var 없음)');
       if (supabase) {
         try {
           const [likesResult, savesResult] = await Promise.all([
@@ -210,10 +210,11 @@ export default function DashboardTabs({
       }
 
       setDbLoading(false);
-    }
-
-    fetchAggregates();
   }, []);
+
+  useEffect(() => {
+    fetchAggregates();
+  }, [fetchAggregates]);
 
   return (
     <div
@@ -254,6 +255,18 @@ export default function DashboardTabs({
               SnapWise 카드 현황
             </p>
           </div>
+          <button
+            onClick={fetchAggregates}
+            className="text-xs px-2.5 py-1 rounded-lg transition-colors shrink-0"
+            style={{
+              background: 'var(--color-surface-2)',
+              color: 'var(--color-muted)',
+              border: '1px solid var(--color-divider)',
+            }}
+            title="데이터 새로고침"
+          >
+            ↻ 갱신
+          </button>
         </div>
 
         {/* 탭바 */}
