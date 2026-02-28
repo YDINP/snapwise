@@ -38,6 +38,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    keywords: card.tags && card.tags.length > 0
+      ? card.tags
+      : [card.category, card.title],
     alternates: { canonical: url },
     openGraph: {
       title,

@@ -10,10 +10,29 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
+  keywords: [
+    '지식카드', '숏폼블로그', '심리학', '과학', '역사', '비즈니스', '문화', '인물', '라이프스타일',
+    '한국사', '어원', '상식', '바다', '우주', '인체', 'TMI', 'SnapWise', '스와이프', '지식',
+    '읽기', '교양', '학습', '짧은지식',
+  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
     locale: 'ko_KR',
+    url: SITE_URL,
   },
   twitter: {
     card: 'summary_large_image',
@@ -29,6 +48,10 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+  themeColor: [
+    { color: '#09090B', media: '(prefers-color-scheme: dark)' },
+    { color: '#FFFFFF', media: '(prefers-color-scheme: light)' },
+  ],
 };
 
 const websiteJsonLd = {
@@ -37,6 +60,11 @@ const websiteJsonLd = {
   name: SITE_NAME,
   description: SITE_DESCRIPTION,
   url: SITE_URL,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: `${SITE_URL}/feed?q={search_term_string}`,
+    'query-input': 'required name=search_term_string',
+  },
 };
 
 export default function RootLayout({
