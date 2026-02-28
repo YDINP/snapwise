@@ -37,10 +37,17 @@ const ALL_CATEGORIES = [
   'life', 'business', 'culture', 'origins', 'etc', 'tmi'
 ];
 
+// 방식 A(시네마틱) + 방식 B(만화) + 방식 C(리듬형) 전체 유효 스텝 타입
+// CARD_FORMAT_SPEC.md v4 기준
 const VALID_STEP_TYPES = [
+  // 방식 A (시네마틱) — 기본
   'cinematic-hook', 'scene', 'dialogue', 'narration', 'impact',
   'vs', 'stat', 'quote', 'showcase',
-  'reveal-title', 'outro'
+  'reveal-title', 'outro',
+  // 방식 B (만화) — 추가
+  'panel', 'splash',
+  // 방식 C (리듬형, v4) — 추가
+  'fact', 'cliffhanger', 'data-viz',
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -217,12 +224,12 @@ function validateCard(card) {
   if (![1, 2, 3].includes(frontmatter?.difficulty)) errors.push('difficulty 오류');
   if (!slug) errors.push('slug 누락');
 
-  // steps 검증
-  if (!Array.isArray(steps) || steps.length < 8) {
-    errors.push(`steps 부족 (${steps?.length ?? 0}개)`);
+  // steps 검증 — CARD_FORMAT_SPEC.md: 10~16개
+  if (!Array.isArray(steps) || steps.length < 10) {
+    errors.push(`steps 부족 (${steps?.length ?? 0}개, 최소 10개 필요)`);
     return { valid: false, errors };
   }
-  if (steps.length > 18) errors.push(`steps 과다 (${steps.length}개)`);
+  if (steps.length > 16) errors.push(`steps 과다 (${steps.length}개, 최대 16개)`);
 
   // 첫/끝 순서
   if (steps[0]?.type !== 'cinematic-hook') errors.push('첫 스텝이 cinematic-hook이 아님');
@@ -313,7 +320,7 @@ async function callClaude(systemPrompt, userPrompt) {
 
 function buildSystemPrompt() {
   return `당신은 SnapWise 카드 콘텐츠 작가입니다.
-SnapWise는 복잡한 지식을 10~14개의 시네마틱 스텝으로 전달하는 숏폼 앱입니다.
+SnapWise는 복잡한 지식을 10~16개의 시네마틱 스텝으로 전달하는 숏폼 앱입니다.
 
 ## 카드 작성 규칙
 
@@ -321,9 +328,18 @@ SnapWise는 복잡한 지식을 10~14개의 시네마틱 스텝으로 전달하�
 - 첫 스텝: 반드시 cinematic-hook
 - 마지막 스텝: 반드시 outro
 - 끝에서 두 번째 스텝: 반드시 reveal-title
-- 총 스텝 수: 10~14개
+- 총 스텝 수: 10~16개
 
-### 유효한 step 타입
+### title 포맷 규칙 (필수)
+- 반드시 명사형(개념명/인물명/사건명)으로 작성
+- ✅ 올바른 예: "파블로프의 개" / "양자 컴퓨터" / "알렉산더 플레밍"
+- ❌ 금지: "왜 개는 종소리에 반응하는가?" (질문형 금지)
+- ❌ 금지: "실수가 세상을 구했다" (서술 문장형 금지)
+- ❌ 금지: "저항이 사라지는 세계" (개념명 없는 은유형 금지)
+- people 카드: 반드시 인물 이름 포함
+- origins 카드: 단어/어원 자체가 title
+
+### 유효한 step 타입 (방식 A — 시네마틱, 기본)
 - cinematic-hook: 강렬한 오프닝, 호기심 유발
 - scene: 🎬 장면 묘사 (시간/장소/상황)
 - dialogue: 캐릭터 대사 (characterId 필수)
@@ -335,6 +351,20 @@ SnapWise는 복잡한 지식을 10~14개의 시네마틱 스텝으로 전달하�
 - showcase: 목록 데이터 (───구분자 섹션)
 - reveal-title: 제목/개념 공개 (끝에서 두 번째)
 - outro: 마무리 메시지
+
+### 추가 step 타입 (방식 B — 만화 스타일)
+- panel: 다인 대화. 형식: "캐릭터id: 대사\\n캐릭터id: 대사" (한 스텝에 여러 캐릭터 대사)
+- splash: 만화 스플래시. 첫 줄은 이모지+핵심문장, 이후 보조 설명
+
+### 추가 step 타입 (방식 C — 리듬형, v4)
+- fact: 단일 팩트 드롭. 첫 줄에 짧고 강렬한 한 줄 사실 (10~20자 권장)
+- cliffhanger: 다음 스텝 궁금증 유발. "그런데..." / "그 결과는?" 형식의 전환점
+- data-viz: 숫자 카운트업 시각화. 형식: "숫자값 | 레이블\\n설명텍스트(선택)"
+
+### 방식 선택 가이드
+- 인물 대화 중심이면 방식 B(만화): panel/splash를 각 2회 이상 사용, characters 2~4명 필수
+- 개념/팩트 중심이면 방식 A(시네마틱) 기본
+- 빠른 리듬이 필요하면 방식 C(리듬형): fact/cliffhanger/data-viz 활용
 
 ### 스타일 규칙
 - 한국어로 작성
@@ -356,7 +386,7 @@ SnapWise는 복잡한 지식을 10~14개의 시네마틱 스텝으로 전달하�
 {
   "slug": "영문-슬러그-하이픈-구분-최대40자",
   "frontmatter": {
-    "title": "카드 제목",
+    "title": "명사형 카드 제목 (개념명/인물명/사건명)",
     "emoji": "단일 이모지",
     "category": "카테고리명",
     "tags": ["태그1", "태그2", "태그3"],
