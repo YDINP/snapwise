@@ -12,16 +12,8 @@ export function parseInline(text: string, accentColor?: string): React.ReactNode
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
-    // Bold text — optionally accent-colored
-    parts.push(
-      <strong
-        key={`b-${match.index}`}
-        className="font-bold"
-        style={accentColor ? { color: accentColor } : undefined}
-      >
-        {match[1]}
-      </strong>
-    );
+    // Bold syntax stripped — render inner text as plain string
+    parts.push(match[1]);
     lastIndex = match.index + match[0].length;
   }
 
