@@ -278,18 +278,18 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
       <AnimatePresence>
         {canShowHint && showProgressHint && (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 4 }}
             transition={{ duration: 0.4 }}
-            className="pointer-events-none absolute bottom-6 left-1/2 z-30 -translate-x-1/2"
+            className="pointer-events-none absolute right-4 top-1/2 z-30 -translate-y-1/2"
           >
             <motion.div
-              animate={{ y: [0, 4, 0] }}
+              animate={{ x: [0, 4, 0] }}
               transition={{ duration: 1.0, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-white/30 text-lg"
+              className="text-white/40 text-2xl"
             >
-              ↓
+              ›
             </motion.div>
           </motion.div>
         )}
