@@ -17,20 +17,42 @@ export function useSessionTracker() {
   const sessionIdRef = useRef<string | null>(null);
   const startTimeRef = useRef<number>(0);
 
+  /**
+   * 현재 URL pathname에서 카드 slug 추출
+   * /card/[slug] 패턴에 해당하면 slug 반환, 그 외 null 반환
+   */
+  const getCurrentCardSlug = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    const match = window.location.pathname.match(/^\/card\/([^/]+)\/?$/);
+    return match ? match[1] : null;
+  };
+
   const endSession = useCallback(async () => {
     if (!supabase || !sessionIdRef.current || !startTimeRef.current) return;
 
     const durationSeconds = Math.round((Date.now() - startTimeRef.current) / 1000);
     const endedAt = new Date().toISOString();
+    const exitCardSlug = getCurrentCardSlug();
 
     try {
-      await supabase
+      const updatePayload: {
+        ended_at: string;
+        duration_seconds: number;
+        exit_card_slug?: string | null;
+      } = {
+        ended_at: endedAt,
+        duration_seconds: durationSeconds,
+        exit_card_slug: exitCardSlug,
+      };
+
+      const { error } = await supabase
         .from('sessions')
-        .update({
-          ended_at: endedAt,
-          duration_seconds: durationSeconds,
-        })
+        .update(updatePayload)
         .eq('id', sessionIdRef.current);
+
+      if (error) {
+        console.warn('[SnapWise] 세션 종료 기록 실패:', error.message);
+      }
     } catch (err) {
       console.warn('[SnapWise] 세션 종료 기록 실패:', err);
     }

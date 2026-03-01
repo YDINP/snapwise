@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Eye,
   Calendar,
+  LogOut,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { CardMeta } from '@/types/content';
@@ -21,6 +22,7 @@ interface SessionRow {
   ended_at: string | null;
   duration_seconds: number | null;
   card_slugs: string[];
+  exit_card_slug: string | null;
 }
 
 interface CardViewCount {
@@ -141,7 +143,7 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
       const [sessionsResult, cardViewsResult] = await Promise.all([
         supabase
           .from('sessions')
-          .select('id, anonymous_id, started_at, ended_at, duration_seconds, card_slugs')
+          .select('id, anonymous_id, started_at, ended_at, duration_seconds, card_slugs, exit_card_slug')
           .order('started_at', { ascending: false })
           .limit(20),
         supabase
@@ -405,35 +407,56 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
               <p className="text-xs mt-1" style={{ color: 'var(--color-placeholder)' }}>사이트에 접속하면 자동으로 수집됩니다</p>
             </div>
           ) : (
-            recentSessions.slice(0, 10).map((session, i) => (
-              <div
-                key={session.id}
-                className="dash-row"
-                style={{ borderBottom: i < Math.min(recentSessions.length, 10) - 1 ? '1px solid var(--color-divider)' : 'none' }}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs font-mono" style={{ color: 'var(--color-muted)' }}>
-                      {session.anonymous_id.slice(0, 8)}...
-                    </p>
-                    <span
-                      className="text-[10px] px-1.5 py-0.5 rounded"
-                      style={{ background: 'var(--color-surface-2)', color: 'var(--color-muted)' }}
-                    >
-                      {formatTime(session.started_at)}
-                    </span>
+            recentSessions.slice(0, 10).map((session, i) => {
+              const exitCard = session.exit_card_slug ? cardLookup[session.exit_card_slug] : null;
+              return (
+                <div
+                  key={session.id}
+                  className="dash-row flex-col items-start gap-1"
+                  style={{ borderBottom: i < Math.min(recentSessions.length, 10) - 1 ? '1px solid var(--color-divider)' : 'none' }}
+                >
+                  {/* 상단: 유저 ID + 시각 + 체류 시간 */}
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs font-mono" style={{ color: 'var(--color-muted)' }}>
+                        {session.anonymous_id.slice(0, 8)}...
+                      </p>
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded"
+                        style={{ background: 'var(--color-surface-2)', color: 'var(--color-muted)' }}
+                      >
+                        {formatTime(session.started_at)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Clock size={10} style={{ color: 'var(--color-muted)' }} />
+                      <span className="text-[11px] tabular-nums" style={{ color: 'var(--color-text-sub)' }}>
+                        {formatDuration(session.duration_seconds)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
+                  {/* 하단: 이탈 카드 정보 */}
                   <div className="flex items-center gap-1">
-                    <Clock size={10} style={{ color: 'var(--color-muted)' }} />
-                    <span className="text-[11px] tabular-nums" style={{ color: 'var(--color-text-sub)' }}>
-                      {formatDuration(session.duration_seconds)}
-                    </span>
+                    <LogOut size={10} style={{ color: 'var(--color-placeholder)' }} />
+                    {session.exit_card_slug ? (
+                      <Link
+                        href={`/card/${session.exit_card_slug}`}
+                        className="text-[11px] truncate max-w-[180px] hover:underline"
+                        style={{ color: '#6366F1' }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {exitCard?.emoji ? `${exitCard.emoji} ` : ''}
+                        {exitCard?.title ?? session.exit_card_slug}
+                      </Link>
+                    ) : (
+                      <span className="text-[11px]" style={{ color: 'var(--color-placeholder)' }}>
+                        직접 이탈
+                      </span>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </section>
