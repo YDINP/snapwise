@@ -80,13 +80,7 @@ export function useSaved(slug: string, card?: CardMeta) {
         if (supabase && userId) {
           supabase
             .from('card_saves')
-            .insert({
-              slug,
-              user_id: userId,
-              title: info.title,
-              emoji: info.emoji,
-              category: info.category,
-            })
+            .insert({ slug, user_id: userId })
             .then(({ error }) => {
               // 23505 = UNIQUE violation (중복 저장) → 정상 무시
               if (error && error.code !== '23505') {
