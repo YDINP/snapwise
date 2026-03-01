@@ -3,12 +3,15 @@
 import Link from 'next/link';
 import type { CardMeta } from '@/types/content';
 import StoryCard from '@/components/feed/StoryCard';
+import { useCardViewTracker } from '@/hooks/useCardViewTracker';
 
 interface SingleCardViewProps {
   card: CardMeta;
 }
 
 export default function SingleCardView({ card }: SingleCardViewProps) {
+  useCardViewTracker(card.slug);
+
   return (
     <main className="relative h-dvh overflow-hidden">
       {/* Back link */}
