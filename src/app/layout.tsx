@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from '@/lib/constants';
+import SessionTrackerWrapper from '@/components/SessionTrackerWrapper';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -106,6 +107,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[var(--color-bg)] text-[var(--color-text)]" suppressHydrationWarning>
+        <SessionTrackerWrapper />
         {children}
       </body>
     </html>

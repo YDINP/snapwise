@@ -12,16 +12,17 @@ import {
   CalendarDays,
   Hash,
   AlertTriangle,
-  Flame,
   Clock,
   ExternalLink,
   Heart,
   Bookmark,
+  Users,
 } from 'lucide-react';
 import type { CardMeta, CategoryKey } from '@/types/content';
 import type { QualityIssue } from '@/app/dashboard/page';
 import { CATEGORIES } from '@/lib/categories';
 import CategoryTabs from './CategoryTabs';
+import SessionTab from './SessionTab';
 import { supabase } from '@/lib/supabase';
 
 /* ── 유틸 ─────────────────────────────────────────────── */
@@ -76,9 +77,10 @@ function SectionHeader({
 const TABS = [
   { key: 'overview' as const,  label: '개요',     icon: TrendingUp },
   { key: 'category' as const,  label: '카테고리', icon: BarChart2  },
+  { key: 'sessions' as const,  label: '세션',     icon: Users      },
 ] as const;
 
-type TabKey = 'overview' | 'category';
+type TabKey = 'overview' | 'category' | 'sessions';
 
 /* ── Props ────────────────────────────────────────────── */
 export interface DashboardTabsProps {
@@ -348,6 +350,18 @@ export default function DashboardTabs({
                 sortedCategories={sortedCategories}
                 maxCount={maxCount}
               />
+            </motion.div>
+          )}
+          {activeTab === 'sessions' && (
+            <motion.div
+              key="sessions"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-6"
+            >
+              <SessionTab cardLookup={cardLookup} />
             </motion.div>
           )}
         </AnimatePresence>
