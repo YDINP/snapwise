@@ -39,8 +39,10 @@ function looksLikeStat(line: string): boolean {
     /[%배명원개×]/.test(line.trim());
 }
 
-/** 값이 긴 텍스트인지 감지 — 15자 초과이거나 숫자 비율이 20% 미만이면 텍스트 값으로 판단 */
+/** 값이 긴 텍스트인지 감지 — 한글 포함, 15자 초과, 또는 숫자 비율 20% 미만이면 텍스트 값 */
 function isTextValue(value: string): boolean {
+  // 한글(완성형·자모) 포함이면 텍스트 값 — "약 26조 원", "연간 약 200편" 등 올바르게 분류
+  if (/[\uAC00-\uD7A3\u3131-\u314E]/.test(value)) return true;
   if (value.length > 15) return true;
   const digitCount = (value.match(/\d/g) ?? []).length;
   const digitRatio = digitCount / value.length;
@@ -56,7 +58,8 @@ function parseStatContent(content: string): ParsedStat {
   for (const line of rawLines) {
     if (line.includes('|')) {
       pipeLines.push(line);
-    } else {
+    } else if (!/^─+$/.test(line)) {
+      // ─ 구분자 라인(예: ───)은 description에서 제외
       plainLines.push(line);
     }
   }
@@ -350,7 +353,7 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
               }}
             />
 
-            {/* Row content */}
+            {/* Row content — label 좌, value 우 수평 배치 */}
             <motion.div
               initial={{ opacity: 0, x: -12 }}
               animate={isActive ? { opacity: 1, x: 0 } : {}}
@@ -359,11 +362,11 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
                 delay: 0.15 + i * 0.1,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="flex flex-col py-5 px-2"
+              className="flex items-center justify-between gap-3 py-4 px-2"
             >
               {/* Label */}
               <span
-                className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35"
+                className="text-[12px] font-medium text-white/40 min-w-0"
                 style={{ wordBreak: 'keep-all' }}
               >
                 {item.label}
@@ -371,8 +374,8 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
 
               {/* Value */}
               <span
-                className="mt-1.5 text-[15px] font-semibold leading-snug text-white/85"
-                style={{ wordBreak: 'keep-all' }}
+                className="text-[14px] font-semibold shrink-0 text-right"
+                style={{ color: accent, wordBreak: 'keep-all' }}
               >
                 {item.value}
               </span>

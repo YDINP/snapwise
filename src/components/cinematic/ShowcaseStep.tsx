@@ -76,14 +76,14 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
         }
       `}</style>
 
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-5 px-6">
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-2 px-6">
         {/* [A2] Intro text — 전역 TypingText (bold + 커서 지원) */}
         {intro && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ duration: 0.3 }}
-            className="text-center text-sm font-medium text-white/70"
+            className="mb-1 text-center text-sm font-medium text-white/70"
           >
             <TypingText text={intro} isActive={isActive} startDelay={200} speed={40} />
           </motion.p>
@@ -100,7 +100,7 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
               initial={{ opacity: 0, x: slideX, transform: 'perspective(800px) rotateX(10deg)' }}
               animate={isActive ? { opacity: 1, x: 0, transform: 'perspective(800px) rotateX(0deg)' } : {}}
               transition={{ duration: 0.6, delay: 0.3 + i * 0.18, ease: 'easeOut' }}
-              className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-md"
+              className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/10 py-3 px-4 backdrop-blur-md"
               style={{
                 boxShadow: `0 0 30px ${categoryInfo.accent}15, inset 0 1px 0 rgba(255,255,255,0.1)`,
               }}
