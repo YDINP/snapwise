@@ -123,7 +123,7 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
                 }}
               />
 
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-3">
                 {/* [B3] Emoji — spring 애니메이션 */}
                 {item.emoji && (
                   <motion.div
@@ -135,7 +135,7 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
                       stiffness: 400,
                       damping: 12,
                     }}
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${[...item.emoji].length >= 3 ? 'text-sm' : [...item.emoji].length >= 2 ? 'text-base' : 'text-2xl'}`}
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${[...item.emoji].length >= 3 ? 'text-xs' : [...item.emoji].length >= 2 ? 'text-sm' : 'text-xl'}`}
                     style={{
                       backgroundColor: `${categoryInfo.accent}25`,
                       animation: isActive ? 'emojiGlowPulse 2.5s ease-in-out infinite' : 'none',
@@ -148,28 +148,25 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
 
                 {/* Content */}
                 <div className="min-w-0 flex-1">
-                  {/* [A1] subtitle 있으면 title + accent badge로 표시 */}
-                  <div className="mb-1 flex items-center gap-2">
-                    <h3 className="text-base font-bold text-white">{item.title}</h3>
-                    {item.subtitle && (
-                      <span
-                        className="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
-                        style={{
-                          backgroundColor: `${categoryInfo.accent}25`,
-                          color: categoryInfo.accent,
-                        }}
-                      >
-                        {item.subtitle}
-                      </span>
-                    )}
-                  </div>
+                  {/* [A1] title + subtitle(badge→텍스트) */}
+                  <h3 className="text-sm font-bold leading-tight text-white">{item.title}</h3>
+                  {item.subtitle && (
+                    <p
+                      className="mt-0.5 text-[11px] leading-snug text-white/50"
+                      style={{ wordBreak: 'keep-all' }}
+                    >
+                      {item.subtitle}
+                    </p>
+                  )}
                   {/* [B4] description — accent 색상 bold 지원 */}
-                  <p
-                    className="text-sm leading-relaxed text-white/70"
-                    style={{ wordBreak: 'keep-all', textWrap: 'balance' } as React.CSSProperties}
-                  >
-                    {renderWithLineBreaks(item.description, categoryInfo.accent)}
-                  </p>
+                  {item.description && (
+                    <p
+                      className="mt-1 text-xs leading-relaxed text-white/60"
+                      style={{ wordBreak: 'keep-all', textWrap: 'balance' } as React.CSSProperties}
+                    >
+                      {renderWithLineBreaks(item.description, categoryInfo.accent)}
+                    </p>
+                  )}
                 </div>
               </div>
             </motion.div>
