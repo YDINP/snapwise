@@ -7,11 +7,16 @@ import { getAnonymousId } from './useAnonymousId';
 const SESSION_ID_KEY = 'snapwise-session-id';
 const SESSION_START_KEY = 'snapwise-session-start';
 
+/** 대시보드 경로면 세션 추적 건너뜀 */
+const isDashboard = () =>
+  typeof window !== 'undefined' && window.location.pathname.startsWith('/dashboard');
+
 /**
  * 유저 세션 추적 훅
  * - 마운트 시 세션 시작 (Supabase sessions 테이블 INSERT)
- * - visibilitychange='hidden' 또는 beforeunload 시 세션 종료 (UPDATE duration_seconds)
- * - Supabase 연결 없으면 조용히 실패
+ * - visibilitychange='hidden' 또는 pagehide 시 세션 종료
+ * - keepalive fetch 사용 → 페이지 언로드 시에도 요청 보장
+ * - /dashboard 경로는 추적 제외
  */
 export function useSessionTracker() {
   const sessionIdRef = useRef<string | null>(null);
@@ -27,35 +32,32 @@ export function useSessionTracker() {
     return match ? match[1] : null;
   };
 
-  const endSession = useCallback(async () => {
-    if (!supabase || !sessionIdRef.current || !startTimeRef.current) return;
+  const endSession = useCallback(() => {
+    if (!sessionIdRef.current || !startTimeRef.current) return;
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+    if (!supabaseUrl || !supabaseKey) return;
 
     const durationSeconds = Math.round((Date.now() - startTimeRef.current) / 1000);
-    const endedAt = new Date().toISOString();
     const exitCardSlug = getCurrentCardSlug();
 
-    try {
-      const updatePayload: {
-        ended_at: string;
-        duration_seconds: number;
-        exit_card_slug?: string | null;
-      } = {
-        ended_at: endedAt,
+    // keepalive: true → 페이지 언로드 중에도 요청이 취소되지 않음
+    fetch(`${supabaseUrl}/rest/v1/sessions?id=eq.${sessionIdRef.current}`, {
+      method: 'PATCH',
+      keepalive: true,
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        ended_at: new Date().toISOString(),
         duration_seconds: durationSeconds,
         exit_card_slug: exitCardSlug,
-      };
-
-      const { error } = await supabase
-        .from('sessions')
-        .update(updatePayload)
-        .eq('id', sessionIdRef.current);
-
-      if (error) {
-        console.warn('[SnapWise] 세션 종료 기록 실패:', error.message);
-      }
-    } catch (err) {
-      console.warn('[SnapWise] 세션 종료 기록 실패:', err);
-    }
+      }),
+    }).catch(() => {/* 실패 시 무시 */});
   }, []);
 
   useEffect(() => {
@@ -66,6 +68,7 @@ export function useSessionTracker() {
 
     const startSession = async () => {
       if (!supabase) return;
+      if (isDashboard()) return; // 대시보드 세션 추적 제외
 
       startTimeRef.current = Date.now();
 
