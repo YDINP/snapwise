@@ -204,20 +204,20 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
         }}
       />
 
-      {/* Main comparison area — always stacked vertical layout */}
+      {/* Main comparison area — horizontal side-by-side layout */}
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-6">
-        <div className="flex w-full flex-col items-center gap-0">
+        <div className="relative flex w-full flex-row items-stretch">
 
-          {/* ── Top panel (left / A side) ── */}
+          {/* ── Left panel (A side) ── */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            initial={{ opacity: 0, x: -20 }}
+            animate={isActive ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="w-full rounded-t-2xl border border-b-0 border-white/10 bg-zinc-800/25 px-5 py-4 backdrop-blur-sm"
+            className="flex flex-1 min-w-0 flex-col justify-center overflow-hidden rounded-l-2xl border border-r-0 border-white/10 bg-zinc-800/25 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
           >
             {leftTitle && (
               <p
-                className="mb-2 text-sm font-black text-white/85"
+                className="mb-2 text-xs font-black text-white/85 sm:text-sm"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {leftTitle}
@@ -225,7 +225,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             )}
             {leftBody && (
               <p
-                className="text-sm leading-relaxed text-white/80"
+                className="text-xs leading-relaxed text-white/80 sm:text-sm"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {renderWithLineBreaks(leftBody)}
@@ -233,29 +233,25 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             )}
           </motion.div>
 
-          {/* ── VS divider ── */}
-          <div className="relative z-10 flex w-full items-center">
-            <div className="flex-1 border-t border-white/10" />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.3 }}
-              animate={isActive ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.25, type: 'spring', stiffness: 280, damping: 18 }}
-              className="mx-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 bg-zinc-900"
-              style={{ borderColor: categoryInfo.accent }}
-            >
-              <span className="text-xs font-black tracking-tighter" style={{ color: categoryInfo.accent }}>
-                VS
-              </span>
-            </motion.div>
-            <div className="flex-1 border-t border-white/10" />
-          </div>
-
-          {/* ── Bottom panel (right / B side) ── */}
+          {/* ── VS badge — absolute center ── */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            initial={{ opacity: 0, scale: 0.3 }}
+            animate={isActive ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.25, type: 'spring', stiffness: 280, damping: 18 }}
+            className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 bg-zinc-900"
+            style={{ borderColor: categoryInfo.accent }}
+          >
+            <span className="text-xs font-black tracking-tighter" style={{ color: categoryInfo.accent }}>
+              VS
+            </span>
+          </motion.div>
+
+          {/* ── Right panel (B side) ── */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={isActive ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
-            className="w-full rounded-b-2xl border border-t-0 px-5 py-4 backdrop-blur-sm"
+            className="flex flex-1 min-w-0 flex-col justify-center overflow-hidden rounded-r-2xl border border-l-0 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
             style={{
               borderColor: `${categoryInfo.accent}50`,
               backgroundColor: `${categoryInfo.accent}25`,
@@ -263,7 +259,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
           >
             {rightTitle && (
               <p
-                className="mb-2 text-sm font-black"
+                className="mb-2 text-xs font-black sm:text-sm"
                 style={{ color: categoryInfo.accent, wordBreak: 'keep-all' }}
               >
                 {rightTitle}
@@ -271,7 +267,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             )}
             {rightBody && (
               <p
-                className="text-sm leading-relaxed text-white/80"
+                className="text-xs leading-relaxed text-white/80 sm:text-sm"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {renderWithLineBreaks(rightBody)}

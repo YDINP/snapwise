@@ -290,12 +290,23 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
               ))}
             </div>
           ) : (
-            <div className="flex items-end gap-2" style={{ height: '80px' }}>
+            <div className="flex items-end gap-2" style={{ height: '96px' }}>
               {dailyCounts.map((d, i) => {
                 const barHeight = maxDaily > 0 ? (d.count / maxDaily) * 100 : 0;
                 const isToday = i === dailyCounts.length - 1;
                 return (
-                  <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
+                  <div key={d.date} className="flex-1 flex flex-col items-center justify-end gap-0.5" style={{ height: '100%' }}>
+                    {/* 수치 레이블 — 막대 위에 표시 */}
+                    <span
+                      className="text-[9px] font-bold tabular-nums leading-none"
+                      style={{
+                        color: isToday ? '#6366F1' : 'var(--color-muted)',
+                        opacity: d.count === 0 ? 0.35 : 1,
+                        marginBottom: '2px',
+                      }}
+                    >
+                      {d.count}
+                    </span>
                     <motion.div
                       className="w-full rounded-t"
                       initial={{ height: 0 }}
@@ -309,7 +320,7 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
                     />
                     <span
                       className="text-[10px] tabular-nums"
-                      style={{ color: isToday ? '#6366F1' : 'var(--color-muted)' }}
+                      style={{ color: isToday ? '#6366F1' : 'var(--color-muted)', marginTop: '2px' }}
                     >
                       {formatDate(d.date)}
                     </span>
