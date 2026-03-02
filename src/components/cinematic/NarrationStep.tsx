@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
-import { renderWithLineBreaks } from '@/lib/renderContent';
+import TypingText from './TypingText';
 
 interface NarrationStepProps {
   step: CardStep;
@@ -113,7 +113,7 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
                 textShadow: '0 1px 4px rgba(0,0,0,0.15)',
               }}
             >
-              {renderWithLineBreaks(bodyText, categoryInfo.accent)}
+              <TypingText text={bodyText} isActive={isActive} speed={28} startDelay={500} />
             </p>
 
             {/* 하단 구분선 */}

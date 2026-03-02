@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
+import { clipSweep } from '@/lib/motionVariants';
 
 interface RevealTitleStepProps {
   step: CardStep;
@@ -188,12 +189,12 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
           </motion.div>
         )}
 
-        {/* Description with accent-colored bold */}
+        {/* Description with clipSweep entrance */}
         {description && (
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: card.coverImage ? 0.9 : 0.8, duration: 0.5 }}
+            variants={clipSweep}
+            initial="hidden"
+            animate={isActive ? 'visible' : 'hidden'}
             className="max-w-[22rem] text-center text-white/80"
             style={{
               fontSize: 'var(--card-text-body)',

@@ -1,9 +1,10 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
-import { renderWithLineBreaks } from '@/lib/renderContent';
+import { lineStagger, lineFadeUp } from '@/lib/motionVariants';
 
 interface SceneStepProps {
   step: CardStep;
@@ -77,31 +78,40 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
       )}
 
       {/* Centered text content */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={isActive ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="relative z-10 w-full px-8"
-      >
+      <div className="relative z-10 w-full px-8">
         {caption !== null && (
-          <p
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
             className="text-center text-xs tracking-widest text-white/50 mb-3 uppercase"
             style={{ wordBreak: 'keep-all' }}
           >
             {caption}
-          </p>
+          </motion.p>
         )}
-        <p
-          className="text-center text-xl font-semibold text-white"
-          style={{
-            wordBreak: 'keep-all',
-            textWrap: 'balance',
-            textShadow: '0 2px 12px rgba(0,0,0,0.4)',
-          }}
+        <motion.div
+          variants={lineStagger}
+          initial="hidden"
+          animate={isActive ? 'visible' : 'hidden'}
+          className="flex flex-col items-center gap-1"
         >
-          {renderWithLineBreaks(body)}
-        </p>
-      </motion.div>
+          {body.split('\n').filter(l => l.trim()).map((line, i) => (
+            <motion.p
+              key={i}
+              variants={lineFadeUp}
+              className="text-center text-xl font-semibold text-white"
+              style={{
+                wordBreak: 'keep-all',
+                textWrap: 'balance' as React.CSSProperties['textWrap'],
+                textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+              }}
+            >
+              {line}
+            </motion.p>
+          ))}
+        </motion.div>
+      </div>
     </div>
   );
 }

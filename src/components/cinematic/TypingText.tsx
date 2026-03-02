@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useReducedMotion } from 'motion/react';
 
 interface BoldRange {
   start: number;
@@ -66,6 +67,7 @@ export default function TypingText({
   startDelay = 600,
 }: TypingTextProps) {
   const { clean, boldRanges } = useMemo(() => preprocessBold(text), [text]);
+  const prefersReducedMotion = useReducedMotion();
 
   const [displayedLength, setDisplayedLength] = useState(0);
   const [started, setStarted] = useState(false);
@@ -87,11 +89,16 @@ export default function TypingText({
       setStarted(false);
       return;
     }
+    // prefers-reduced-motion: 즉시 전체 텍스트 표시
+    if (prefersReducedMotion) {
+      setDisplayedLength(clean.length);
+      return;
+    }
     if (!started) {
       const timer = setTimeout(() => setStarted(true), startDelay);
       return () => clearTimeout(timer);
     }
-  }, [isActive, started, startDelay]);
+  }, [isActive, started, startDelay, prefersReducedMotion, clean.length]);
 
   // Typing loop — operates on clean text (no ** markers)
   useEffect(() => {
@@ -121,16 +128,22 @@ export default function TypingText({
   }
 
   return (
-    <>
-      {lines.map(({ text: lineText, offset: lineOffset }, i) => (
-        <span key={i}>
-          {renderWithBold(lineText, lineOffset, boldRanges)}
-          {i < lines.length - 1 && <br />}
-        </span>
-      ))}
-      {isTyping && (
-        <span className="ml-0.5 inline-block animate-pulse text-gray-400">▌</span>
-      )}
-    </>
+    // 클릭/탭 시 타이핑 즉시 완료 (skip 기능)
+    <span onClick={() => setDisplayedLength(clean.length)}>
+      {/* 스크린리더용 전체 텍스트 (숨김) */}
+      <span className="sr-only">{clean}</span>
+      {/* 타이핑 애니메이션 영역 (스크린리더에서 숨김) */}
+      <span aria-hidden="true">
+        {lines.map(({ text: lineText, offset: lineOffset }, i) => (
+          <span key={i}>
+            {renderWithBold(lineText, lineOffset, boldRanges)}
+            {i < lines.length - 1 && <br />}
+          </span>
+        ))}
+        {isTyping && (
+          <span className="ml-0.5 inline-block animate-pulse text-gray-400">▌</span>
+        )}
+      </span>
+    </span>
   );
 }

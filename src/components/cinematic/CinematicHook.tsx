@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { parseInline } from '@/lib/renderContent';
-import { fadeInUp, fadeIn, stagger } from '@/lib/motionVariants';
+import { fadeInUp, fadeIn, staggerWithDelay } from '@/lib/motionVariants';
 
 interface CinematicHookProps {
   step: CardStep;
@@ -121,7 +121,7 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
 
         {/* Title: 줄 단위 stagger fadeInUp + 볼드 마크다운 렌더링 */}
         <motion.div
-          variants={stagger}
+          variants={staggerWithDelay}
           initial="hidden"
           animate={isActive ? 'visible' : 'hidden'}
           className="max-w-[22rem] flex flex-col items-center gap-1.5 text-center"

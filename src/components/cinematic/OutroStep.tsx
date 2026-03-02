@@ -10,7 +10,7 @@ import { useLikes } from '@/hooks/useLikes';
 import { useSaved } from '@/hooks/useSaved';
 import { Heart, Share2, Bookmark, ChevronDown, Quote } from 'lucide-react';
 import { getQuoteForCard } from '@/lib/quotes';
-import { scaleIn, stagger, fadeInUp } from '@/lib/motionVariants';
+import { scaleIn, stagger, fadeInUp, lineStagger, lineFadeUp } from '@/lib/motionVariants';
 
 interface OutroStepProps {
   step: CardStep;
@@ -166,12 +166,27 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
                 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%)',
             }}
           />
-          <p
-            className="relative text-center text-white/90"
-            style={{ fontSize: 'var(--card-text-body)', lineHeight: 'var(--card-line-height)' }}
+          <motion.div
+            variants={lineStagger}
+            initial="hidden"
+            animate={isActive ? 'visible' : 'hidden'}
+            className="relative flex flex-col items-center gap-1"
           >
-            {renderWithLineBreaks(step.content)}
-          </p>
+            {step.content.split('\n').filter(l => l.trim()).map((line, i) => (
+              <motion.p
+                key={i}
+                variants={lineFadeUp}
+                className="text-center text-white/90"
+                style={{
+                  fontSize: 'var(--card-text-body)',
+                  lineHeight: 'var(--card-line-height)',
+                  wordBreak: 'keep-all',
+                }}
+              >
+                {line}
+              </motion.p>
+            ))}
+          </motion.div>
         </motion.div>
 
         {/* Action buttons with micro-interactions */}

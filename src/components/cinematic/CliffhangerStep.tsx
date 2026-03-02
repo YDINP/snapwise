@@ -63,21 +63,26 @@ export default function CliffhangerStep({ step, card, isActive }: CliffhangerSte
           </motion.p>
         ))}
 
-        {/* 말줄임표 애니메이션 */}
-        <motion.span
-          initial={{ opacity: 0 }}
-          animate={isActive ? { opacity: [0, 1, 0.4, 1, 0.4, 1] } : {}}
-          transition={{
-            duration: 2,
-            delay: 0.3 + lines.length * 0.12,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="text-2xl font-black tracking-widest"
-          style={{ color: categoryInfo.accent }}
-        >
-          ...
-        </motion.span>
+        {/* 말줄임표 — 점 3개 순차 등장 */}
+        <span aria-hidden="true" className="flex items-center gap-0.5">
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: [0, 1, 0.3] } : { opacity: 0 }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                delay: 0.3 + lines.length * 0.12 + i * 0.4,
+                ease: 'easeInOut',
+              }}
+              className="text-2xl font-black"
+              style={{ color: categoryInfo.accent }}
+            >
+              .
+            </motion.span>
+          ))}
+        </span>
       </div>
 
       {/* 하단 "다음 장" 힌트 */}
