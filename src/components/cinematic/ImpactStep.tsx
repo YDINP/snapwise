@@ -7,6 +7,14 @@ import { getCategoryInfo } from '@/lib/categories';
 import { parseInline } from '@/lib/renderContent';
 import { lineDrama } from '@/lib/motionVariants';
 
+/** 이모지만으로 구성된 라인인지 판별 */
+function isEmojiOnlyLine(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed) return false;
+  // 이모지 + 공백만 있으면 true
+  return /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\s]+$/u.test(trimmed);
+}
+
 // [P5] Stagger container variants — Impact 텍스트 줄 순차 등장
 const impactContainerVariants = {
   hidden: { opacity: 0 },
@@ -27,7 +35,10 @@ interface ImpactStepProps {
 
 export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
-  const lines = step.content.split('\n').filter(l => l.trim());
+  const allLines = step.content.split('\n').filter(l => l.trim());
+  const emojiLines = allLines.filter(isEmojiOnlyLine);
+  const textLines = allLines.filter(l => !isEmojiOnlyLine(l));
+  const lines = textLines; // 기존 로직은 textLines 기준으로 유지
 
   // Adaptive font size
   const fontSize = lines.length <= 3
@@ -68,6 +79,19 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
           className="h-0.5 w-12 origin-center"
           style={{ backgroundColor: categoryInfo.accent }}
         />
+
+        {/* 이모지 헤더 — 텍스트 블록 위 */}
+        {emojiLines.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.6 }}
+            transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+            className="text-5xl text-center"
+            aria-hidden="true"
+          >
+            {emojiLines.join(' ')}
+          </motion.div>
+        )}
 
         {/* Grouped blocks separated by dividers */}
         {(() => {
