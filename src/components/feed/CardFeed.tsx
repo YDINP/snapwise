@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { motion } from 'motion/react';
 import type { CardMeta } from '@/types/content';
 import { fisherYatesShuffle } from '@/lib/shuffle';
 import { useSeenCards } from '@/hooks/useSeenCards';
@@ -151,7 +152,14 @@ export default function CardFeed({ cards }: CardFeedProps) {
     <>
       <div ref={containerRef} className="snap-container hide-scrollbar">
         {shuffled.map((card, index) => (
-          <div key={card.slug} data-index={index} className="snap-card">
+          <motion.div
+            key={card.slug}
+            data-index={index}
+            className="snap-card"
+            initial={index === 0 ? { opacity: 0, scale: 0.97 } : false}
+            animate={index === 0 ? { opacity: 1, scale: 1 } : undefined}
+            transition={index === 0 ? { duration: 0.5, ease: 'easeOut' } : undefined}
+          >
             <StoryCard
               card={card}
               isActive={index === currentIndex}
@@ -159,7 +167,7 @@ export default function CardFeed({ cards }: CardFeedProps) {
               onComplete={() => handleCardComplete(index)}
               topOffset={61}
             />
-          </div>
+          </motion.div>
         ))}
       </div>
 

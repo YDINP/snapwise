@@ -35,6 +35,51 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
         />
       )}
 
+      {/* Floating ambient particles */}
+      {isActive && (
+        <>
+          <motion.div
+            className="pointer-events-none absolute rounded-full opacity-20"
+            style={{
+              width: 80,
+              height: 80,
+              top: '15%',
+              left: '10%',
+              backgroundColor: `${categoryInfo.accent}`,
+              filter: 'blur(24px)',
+            }}
+            animate={{ y: [0, -20, 0], x: [0, 8, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="pointer-events-none absolute rounded-full opacity-15"
+            style={{
+              width: 60,
+              height: 60,
+              bottom: '20%',
+              right: '12%',
+              backgroundColor: `${categoryInfo.accent}`,
+              filter: 'blur(18px)',
+            }}
+            animate={{ y: [0, 16, 0], x: [0, -10, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          />
+          <motion.div
+            className="pointer-events-none absolute rounded-full opacity-10"
+            style={{
+              width: 40,
+              height: 40,
+              top: '60%',
+              left: '70%',
+              backgroundColor: 'white',
+              filter: 'blur(12px)',
+            }}
+            animate={{ y: [0, -12, 0] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+          />
+        </>
+      )}
+
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-6 px-6">
         {/* Emoji with halo glow */}
@@ -56,14 +101,14 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={isActive
-              ? { opacity: 1, scale: 1, y: [0, -10, 0] }
+              ? { opacity: 1, scale: [1, 1.04, 1], y: [0, -12, 0] }
               : { opacity: 0, scale: 0.5 }
             }
             transition={{
               opacity: { duration: 0.5 },
-              scale: { duration: 0.5, type: 'spring' },
+              scale: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
               y: {
-                duration: 2,
+                duration: 1.8,
                 repeat: Infinity,
                 ease: 'easeInOut'
               }

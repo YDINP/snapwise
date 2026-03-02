@@ -49,11 +49,15 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
       {/* Dark base */}
       <div className="absolute inset-0 bg-black" />
 
-      {/* Radial accent glow behind text */}
+      {/* Radial accent glow behind text — pulse 반복 */}
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
-        animate={isActive ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 1.2, ease: 'easeOut' }}
+        animate={isActive ? { opacity: [1, 0.6, 1], scale: [1, 1.25, 1] } : { opacity: 0, scale: 0.5 }}
+        transition={
+          isActive
+            ? { duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
+            : { duration: 0.3 }
+        }
         className="absolute inset-0 flex items-center justify-center"
       >
         <div

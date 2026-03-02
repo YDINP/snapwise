@@ -32,3 +32,32 @@ export const scaleIn: Variants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: 'easeOut' } },
 };
+
+/** floatUp — 위로 부드럽게 떠오르는 등장 효과 */
+export const floatUp: Variants = {
+  hidden: { opacity: 0, y: 30, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.6, ease: 'easeOut' },
+  },
+};
+
+/** fadeInScale — 페이드+스케일 동시 등장 */
+export const fadeInScale: Variants = {
+  hidden: { opacity: 0, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: 'easeOut' },
+  },
+};
+
+/** staggerFast — 더 빠른 stagger (카드 피드 인트로용) */
+export const staggerFast: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.05 },
+  },
+};

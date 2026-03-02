@@ -34,8 +34,13 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
-      {/* Category gradient background */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
+      {/* Category gradient background — subtle breathing scale */}
+      <motion.div
+        className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`}
+        animate={isActive ? { scale: [1, 1.03, 1] } : {}}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: 'center center' }}
+      />
 
       {/* Base overlay for readability */}
       <div className="absolute inset-0 bg-black/20" />

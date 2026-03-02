@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
@@ -85,10 +85,28 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
           transition={{ duration: 0.5, delay: hasPrefix ? 0.2 : 0.15, ease: 'easeOut' }}
         >
           {/* 글래스 카드 + 본문 */}
-          <div className="rounded-2xl bg-white/10 px-5 py-6 backdrop-blur-md">
+          <div className="relative rounded-2xl bg-white/10 px-5 py-6 backdrop-blur-md overflow-hidden">
+            {/* Shimmer 반사 효과 — OutroStep 패턴 참조 */}
+            <motion.div
+              initial={{ left: '-60%' }}
+              animate={isActive ? { left: '160%' } : { left: '-60%' }}
+              transition={{
+                delay: 0.6,
+                duration: 1.8,
+                repeat: Infinity,
+                repeatDelay: 3.5,
+                ease: 'easeInOut',
+              }}
+              className="pointer-events-none absolute top-0 h-full w-1/3"
+              style={{
+                background:
+                  'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.07) 50%, transparent 70%)',
+              }}
+            />
+
             {/* 본문 텍스트 */}
             <p
-              className={`${fontSize} font-medium text-white/90`}
+              className={`relative ${fontSize} font-medium text-white/90`}
               style={{
                 wordBreak: 'keep-all',
                 lineHeight: 'var(--card-line-height)',
@@ -103,7 +121,7 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
               initial={{ scaleX: 0, opacity: 0 }}
               animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
               transition={{ duration: 0.6, delay: hasPrefix ? 0.4 : 0.35, ease: 'easeOut' }}
-              className="mt-5 h-px origin-left rounded-full bg-white/20"
+              className="relative mt-5 h-px origin-left rounded-full bg-white/20"
             />
           </div>
         </motion.div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface StepProgressBarProps {
   totalSteps: number;
@@ -64,6 +64,21 @@ export default function StepProgressBar({ totalSteps, currentStep, onJump, accen
                   />
                 )}
               </div>
+
+              {/* 현재 스텝 pulse glow — 바 아래에 배치 (overflow 외부) */}
+              <AnimatePresence>
+                {isCurrent && accentColor && (
+                  <motion.div
+                    key="glow"
+                    initial={{ opacity: 0, scaleX: 0.5 }}
+                    animate={{ opacity: [0.5, 0, 0.5], scaleX: [0.8, 1.2, 0.8] }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full blur-sm"
+                    style={{ backgroundColor: accentColor }}
+                  />
+                )}
+              </AnimatePresence>
             </button>
           );
         })}
