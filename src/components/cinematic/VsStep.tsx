@@ -213,11 +213,11 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             initial={{ opacity: 0, x: -20 }}
             animate={isActive ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="flex flex-1 min-w-0 flex-col justify-center overflow-hidden rounded-l-2xl border border-r-0 border-white/10 bg-zinc-800/25 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
+            className="flex flex-1 min-w-0 flex-col items-center justify-center overflow-hidden rounded-l-2xl border border-r-0 border-white/10 bg-zinc-800/25 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
           >
             {leftTitle && (
               <p
-                className="mb-2 text-xs font-black text-white/85 sm:text-sm"
+                className="mb-2 text-center text-xs font-black text-white/85 sm:text-sm"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {leftTitle}
@@ -225,7 +225,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             )}
             {leftBody && (
               <p
-                className="text-xs leading-relaxed text-white/80 sm:text-sm"
+                className="text-center text-xs leading-relaxed text-white/80 sm:text-sm"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {renderWithLineBreaks(leftBody)}
@@ -251,7 +251,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             initial={{ opacity: 0, x: 20 }}
             animate={isActive ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
-            className="flex flex-1 min-w-0 flex-col justify-center overflow-hidden rounded-r-2xl border border-l-0 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
+            className="flex flex-1 min-w-0 flex-col items-center justify-center overflow-hidden rounded-r-2xl border border-l-0 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
             style={{
               borderColor: `${categoryInfo.accent}50`,
               backgroundColor: `${categoryInfo.accent}25`,
@@ -259,7 +259,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
           >
             {rightTitle && (
               <p
-                className="mb-2 text-xs font-black sm:text-sm"
+                className="mb-2 text-center text-xs font-black sm:text-sm"
                 style={{ color: categoryInfo.accent, wordBreak: 'keep-all' }}
               >
                 {rightTitle}
@@ -267,7 +267,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             )}
             {rightBody && (
               <p
-                className="text-xs leading-relaxed text-white/80 sm:text-sm"
+                className="text-center text-xs leading-relaxed text-white/80 sm:text-sm"
                 style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {renderWithLineBreaks(rightBody)}
