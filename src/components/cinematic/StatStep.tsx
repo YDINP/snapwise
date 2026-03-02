@@ -5,6 +5,28 @@ import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
 
+// [P5] Stagger container variants — 통계 항목 순차 등장 플로우
+const statContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const statItemVariants = {
+  hidden: { opacity: 0, x: -16, y: 8 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+  },
+};
+
 interface StatStepProps {
   step: CardStep;
   card: CardMeta;
@@ -259,19 +281,18 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
         </div>
       )}
 
-      {/* ── Secondary stats: glass cards (grid 2-col aligned) ── */}
+      {/* ── Secondary stats: glass cards (stagger flow) ── */}
       {rest.length > 0 && (
-        <div className="flex w-full flex-col gap-3">
+        <motion.div
+          className="flex w-full flex-col gap-3"
+          variants={statContainerVariants}
+          initial="hidden"
+          animate={isActive ? 'visible' : 'hidden'}
+        >
           {rest.map((item, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 16 }}
-              animate={isActive ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                duration: 0.5,
-                delay: 0.75 + i * 0.15,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              variants={statItemVariants}
               className="relative grid items-center rounded-xl px-4 py-3.5 overflow-hidden"
               style={{
                 gridTemplateColumns: '1fr auto',
@@ -289,23 +310,23 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
                 }}
               />
               <span
-                className="relative text-[13px] font-medium text-white/55 min-w-0"
+                className="relative text-sm font-semibold text-white/75 min-w-0"
                 style={{ wordBreak: 'keep-all' }}
               >
                 {item.label}
               </span>
               <span
-                className="relative text-lg font-extrabold tracking-tight text-right shrink-0"
+                className="relative text-xl font-extrabold tracking-tight text-right shrink-0"
                 style={{
                   color: accent,
-                  textShadow: `0 0 16px ${accent}30`,
+                  textShadow: `0 0 20px ${accent}50`,
                 }}
               >
                 {item.value}
               </span>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* description: hero 모드에서도 하단 표시 */}
@@ -338,32 +359,25 @@ interface TextListStatsProps {
 function TextListStats({ items, description, accent, isActive }: TextListStatsProps) {
   return (
     <div className="flex w-full flex-col">
-      {/* Stat rows with dividers */}
-      <div className="flex w-full flex-col">
+      {/* [P5] Stagger container — 텍스트 리스트 항목 순차 등장 */}
+      <motion.div
+        className="flex w-full flex-col"
+        variants={statContainerVariants}
+        initial="hidden"
+        animate={isActive ? 'visible' : 'hidden'}
+      >
         {items.map((item, i) => (
-          <div key={i} className="flex flex-col">
+          <motion.div key={i} className="flex flex-col" variants={statItemVariants}>
             {/* Divider — accent color, 첫 번째 행 위에도 표시 */}
-            <motion.div
-              initial={{ scaleX: 0, opacity: 0 }}
-              animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.1 + i * 0.1 }}
-              className="h-px w-full origin-left"
+            <div
+              className="h-px w-full"
               style={{
                 background: `linear-gradient(90deg, ${accent}30, transparent 80%)`,
               }}
             />
 
             {/* Row content — label 좌, value 우 수평 배치 */}
-            <motion.div
-              initial={{ opacity: 0, x: -12 }}
-              animate={isActive ? { opacity: 1, x: 0 } : {}}
-              transition={{
-                duration: 0.5,
-                delay: 0.15 + i * 0.1,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="flex items-center justify-between gap-3 py-4 px-2"
-            >
+            <div className="flex items-center justify-between gap-3 py-4 px-2">
               {/* Label */}
               <span
                 className="text-[12px] font-medium text-white/40 min-w-0"
@@ -379,28 +393,25 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
               >
                 {item.value}
               </span>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         ))}
 
         {/* 마지막 항목 하단 구분선 */}
-        <motion.div
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.1 + items.length * 0.1 }}
-          className="h-px w-full origin-left"
+        <div
+          className="h-px w-full"
           style={{
             background: `linear-gradient(90deg, ${accent}30, transparent 80%)`,
           }}
         />
-      </div>
+      </motion.div>
 
       {/* Description */}
       {description && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 + items.length * 0.1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="mt-6 text-[12px] font-medium text-white/30 leading-relaxed"
           style={{ wordBreak: 'keep-all' }}
         >

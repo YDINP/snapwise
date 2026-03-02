@@ -19,6 +19,28 @@ interface ShowcaseItem {
   description: string;
 }
 
+// [P5] Stagger container variants — 항목 순차 등장 플로우 연출
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.25,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+  },
+};
+
 // [A1] 파이프(|) 파싱 추가: "별 하나|좋은 식당" → title="별 하나", subtitle="좋은 식당"
 function parseShowcase(content: string): { intro: string; items: ShowcaseItem[] } {
   const sections = content.split('───').map(s => s.trim()).filter(Boolean);
@@ -89,17 +111,18 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
           </motion.p>
         )}
 
-        {/* Showcase cards */}
-        {items.map((item, i) => {
-          const isOdd = i % 2 === 0;
-          const slideX = isOdd ? -30 : 30;
-
-          return (
+        {/* [P5] Stagger container — 항목들이 순차적으로 아래에서 위로 등장하는 플로우 연출 */}
+        <motion.div
+          className="flex w-full flex-col gap-2"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isActive ? 'visible' : 'hidden'}
+        >
+          {/* Showcase cards */}
+          {items.map((item, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, x: slideX, transform: 'perspective(800px) rotateX(10deg)' }}
-              animate={isActive ? { opacity: 1, x: 0, transform: 'perspective(800px) rotateX(0deg)' } : {}}
-              transition={{ duration: 0.6, delay: 0.3 + i * 0.18, ease: 'easeOut' }}
+              variants={itemVariants}
               className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/10 py-3 px-4 backdrop-blur-md"
               style={{
                 boxShadow: `0 0 30px ${categoryInfo.accent}15, inset 0 1px 0 rgba(255,255,255,0.1)`,
@@ -170,8 +193,8 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
                 </div>
               </div>
             </motion.div>
-          );
-        })}
+          ))}
+        </motion.div>
       </div>
     </div>
   );
