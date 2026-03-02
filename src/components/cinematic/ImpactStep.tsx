@@ -6,6 +6,27 @@ import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
 import { parseInline } from '@/lib/renderContent';
 
+// [P5] Stagger container variants — Impact 텍스트 줄 순차 등장
+const impactContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const impactLineVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: 'easeOut' as const },
+  },
+};
+
 interface ImpactStepProps {
   step: CardStep;
   card: CardMeta;
@@ -75,17 +96,20 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
           let globalIndex = 0;
 
           return (
-            <div className="flex flex-col items-center gap-6">
+            <motion.div
+              className="flex flex-col items-center gap-8"
+              variants={impactContainerVariants}
+              initial="hidden"
+              animate={isActive ? 'visible' : 'hidden'}
+            >
               {filteredBlocks.map((block, blockIdx) => (
-                <div key={blockIdx} className="flex flex-col items-center gap-1">
-                  {/* Divider before secondary blocks */}
+                <div key={blockIdx} className="flex flex-col items-center gap-2">
+                  {/* Divider before secondary blocks — 강화된 구분선 */}
                   {blockIdx > 0 && (
                     <motion.div
-                      initial={{ opacity: 0, scaleX: 0 }}
-                      animate={isActive ? { opacity: 0.5, scaleX: 1 } : {}}
-                      transition={{ duration: 0.5, delay: 0.2 + globalIndex * 0.08 }}
-                      className="mb-2 h-0.5 w-16"
-                      style={{ backgroundColor: categoryInfo.accent }}
+                      variants={impactLineVariants}
+                      className="mb-4 h-0.5 w-20 origin-center rounded-full"
+                      style={{ backgroundColor: categoryInfo.accent, opacity: 0.6 }}
                     />
                   )}
                   {block.map((line) => {
@@ -95,10 +119,8 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
                     return (
                       <motion.p
                         key={idx}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={isActive ? { opacity: 1, y: 0 } : {}}
-                        transition={{ duration: 0.5, delay: 0.2 + idx * 0.08, ease: 'easeOut' }}
-                        className={`text-center ${isSecondary ? secondaryFontSize : fontSize} font-bold ${isSecondary ? 'text-white/70' : 'text-white/90'}`}
+                        variants={impactLineVariants}
+                        className={`text-center ${isSecondary ? secondaryFontSize : fontSize} font-bold ${isSecondary ? 'text-white/65' : 'text-white/90'}`}
                         style={{ wordBreak: 'keep-all', lineHeight: 'var(--card-line-height-tight)' }}
                       >
                         {parseInline(trimmed, categoryInfo.accent)}
@@ -107,7 +129,7 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
                   })}
                 </div>
               ))}
-            </div>
+            </motion.div>
           );
         })()}
 
