@@ -112,7 +112,7 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
                 wordBreak: 'keep-all',
               }}
             >
-              <TypingText text={step.content} isActive={isActive} />
+              <TypingText text={step.content} isActive={isActive} speed={20} startDelay={200} />
             </p>
           </div>
         </motion.div>
