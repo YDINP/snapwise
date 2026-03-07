@@ -428,7 +428,12 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
                         {formatTime(session.started_at)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
+                      {(session.card_slugs?.length ?? 0) > 0 && (
+                        <span className="text-[10px] tabular-nums" style={{ color: 'var(--color-muted)' }}>
+                          📄 {session.card_slugs.length}장
+                        </span>
+                      )}
                       <Clock size={10} style={{ color: 'var(--color-muted)' }} />
                       <span className="text-[11px] tabular-nums" style={{ color: 'var(--color-text-sub)' }}>
                         {formatDuration(session.duration_seconds)}
