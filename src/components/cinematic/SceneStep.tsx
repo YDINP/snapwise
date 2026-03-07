@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
+import { parseInline } from '@/lib/renderContent';
 import { lineStagger, lineFadeUp } from '@/lib/motionVariants';
 
 interface SceneStepProps {
@@ -107,7 +108,7 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
                 textShadow: '0 2px 12px rgba(0,0,0,0.4)',
               }}
             >
-              {line}
+              {parseInline(line.trim())}
             </motion.p>
           ))}
         </motion.div>
