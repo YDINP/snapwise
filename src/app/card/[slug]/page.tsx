@@ -76,7 +76,17 @@ export default async function CardPage({ params }: PageProps) {
     url: cardUrl,
     inLanguage: 'ko-KR',
     author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
-    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_URL}/logo.png`,
+        width: 112,
+        height: 112,
+      },
+    },
     datePublished: card.pubDate,
     dateModified: card.pubDate,
     image: `${SITE_URL}/card/${card.slug}/opengraph-image`,

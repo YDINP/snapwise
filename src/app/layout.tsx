@@ -38,8 +38,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
   },
   verification: {
+    google: 'uShjQZTfZFAauTdbCg7ZN0cvDV_ErVoVmdCScJ75TIQ',
     other: {
       'naver-site-verification': '103d0b50c20ba2c49bb45837edbbd816177c18f1',
+      'msvalidate.01': 'BC9C57705D7C9B0AAA6BE32274FA0DF2',
     },
   },
 };
