@@ -12,8 +12,15 @@ export function parseInline(text: string, accentColor?: string): React.ReactNode
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
-    // Bold syntax stripped — render inner text as plain string
-    parts.push(match[1]);
+    // Bold syntax — render as styled emphasis
+    parts.push(
+      <strong
+        key={`b-${match.index}`}
+        style={{ fontWeight: 700, color: 'white', textShadow: '0 0 12px rgba(255,255,255,0.4)' }}
+      >
+        {match[1]}
+      </strong>
+    );
     lastIndex = match.index + match[0].length;
   }
 

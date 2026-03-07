@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
 import type { CardStep, CardMeta } from '@/types/content';
 import { getCategoryInfo } from '@/lib/categories';
-import { renderWithLineBreaks } from '@/lib/renderContent';
+import { renderWithLineBreaks, parseInline } from '@/lib/renderContent';
 import { useLikes } from '@/hooks/useLikes';
 import { useSaved } from '@/hooks/useSaved';
 import { Heart, Share2, Bookmark, ChevronDown, Quote } from 'lucide-react';
@@ -201,7 +201,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
                     wordBreak: 'keep-all',
                   }}
                 >
-                  {line}
+                  {parseInline(line)}
                 </motion.p>
               );
             })}
