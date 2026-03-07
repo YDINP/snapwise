@@ -113,7 +113,7 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
                 textShadow: '0 1px 4px rgba(0,0,0,0.15)',
               }}
             >
-              <TypingText text={bodyText} isActive={isActive} speed={28} startDelay={500} />
+              <TypingText text={bodyText} isActive={isActive} speed={13} startDelay={250} />
             </p>
 
             {/* 하단 구분선 */}

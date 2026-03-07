@@ -107,7 +107,7 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
             transition={{ duration: 0.3 }}
             className="mb-1 text-center text-sm font-medium text-white/70"
           >
-            <TypingText text={intro} isActive={isActive} startDelay={200} speed={40} />
+            <TypingText text={intro} isActive={isActive} startDelay={100} speed={18} />
           </motion.p>
         )}
 

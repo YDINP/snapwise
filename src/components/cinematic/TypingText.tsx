@@ -63,8 +63,8 @@ interface TypingTextProps {
 export default function TypingText({
   text,
   isActive,
-  speed = 35,
-  startDelay = 600,
+  speed = 15,
+  startDelay = 300,
 }: TypingTextProps) {
   const { clean, boldRanges } = useMemo(() => preprocessBold(text), [text]);
   const prefersReducedMotion = useReducedMotion();

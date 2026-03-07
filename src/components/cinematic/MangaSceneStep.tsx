@@ -156,7 +156,7 @@ function renderInlineMarkdown(str: string): React.ReactNode[] {
   });
 }
 
-function TypeWriter({ text, isActive, delay = 0, speed = 30, className, style }: {
+function TypeWriter({ text, isActive, delay = 0, speed = 15, className, style }: {
   text: string; isActive: boolean; delay?: number; speed?: number; className?: string; style?: React.CSSProperties;
 }) {
   // Strip markdown markers for length calculation, type visible chars only
@@ -367,7 +367,7 @@ function NarrativePanel({
                 animate={isActive ? { opacity: 1 } : {}}
                 transition={{ duration: 0.3, delay }}
               >
-                <TypeWriter text={line.text} isActive={isActive} delay={delay} speed={30} />
+                <TypeWriter text={line.text} isActive={isActive} delay={delay} speed={15} />
               </motion.p>
             );
           }
@@ -494,7 +494,7 @@ function DialoguePanel({
                   transition={{ type: 'spring', stiffness: 200, damping: 20, delay: delay + 0.12 }}
                 >
                   <span style={{ color: accent, opacity: 0.6 }}>&ldquo;</span>
-                  <TypeWriter text={line.text} isActive={isActive} delay={delay + 0.25} speed={25} />
+                  <TypeWriter text={line.text} isActive={isActive} delay={delay + 0.25} speed={12} />
                   <span style={{ color: accent, opacity: 0.6 }}>&rdquo;</span>
                 </motion.div>
               </motion.div>
@@ -669,7 +669,7 @@ function ActionPanel({
                     text={line.text}
                     isActive={isActive}
                     delay={delay + 0.15}
-                    speed={25}
+                    speed={12}
                     className="text-base text-white/90"
                     style={{ wordBreak: 'keep-all' }}
                   />
@@ -900,7 +900,7 @@ function VersusPanel({
               initial={{ opacity: 0, x: -20 }}
               animate={isActive ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.4, delay: 0.5 + i * 0.15 }}>
-              <TypeWriter text={line.number || ''} isActive={isActive} delay={0.6 + i * 0.15} speed={40}
+              <TypeWriter text={line.number || ''} isActive={isActive} delay={0.6 + i * 0.15} speed={20}
                 className="text-sm text-white/80" style={{ wordBreak: 'keep-all' }} />
             </motion.div>
             <div className="w-px mx-2 opacity-20" style={{ backgroundColor: accent }} />
@@ -908,7 +908,7 @@ function VersusPanel({
               initial={{ opacity: 0, x: 20 }}
               animate={isActive ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.4, delay: 0.5 + i * 0.15 }}>
-              <TypeWriter text={line.label || ''} isActive={isActive} delay={0.6 + i * 0.15} speed={40}
+              <TypeWriter text={line.label || ''} isActive={isActive} delay={0.6 + i * 0.15} speed={20}
                 className="text-sm" style={{ color: `${accent}CC`, wordBreak: 'keep-all' }} />
             </motion.div>
           </div>
@@ -1105,7 +1105,7 @@ function MontagePanel({
               text={sectionTitle.text}
               isActive={isActive}
               delay={0.2}
-              speed={40}
+              speed={20}
               className="text-xs uppercase tracking-widest font-semibold"
               style={{ color: accent, wordBreak: 'keep-all' }}
             />
@@ -1150,7 +1150,7 @@ function MontagePanel({
                     text={line.text}
                     isActive={isActive}
                     delay={itemDelay + 0.1}
-                    speed={25}
+                    speed={12}
                   />
                 </div>
                 <motion.div
@@ -1234,7 +1234,7 @@ function CloseupPanel({
                 animate={isActive ? { opacity: 1, scale: 1, rotate: 0 } : {}}
                 transition={{ type: 'spring', stiffness: 200, damping: 18, delay }}
               >
-                <TypeWriter text={line.text} isActive={isActive} delay={delay + 0.1} speed={35} />
+                <TypeWriter text={line.text} isActive={isActive} delay={delay + 0.1} speed={15} />
               </motion.div>
             );
           }
