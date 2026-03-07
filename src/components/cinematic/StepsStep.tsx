@@ -67,77 +67,79 @@ export default function StepsStep({ step, card, isActive }: StepsStepProps) {
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
       {/* Background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/55" />
 
-      <div className="relative z-10 flex w-full max-w-sm flex-col gap-3 px-6 py-8">
-        {/* Optional header text */}
-        {header && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.4 }}
-            className="mb-2 text-center text-sm font-medium text-white/60"
-            style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
+      <div className="relative z-10 flex w-full max-w-sm flex-col gap-4 px-6 py-8">
+        {/* Section label — teaser, not spoiler */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={isActive ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.4 }}
+        >
+          <p
+            className="mb-1 text-[10px] font-bold uppercase tracking-widest"
+            style={{ color: categoryInfo.accent, opacity: 0.9 }}
           >
-            {header}
-          </motion.p>
-        )}
+            이야기의 흐름
+          </p>
+          {header && (
+            <p
+              className="text-sm font-semibold text-white/70"
+              style={{ wordBreak: 'keep-all' }}
+            >
+              {header}
+            </p>
+          )}
+        </motion.div>
 
         {/* Steps list */}
         <div className="flex flex-col">
-          {steps.map((item, i) => (
-            <div key={item.number} className="flex items-stretch gap-3">
-              {/* Left column: badge + connector */}
-              <div className="flex flex-col items-center">
-                {/* Number badge */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={isActive ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ duration: 0.35, delay: 0.1 + i * 0.12 }}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                  style={{ backgroundColor: categoryInfo.accent }}
-                >
-                  {item.number}
-                </motion.div>
-
-                {/* Connecting vertical line (not after last item) */}
-                {i < steps.length - 1 && (
+          {steps.map((item, i) => {
+            const isLast = i === steps.length - 1;
+            return (
+              <div key={item.number} className="flex items-stretch gap-3">
+                {/* Left column: badge + connector */}
+                <div className="flex w-8 shrink-0 flex-col items-center">
+                  {/* Number badge */}
                   <motion.div
-                    initial={{ scaleY: 0, opacity: 0 }}
-                    animate={isActive ? { scaleY: 1, opacity: 1 } : {}}
-                    transition={{ duration: 0.3, delay: 0.2 + i * 0.12, ease: 'easeOut' }}
-                    className="my-1 w-px flex-1 bg-white/20"
-                    style={{ transformOrigin: 'top' }}
-                  />
-                )}
-              </div>
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={isActive ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ duration: 0.35, delay: 0.1 + i * 0.12 }}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                    style={{ backgroundColor: categoryInfo.accent }}
+                  >
+                    {item.number}
+                  </motion.div>
 
-              {/* Step card */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={isActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.4, delay: 0.15 + i * 0.12, ease: 'easeOut' }}
-                className={`flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm ${
-                  i < steps.length - 1 ? 'mb-3' : ''
-                }`}
-              >
-                <p
-                  className="text-sm font-bold leading-snug text-white"
-                  style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
+                  {/* Connector: negative margin bridges the mb-3 gap to the next badge */}
+                  {!isLast && (
+                    <motion.div
+                      initial={{ scaleY: 0, opacity: 0 }}
+                      animate={isActive ? { scaleY: 1, opacity: 1 } : {}}
+                      transition={{ duration: 0.3, delay: 0.2 + i * 0.12, ease: 'easeOut' }}
+                      className="mt-1 w-px flex-1 bg-white/20"
+                      style={{ transformOrigin: 'top', marginBottom: '-12px' }}
+                    />
+                  )}
+                </div>
+
+                {/* Step card — title only, descriptions hidden to prevent story spoilers */}
+                <motion.div
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={isActive ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.4, delay: 0.15 + i * 0.12, ease: 'easeOut' }}
+                  className={`flex flex-1 items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-sm${isLast ? '' : ' mb-3'}`}
                 >
-                  {parseInline(item.title, categoryInfo.accent)}
-                </p>
-                {item.description && (
                   <p
-                    className="mt-1 text-xs leading-relaxed text-white/60"
+                    className="text-sm font-semibold leading-snug text-white"
                     style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
                   >
-                    {parseInline(item.description, categoryInfo.accent)}
+                    {parseInline(item.title, categoryInfo.accent)}
                   </p>
-                )}
-              </motion.div>
-            </div>
-          ))}
+                </motion.div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
