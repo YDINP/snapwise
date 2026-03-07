@@ -172,20 +172,39 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
             animate={isActive ? 'visible' : 'hidden'}
             className="relative flex flex-col items-center gap-1"
           >
-            {step.content.split('\n').filter(l => l.trim()).map((line, i) => (
-              <motion.p
-                key={i}
-                variants={lineFadeUp}
-                className="text-center text-white/90"
-                style={{
-                  fontSize: 'var(--card-text-body)',
-                  lineHeight: 'var(--card-line-height)',
-                  wordBreak: 'keep-all',
-                }}
-              >
-                {line}
-              </motion.p>
-            ))}
+            {step.content.split('\n').filter(l => l.trim()).map((line, i) => {
+              const isHighlight = line.startsWith('!!');
+              const text = isHighlight ? line.slice(2) : line;
+              return isHighlight ? (
+                <motion.p
+                  key={i}
+                  variants={lineFadeUp}
+                  className="text-center font-bold text-white"
+                  style={{
+                    fontSize: 'calc(var(--card-text-body) * 1.15)',
+                    lineHeight: 'var(--card-line-height)',
+                    wordBreak: 'keep-all',
+                    textShadow: '0 0 20px rgba(255,255,255,0.6)',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {text}
+                </motion.p>
+              ) : (
+                <motion.p
+                  key={i}
+                  variants={lineFadeUp}
+                  className="text-center text-white/90"
+                  style={{
+                    fontSize: 'var(--card-text-body)',
+                    lineHeight: 'var(--card-line-height)',
+                    wordBreak: 'keep-all',
+                  }}
+                >
+                  {line}
+                </motion.p>
+              );
+            })}
           </motion.div>
         </motion.div>
 
