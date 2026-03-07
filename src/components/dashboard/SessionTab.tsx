@@ -41,6 +41,10 @@ interface SessionStats {
   dailyCounts: DailyCount[];
   avgDurationSeconds: number;
   totalSessions: number;
+  totalUsers: number;
+  returningUsers: number;
+  newUsers: number;
+  returningRate: number;
   loading: boolean;
   error: string | null;
 }
@@ -122,6 +126,10 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
     dailyCounts: [],
     avgDurationSeconds: 0,
     totalSessions: 0,
+    totalUsers: 0,
+    returningUsers: 0,
+    newUsers: 0,
+    returningRate: 0,
     loading: true,
     error: null,
   });
@@ -140,7 +148,7 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
 
     try {
       // 병렬 데이터 요청
-      const [sessionsResult, cardViewsResult] = await Promise.all([
+      const [sessionsResult, cardViewsResult, allAnonResult] = await Promise.all([
         supabase
           .from('sessions')
           .select('id, anonymous_id, started_at, ended_at, duration_seconds, card_slugs, exit_card_slug')
@@ -151,6 +159,11 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
           .select('slug, viewed_at')
           .order('viewed_at', { ascending: false })
           .limit(2000),
+        // 재방문 집계용: 전체 anonymous_id 목록 (최대 1000개)
+        supabase
+          .from('sessions')
+          .select('anonymous_id')
+          .limit(1000),
       ]);
 
       // 최근 세션
@@ -158,6 +171,17 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
 
       // 총 세션 수
       const totalSessions = recentSessions.length;
+
+      // 재방문 유저 집계: anonymous_id 별 세션 횟수
+      const anonSessionCount: Record<string, number> = {};
+      for (const row of allAnonResult.data ?? []) {
+        const id = (row as { anonymous_id: string }).anonymous_id;
+        anonSessionCount[id] = (anonSessionCount[id] || 0) + 1;
+      }
+      const totalUsers = Object.keys(anonSessionCount).length;
+      const returningUsers = Object.values(anonSessionCount).filter((c) => c > 1).length;
+      const newUsers = totalUsers - returningUsers;
+      const returningRate = totalUsers > 0 ? Math.round((returningUsers / totalUsers) * 100) : 0;
 
       // 평균 체류 시간
       const durations = recentSessions
@@ -207,6 +231,10 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
         dailyCounts,
         avgDurationSeconds,
         totalSessions,
+        totalUsers,
+        returningUsers,
+        newUsers,
+        returningRate,
         loading: false,
         error: null,
       });
@@ -224,7 +252,7 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
     fetchStats();
   }, [fetchStats]);
 
-  const { recentSessions, topCards, dailyCounts, avgDurationSeconds, totalSessions, loading, error } = stats;
+  const { recentSessions, topCards, dailyCounts, avgDurationSeconds, totalSessions, totalUsers, returningUsers, newUsers, returningRate, loading, error } = stats;
 
   if (error) {
     return (
@@ -274,6 +302,70 @@ export default function SessionTab({ cardLookup }: { cardLookup: Record<string, 
             icon={<TrendingUp size={14} />}
             accentColor="#F59E0B"
           />
+        </div>
+      </section>
+
+      {/* ── 재방문 비중 ────────────────────────────── */}
+      <section>
+        <SectionHeader icon={<TrendingUp size={13} />} title="신규 vs 재방문 유저" />
+        <div className="dash-card px-4 py-4">
+          {loading ? (
+            <div className="animate-pulse space-y-2">
+              <div className="h-3 rounded" style={{ background: 'var(--color-surface-2)', width: '60%' }} />
+              <div className="h-5 rounded" style={{ background: 'var(--color-surface-2)' }} />
+              <div className="h-3 rounded" style={{ background: 'var(--color-surface-2)', width: '40%' }} />
+            </div>
+          ) : totalUsers === 0 ? (
+            <p className="text-sm text-center" style={{ color: 'var(--color-muted)' }}>
+              아직 유저 데이터가 없어요
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {/* 수치 요약 */}
+              <div className="flex items-center justify-between text-xs" style={{ color: 'var(--color-muted)' }}>
+                <span>전체 유저 <span className="font-bold tabular-nums" style={{ color: 'var(--color-text)' }}>{totalUsers}명</span></span>
+                <span className="font-bold tabular-nums" style={{ color: '#6366F1' }}>재방문 {returningRate}%</span>
+              </div>
+              {/* 스택 바 */}
+              <div className="flex rounded overflow-hidden" style={{ height: '20px' }}>
+                {newUsers > 0 && (
+                  <div
+                    className="flex items-center justify-center text-[10px] font-bold text-white"
+                    style={{
+                      width: `${100 - returningRate}%`,
+                      background: '#10B981',
+                      minWidth: newUsers > 0 ? '24px' : '0',
+                    }}
+                  >
+                    {newUsers}
+                  </div>
+                )}
+                {returningUsers > 0 && (
+                  <div
+                    className="flex items-center justify-center text-[10px] font-bold text-white"
+                    style={{
+                      width: `${returningRate}%`,
+                      background: '#6366F1',
+                      minWidth: returningUsers > 0 ? '24px' : '0',
+                    }}
+                  >
+                    {returningUsers}
+                  </div>
+                )}
+              </div>
+              {/* 범례 */}
+              <div className="flex items-center gap-4 text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: '#10B981' }} />
+                  신규 {newUsers}명 ({100 - returningRate}%)
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: '#6366F1' }} />
+                  재방문 {returningUsers}명 ({returningRate}%)
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
