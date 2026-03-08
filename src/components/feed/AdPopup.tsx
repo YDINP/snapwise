@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 
 interface AdPopupProps {
@@ -9,17 +9,25 @@ interface AdPopupProps {
 }
 
 export default function AdPopup({ isVisible, onDismiss }: AdPopupProps) {
-  // AdSense 초기화 — popup이 마운트될 때마다 실행
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
+
+  // 팝업이 열릴 때마다 애드핏 스크립트를 새로 주입하여 ins 태그 재인식
   useEffect(() => {
     if (!isVisible) return;
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).adsbygoogle = (window as any).adsbygoogle || [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ((window as any).adsbygoogle as unknown[]).push({});
-    } catch {
-      // AdSense not loaded (dev environment)
-    }
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+    script.async = true;
+    document.body.appendChild(script);
+    scriptRef.current = script;
+
+    return () => {
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        document.body.removeChild(scriptRef.current);
+        scriptRef.current = null;
+      }
+    };
   }, [isVisible]);
 
   return (
@@ -33,28 +41,26 @@ export default function AdPopup({ isVisible, onDismiss }: AdPopupProps) {
           className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md"
           onClick={onDismiss}
         >
-          <p className="mb-6 text-[10px] font-medium uppercase tracking-widest text-white/30">
+          <p className="mb-4 text-[10px] font-medium uppercase tracking-widest text-white/30">
             광고
           </p>
 
-          {/* AdSense 광고 영역 — 클릭이 dismiss로 전파되지 않도록 */}
+          {/* 카카오 애드핏 광고 영역 — 클릭이 dismiss로 전파되지 않도록 */}
           <div
-            className="w-full max-w-sm px-4"
             onClick={(e) => e.stopPropagation()}
           >
             <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-9400779918671270"
-              data-ad-slot="3500007981"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
+              className="kakao_ad_area"
+              style={{ display: 'none' }}
+              data-ad-unit="DAN-dDjVsQ9xBWbvKXL0"
+              data-ad-width="320"
+              data-ad-height="480"
             />
           </div>
 
           <button
             onClick={onDismiss}
-            className="mt-8 flex items-center gap-2 rounded-full border border-white/20 px-6 py-2.5 text-sm text-white/60 transition-colors hover:border-white/40 hover:text-white/90"
+            className="mt-6 flex items-center gap-2 rounded-full border border-white/20 px-6 py-2.5 text-sm text-white/60 transition-colors hover:border-white/40 hover:text-white/90"
           >
             계속하기 →
           </button>
