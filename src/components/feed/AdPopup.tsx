@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 
 interface AdPopupProps {
@@ -9,26 +8,6 @@ interface AdPopupProps {
 }
 
 export default function AdPopup({ isVisible, onDismiss }: AdPopupProps) {
-  const scriptRef = useRef<HTMLScriptElement | null>(null);
-
-  // 팝업이 열릴 때마다 애드핏 스크립트를 새로 주입하여 ins 태그 재인식
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-    script.async = true;
-    document.body.appendChild(script);
-    scriptRef.current = script;
-
-    return () => {
-      if (scriptRef.current && document.body.contains(scriptRef.current)) {
-        document.body.removeChild(scriptRef.current);
-        scriptRef.current = null;
-      }
-    };
-  }, [isVisible]);
 
   return (
     <AnimatePresence>
