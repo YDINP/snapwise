@@ -376,11 +376,11 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
               }}
             />
 
-            {/* Row content — label 좌, value 우 수평 배치 */}
-            <div className="flex items-center justify-between gap-3 py-4 px-2">
+            {/* Row content — label 위, value 아래 (세로 레이아웃: 긴 텍스트 오버플로 방지) */}
+            <div className="flex flex-col gap-1 py-3 px-2">
               {/* Label */}
               <span
-                className="text-[12px] font-medium text-white/40 min-w-0"
+                className="text-[11px] font-medium text-white/40 uppercase tracking-wide"
                 style={{ wordBreak: 'keep-all' }}
               >
                 {item.label}
@@ -388,7 +388,7 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
 
               {/* Value */}
               <span
-                className="text-[14px] font-semibold shrink-0 text-right"
+                className="text-[14px] font-semibold leading-snug"
                 style={{ color: accent, wordBreak: 'keep-all' }}
               >
                 {item.value}
