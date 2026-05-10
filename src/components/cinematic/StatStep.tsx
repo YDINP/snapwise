@@ -2,7 +2,6 @@
 
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
-import { getCategoryInfo } from '@/lib/categories';
 import { renderWithLineBreaks } from '@/lib/renderContent';
 
 // [P5] Stagger container variants — 통계 항목 순차 등장 플로우
@@ -103,8 +102,10 @@ function parseStatContent(content: string): ParsedStat {
   return { mode: 'single', items: [], bigStat, description };
 }
 
-export default function StatStep({ step, card, isActive }: StatStepProps) {
-  const categoryInfo = getCategoryInfo(card.category);
+// Warm Intelligence 앰버 고정 팔레트
+const STAT_AMBER = '#F59E0B';
+
+export default function StatStep({ step, card: _unusedCard, isActive }: StatStepProps) {
   const parsed = parseStatContent(step.content);
 
   return (
@@ -112,13 +113,22 @@ export default function StatStep({ step, card, isActive }: StatStepProps) {
       {/* Dark base */}
       <div className="absolute inset-0 bg-[#060606]" />
 
-      {/* Ambient glow - top */}
+      {/* Ambient glow - top (amber) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={isActive ? { opacity: 1 } : {}}
         transition={{ duration: 1.5 }}
         className="absolute -top-32 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full blur-[100px]"
-        style={{ backgroundColor: `${categoryInfo.accent}15` }}
+        style={{ backgroundColor: 'rgba(245,158,11,0.15)' }}
+      />
+
+      {/* Amber bottom glow */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 60% 40% at 50% 100%, rgba(217,119,6,0.10), transparent)',
+        }}
       />
 
       {/* Content */}
@@ -127,14 +137,14 @@ export default function StatStep({ step, card, isActive }: StatStepProps) {
           <SingleStat
             bigStat={parsed.bigStat}
             description={parsed.description}
-            accent={categoryInfo.accent}
+            accent={STAT_AMBER}
             isActive={isActive}
           />
         ) : (
           <MultiStats
             items={parsed.items}
             description={parsed.description}
-            accent={categoryInfo.accent}
+            accent={STAT_AMBER}
             isActive={isActive}
           />
         )}
@@ -174,7 +184,7 @@ function SingleStat({ bigStat, description, accent, isActive }: SingleStatProps)
         className="text-center text-7xl font-black leading-none tracking-tighter"
         style={{
           color: accent,
-          textShadow: `0 0 40px ${accent}50, 0 4px 20px ${accent}30`,
+          textShadow: `0 0 30px rgba(245,158,11,0.4), 0 0 60px ${accent}40, 0 4px 20px ${accent}30`,
         }}
       >
         {bigStat}
@@ -187,7 +197,7 @@ function SingleStat({ bigStat, description, accent, isActive }: SingleStatProps)
         transition={{ duration: 0.7, delay: 0.5 }}
         className="h-px w-20 origin-center"
         style={{
-          background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+          background: 'linear-gradient(90deg, transparent, #D97706, #F59E0B, transparent)',
         }}
       />
 
@@ -276,7 +286,7 @@ function MultiStats({ items, description, accent, isActive }: MultiStatsProps) {
             animate={isActive ? { scaleX: 1, opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.65 }}
             className="h-[3px] w-12 origin-center rounded-full"
-            style={{ backgroundColor: accent }}
+            style={{ background: 'linear-gradient(90deg, #D97706, #F59E0B)' }}
           />
         </div>
       )}
@@ -368,11 +378,11 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
       >
         {items.map((item, i) => (
           <motion.div key={i} className="flex flex-col" variants={statItemVariants}>
-            {/* Divider — accent color, 첫 번째 행 위에도 표시 */}
+            {/* Divider — amber gradient, 첫 번째 행 위에도 표시 */}
             <div
               className="h-px w-full"
               style={{
-                background: `linear-gradient(90deg, ${accent}30, transparent 80%)`,
+                background: 'linear-gradient(90deg, rgba(217,119,6,0.4), rgba(245,158,11,0.15), transparent 80%)',
               }}
             />
 
@@ -401,7 +411,7 @@ function TextListStats({ items, description, accent, isActive }: TextListStatsPr
         <div
           className="h-px w-full"
           style={{
-            background: `linear-gradient(90deg, ${accent}30, transparent 80%)`,
+            background: 'linear-gradient(90deg, rgba(217,119,6,0.4), rgba(245,158,11,0.15), transparent 80%)',
           }}
         />
       </motion.div>

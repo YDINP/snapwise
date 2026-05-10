@@ -55,10 +55,13 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
   });
   const description = lines.join('\n');
 
+  const revealVisual = card.visuals?.revealTitle;
+
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
       {/* Category gradient background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
+
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
 
       {/* ── Circle clip-path reveal wrapper ── */}
@@ -85,7 +88,7 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
               animate={isActive ? { opacity: 1, filter: 'blur(0px)', scale: 1 } : {}}
               transition={{ delay: 0.5, duration: 0.7, ease: 'easeOut' }}
               className="text-center text-2xl font-black text-white"
-              style={{ wordBreak: 'keep-all' }}
+              style={{ wordBreak: 'keep-all', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}
             >
               {/* Emoji bounce-in (separate from text) */}
               {emoji && (
@@ -146,8 +149,17 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
           />
         </div>
 
+        {/* Amber underline animation */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={isActive ? { scaleX: 1 } : { scaleX: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
+          className="mt-2 origin-left rounded-full"
+          style={{ height: 2, background: '#D97706' }}
+        />
+
         {/* Square image frame — between title and description */}
-        {card.coverImage && (
+        {(card.visuals?.revealTitle || card.coverImage) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={isActive ? { opacity: 1, scale: 1 } : {}}
@@ -159,7 +171,7 @@ export default function RevealTitleStep({ step, card, isActive }: RevealTitleSte
               style={{ border: `3px solid ${categoryInfo.accent}60` }}
             >
               <img
-                src={card.coverImage}
+                src={card.visuals?.revealTitle ?? card.coverImage}
                 alt={card.title}
                 className="h-full w-full object-cover"
               />

@@ -31,14 +31,18 @@ interface ImpactStepProps {
   step: CardStep;
   card: CardMeta;
   isActive: boolean;
+  stepIndex?: number;
 }
 
-export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
+export default function ImpactStep({ step, card, isActive, stepIndex }: ImpactStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
   const allLines = step.content.split('\n').filter(l => l.trim());
   const emojiLines = allLines.filter(isEmojiOnlyLine);
   const textLines = allLines.filter(l => !isEmojiOnlyLine(l));
   const lines = textLines; // 기존 로직은 textLines 기준으로 유지
+  const impactVisual = stepIndex !== undefined
+    ? card.visuals?.impacts?.find(i => i.stepIndex === stepIndex)?.src
+    : undefined;
 
   // Adaptive font size
   const fontSize = lines.length <= 3
@@ -51,6 +55,8 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
       {/* Dark base */}
       <div className="absolute inset-0 bg-black" />
+
+      {/* Background visual was here; now shown inline as content icon */}
 
       {/* Radial accent glow behind text — pulse 반복 */}
       <motion.div
@@ -80,17 +86,37 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
           style={{ backgroundColor: categoryInfo.accent }}
         />
 
-        {/* 이모지 헤더 — 텍스트 블록 위 */}
-        {emojiLines.length > 0 && (
+        {/* AI illustration OR emoji fallback */}
+        {impactVisual ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.6 }}
-            transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-            className="text-5xl text-center"
-            aria-hidden="true"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={isActive ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="relative"
           >
-            {emojiLines.join(' ')}
+            <div
+              className="absolute -inset-3 rounded-3xl blur-2xl"
+              style={{ backgroundColor: 'rgba(245,158,11,0.30)' }}
+            />
+            <div
+              className="relative h-44 w-44 overflow-hidden rounded-2xl shadow-2xl"
+              style={{ border: '2px solid rgba(245,158,11,0.45)' }}
+            >
+              <img src={impactVisual} alt="" className="h-full w-full object-cover" />
+            </div>
           </motion.div>
+        ) : (
+          emojiLines.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.6 }}
+              transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+              className="text-5xl text-center"
+              aria-hidden="true"
+            >
+              {emojiLines.join(' ')}
+            </motion.div>
+          )
         )}
 
         {/* Grouped blocks separated by dividers */}
@@ -141,7 +167,15 @@ export default function ImpactStep({ step, card, isActive }: ImpactStepProps) {
                         key={idx}
                         variants={lineDrama}
                         className={`text-center ${isSecondary ? secondaryFontSize : fontSize} font-bold ${isSecondary ? 'text-white/65' : 'text-white/90'}`}
-                        style={{ wordBreak: 'keep-all', lineHeight: 'var(--card-line-height-tight)' }}
+                        style={{
+                          wordBreak: 'keep-all',
+                          lineHeight: 'var(--card-line-height-tight)',
+                          ...(isSecondary ? {} : {
+                            fontFamily: 'var(--font-serif)',
+                            color: '#F59E0B',
+                            textShadow: '0 0 40px rgba(245,158,11,0.4), 0 0 80px rgba(217,119,6,0.2)',
+                          }),
+                        }}
                       >
                         {parseInline(trimmed, categoryInfo.accent)}
                       </motion.p>

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "fetch-images": "npx tsx scripts/fetch-images.ts"
+    "fetch-images": "npx tsx scripts/fetch-images.ts",
+    "visuals:generate": "tsx scripts/generate-card-visuals.ts",
+    "visuals:dry": "tsx scripts/generate-card-visuals.ts --dry-run"
   },
   "dependencies": {
     "@splinetool/react-spline": "^4.1.0",
@@ -30,6 +32,7 @@
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.1.0",
     "postcss": "^8.0.0",
+    "sharp": "^0.33.5",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.7.0"

@@ -51,8 +51,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { color: '#09090B', media: '(prefers-color-scheme: dark)' },
-    { color: '#FFFFFF', media: '(prefers-color-scheme: light)' },
+    { color: '#1A1816', media: '(prefers-color-scheme: dark)' },
+    { color: '#FAF9F7', media: '(prefers-color-scheme: light)' },
   ],
 };
 
@@ -81,6 +81,12 @@ export default function RootLayout({
           type="text/javascript"
           src="//t1.daumcdn.net/kas/static/ba.min.js"
           async
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap"
         />
         <link
           rel="stylesheet"

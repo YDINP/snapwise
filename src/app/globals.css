@@ -8,25 +8,34 @@
 
 :root {
   /* ─── Core Surface ─────────────────────────────── */
-  --color-bg:         #FAFAF8;   /* 크림 오프화이트 */
-  --color-surface:    #F4F4F1;   /* 약간 어두운 서피스 */
-  --color-surface-2:  #EEEEE9;   /* 2차 서피스 (카드, 패널) */
+  --color-bg:         #FAF9F7;   /* 크림 오프화이트 */
+  --color-surface:    #F2EFE8;   /* 약간 어두운 서피스 */
+  --color-surface-2:  #EAE5DC;   /* 2차 서피스 (카드, 패널) */
   --color-overlay:    rgba(250, 250, 248, 0.88);
 
   /* ─── Typography ───────────────────────────────── */
-  --color-text:       #141412;   /* 따뜻한 잉크블랙 */
-  --color-text-sub:   #4A4A45;   /* 보조 텍스트 */
+  --color-text:       #1A1714;   /* 따뜻한 잉크블랙 */
+  --color-text-sub:   #6B625A;   /* 보조 텍스트 */
   --color-muted:      #88887E;   /* 힌트/레이블 */
   --color-placeholder:#B0B0A6;   /* 플레이스홀더 */
 
   /* ─── Border & Divider ─────────────────────────── */
-  --color-border:     #E0E0DA;   /* 기본 보더 */
+  --color-border:     #E8E2D8;   /* 기본 보더 */
   --color-border-sub: #EBEBE5;   /* 약한 보더 */
   --color-divider:    rgba(20, 20, 18, 0.07);
 
   /* ─── Brand Accent ─────────────────────────────── */
-  --color-accent:     #1A1A16;   /* 프라이머리 액센트 (버튼, 선택) */
-  --color-accent-inv: #FAFAF8;   /* 액센트 위 텍스트 */
+  --color-accent:       #D97706;   /* Claude 앰버 오렌지 */
+  --color-accent-hover: #B45309;   /* 앰버 hover */
+  --color-accent-2:     #7C6AF7;   /* 소프트 퍼플 */
+  --color-accent-inv:   #FFFFFF;   /* 액센트 위 텍스트 */
+
+  /* ─── Claude Design Tokens ─────────────────────── */
+  --color-claude-orange: #D97706;
+  --color-claude-amber:  #F59E0B;
+  --color-claude-cream:  #FAF9F7;
+  --font-serif:          'Lora', 'Pretendard Variable', 'Pretendard', Georgia, serif;
+  --grain-opacity:       0.025;
 
   /* ─── Semantic ─────────────────────────────────── */
   --color-success:    #2D7A4F;
@@ -93,25 +102,32 @@
 /* ─── Dark Mode ─────────────────────────────────────── */
 .dark {
   /* Core Surface — 따뜻한 잉크블랙 */
-  --color-bg:         #0D0D0B;
-  --color-surface:    #161614;
-  --color-surface-2:  #1E1E1B;
+  --color-bg:         #1A1816;
+  --color-surface:    #211E1A;
+  --color-surface-2:  #2A2520;
   --color-overlay:    rgba(13, 13, 11, 0.90);
 
   /* Typography */
-  --color-text:       #F2F2EE;
-  --color-text-sub:   #B8B8B0;
+  --color-text:       #F5F0E8;
+  --color-text-sub:   #A89880;
   --color-muted:      #707068;
   --color-placeholder:#484840;
 
   /* Border & Divider */
-  --color-border:     #2A2A26;
+  --color-border:     #3A342C;
   --color-border-sub: #222220;
   --color-divider:    rgba(242, 242, 238, 0.07);
 
   /* Brand Accent */
-  --color-accent:     #F2F2EE;
-  --color-accent-inv: #0D0D0B;
+  --color-accent:       #F59E0B;
+  --color-accent-hover: #D97706;
+  --color-accent-2:     #A78BFA;
+  --color-accent-inv:   #1A1816;
+
+  /* Claude Design Tokens */
+  --color-claude-orange: #F59E0B;
+  --color-claude-amber:  #FBBF24;
+  --color-claude-cream:  #1A1816;
 
   /* Semantic */
   --color-success:    #4ABA80;
@@ -227,7 +243,7 @@ body {
 }
 
 .nav-pill-default:hover {
-  background: var(--color-border);
+  background: rgba(217, 119, 6, 0.10);
   color: var(--color-text);
 }
 
@@ -413,14 +429,14 @@ body {
 
 /* Impact text glow */
 .impact-text {
-  text-shadow: 0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(255,255,255,0.1);
+  text-shadow: 0 0 40px rgba(245,158,11,0.4), 0 0 80px rgba(217,119,6,0.2);
 }
 
 /* Reveal animation */
 @keyframes reveal-glow {
   0%   { text-shadow: 0 0 0 transparent; transform: scale(0.8); opacity: 0; }
-  50%  { text-shadow: 0 0 60px rgba(255,255,255,0.4); }
-  100% { text-shadow: 0 0 20px rgba(255,255,255,0.2); transform: scale(1); opacity: 1; }
+  50%  { text-shadow: 0 0 60px rgba(245,158,11,0.5); }
+  100% { text-shadow: 0 0 20px rgba(217,119,6,0.3); transform: scale(1); opacity: 1; }
 }
 
 .reveal-animation {
@@ -458,4 +474,45 @@ body {
 .card-text-balanced {
   word-break: keep-all;
   overflow-wrap: break-word;
+}
+
+/* ================================================================
+   LANGUAGE-AWARE TEXT BREAKS
+   ================================================================ */
+
+.text-ko {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+}
+
+.text-en {
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.text-mixed {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ================================================================
+   GRAIN OVERLAY — 페이퍼 텍스처
+   ================================================================ */
+
+.grain-overlay {
+  position: relative;
+}
+
+.grain-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--grain-opacity, 0.025);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 192px 192px;
 }

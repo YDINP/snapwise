@@ -62,8 +62,8 @@ export default function FactStep({ step, card, isActive }: FactStepProps) {
           initial={{ opacity: 0, x: -12 }}
           animate={isActive ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.3, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-3xl font-black leading-tight text-white"
-          style={{ wordBreak: 'keep-all', textWrap: 'balance' as React.CSSProperties['textWrap'] }}
+          className="text-ko text-3xl font-black leading-tight text-white"
+          style={{ textWrap: 'balance' as React.CSSProperties['textWrap'] }}
         >
           {parseInline(headline, categoryInfo.accent)}
         </motion.p>
@@ -74,11 +74,10 @@ export default function FactStep({ step, card, isActive }: FactStepProps) {
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ duration: 0.4, delay: 0.22 }}
-            className="font-medium text-white/50"
+            className="text-ko font-medium text-white/50"
             style={{
               fontSize: 'var(--card-text-caption)',
               lineHeight: 'var(--card-line-height)',
-              wordBreak: 'keep-all',
             }}
           >
             {parseInline(subtext, categoryInfo.accent)}

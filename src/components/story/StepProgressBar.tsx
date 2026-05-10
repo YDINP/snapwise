@@ -42,22 +42,32 @@ export default function StepProgressBar({ totalSteps, currentStep, onJump, accen
             >
               {/* 시각적 바 — 버튼 중앙에 위치 */}
               <div
-                className={`${barHeight} w-full rounded-full overflow-hidden bg-white/20 relative`}
-                style={{ minWidth: '2px' }}
+                className={`${barHeight} w-full rounded-full overflow-hidden relative`}
+                style={{
+                  minWidth: '2px',
+                  background: 'rgba(255,255,255,0.18)',
+                }}
               >
-                {/* 읽은 스텝: 즉시 채워진 accent/흰색 */}
+                {/* 읽은 스텝: 즉시 채워진 앰버/accent */}
                 {isPast && (
                   <div
                     className="absolute inset-0 rounded-full"
-                    style={{ backgroundColor: accentColor ?? 'white' }}
+                    style={{
+                      backgroundColor: accentColor ?? '#D97706',
+                      transition: 'background 200ms ease, box-shadow 200ms ease',
+                    }}
                   />
                 )}
 
-                {/* 현재 스텝: 애니메이션으로 채워짐 */}
+                {/* 현재 스텝: 애니메이션으로 채워짐 + glow */}
                 {isCurrent && (
                   <motion.div
                     className="absolute inset-y-0 left-0 rounded-full"
-                    style={{ backgroundColor: accentColor ?? 'white' }}
+                    style={{
+                      backgroundColor: accentColor ?? '#D97706',
+                      boxShadow: `0 0 8px rgba(217,119,6,0.5)`,
+                      transition: 'background 200ms ease, box-shadow 200ms ease',
+                    }}
                     initial={{ width: '0%' }}
                     animate={{ width: '100%' }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}

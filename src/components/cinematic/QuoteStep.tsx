@@ -101,8 +101,8 @@ export default function QuoteStep({ step, card, isActive }: QuoteStepProps) {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 0.85, ease: 'easeOut', delay: 0.1 }}
-          className="text-center text-xl font-light italic leading-relaxed text-white/90"
-          style={{ wordBreak: 'keep-all', textWrap: 'balance', lineHeight: 1.75 }}
+          className="text-ko text-center text-xl font-light italic leading-relaxed text-white/90"
+          style={{ textWrap: 'balance', lineHeight: 1.75 }}
         >
           {quoteText.split('\n').map((line, i, arr) => (
             <span key={i}>
@@ -126,8 +126,7 @@ export default function QuoteStep({ step, card, isActive }: QuoteStepProps) {
               style={{ backgroundColor: categoryInfo.accent }}
             />
             <p
-              className="text-center text-sm text-white/50"
-              style={{ wordBreak: 'keep-all' }}
+              className="text-ko text-center text-sm text-white/50"
             >
               — {attribution}
             </p>

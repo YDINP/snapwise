@@ -10,6 +10,7 @@ interface ShowcaseStepProps {
   step: CardStep;
   card: CardMeta;
   isActive: boolean;
+  stepIndex?: number;
 }
 
 interface ShowcaseItem {
@@ -80,9 +81,12 @@ function parseShowcase(content: string): { intro: string; items: ShowcaseItem[] 
   return { intro, items };
 }
 
-export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps) {
+export default function ShowcaseStep({ step, card, isActive, stepIndex }: ShowcaseStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
   const { intro, items } = parseShowcase(step.content);
+  const showcaseVisual = stepIndex !== undefined
+    ? card.visuals?.showcases?.find(s => s.stepIndex === stepIndex)?.src
+    : undefined;
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden">
@@ -99,7 +103,27 @@ export default function ShowcaseStep({ step, card, isActive }: ShowcaseStepProps
       `}</style>
 
       <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-2 px-6">
-        {/* [A2] Intro text — 전역 TypingText (bold + 커서 지원) */}
+        {/* AI infographic poster — when available, replaces detailed item list with visual poster */}
+        {showcaseVisual && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={isActive ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="relative mb-4"
+          >
+            <div
+              className="absolute -inset-2 rounded-2xl blur-xl"
+              style={{ backgroundColor: 'rgba(217,119,6,0.20)' }}
+            />
+            <div
+              className="relative h-56 w-56 overflow-hidden rounded-2xl shadow-2xl"
+              style={{ border: '2px solid rgba(217,119,6,0.40)' }}
+            >
+              <img src={showcaseVisual} alt="" className="h-full w-full object-cover" />
+            </div>
+          </motion.div>
+        )}
+
         {intro && (
           <motion.p
             initial={{ opacity: 0 }}

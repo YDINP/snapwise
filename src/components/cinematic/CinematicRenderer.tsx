@@ -32,9 +32,10 @@ interface CinematicRendererProps {
   card: CardMeta;
   isActive: boolean;
   nextCard?: CardMeta;
+  stepIndex?: number;
 }
 
-export default function CinematicRenderer({ step, card, isActive, nextCard }: CinematicRendererProps) {
+export default function CinematicRenderer({ step, card, isActive, nextCard, stepIndex }: CinematicRendererProps) {
   // Ensure step content is never empty
   const safeStep = {
     ...step,
@@ -47,16 +48,16 @@ export default function CinematicRenderer({ step, card, isActive, nextCard }: Ci
       return <CinematicHook step={safeStep} card={card} isActive={isActive} />;
 
     case 'scene':
-      return <SceneStep step={safeStep} card={card} isActive={isActive} />;
+      return <SceneStep step={safeStep} card={card} isActive={isActive} stepIndex={stepIndex} />;
 
     case 'dialogue':
-      return <DialogueStep step={safeStep} card={card} isActive={isActive} />;
+      return <DialogueStep step={safeStep} card={card} isActive={isActive} stepIndex={stepIndex} />;
 
     case 'narration':
       return <NarrationStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'showcase':
-      return <ShowcaseStep step={safeStep} card={card} isActive={isActive} />;
+      return <ShowcaseStep step={safeStep} card={card} isActive={isActive} stepIndex={stepIndex} />;
 
     case 'vs':
       return <VsStep step={safeStep} card={card} isActive={isActive} />;
@@ -93,7 +94,7 @@ export default function CinematicRenderer({ step, card, isActive, nextCard }: Ci
       return <DataVizStep step={safeStep} card={card} isActive={isActive} />;
 
     case 'impact':
-      return <ImpactStep step={safeStep} card={card} isActive={isActive} />;
+      return <ImpactStep step={safeStep} card={card} isActive={isActive} stepIndex={stepIndex} />;
 
     case 'reveal-title':
       return <RevealTitleStep step={safeStep} card={card} isActive={isActive} />;

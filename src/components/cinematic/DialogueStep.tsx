@@ -10,14 +10,19 @@ interface DialogueStepProps {
   step: CardStep;
   card: CardMeta;
   isActive: boolean;
+  stepIndex?: number;
 }
 
-export default function DialogueStep({ step, card, isActive }: DialogueStepProps) {
+export default function DialogueStep({ step, card, isActive, stepIndex }: DialogueStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
 
   // Find character by characterId — fallback to prevent black screen
   const character = card.characters?.find(c => c.id === step.characterId)
     ?? { id: 'unknown', name: '화자', emoji: '💬' };
+
+  const dialogueVisual = stepIndex !== undefined
+    ? card.visuals?.dialogues?.find(d => d.stepIndex === stepIndex)?.src
+    : undefined;
 
   // 캐릭터 배열 내 인덱스로 좌/우 방향 결정
   // index 0 = 왼쪽 캐릭터, 1 이상 = 오른쪽/내레이터
@@ -33,45 +38,71 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
 
       {/* Content container */}
       <div className="relative z-10 flex w-full flex-col items-start gap-3">
-        {/* Character row: avatar + name badge */}
-        <motion.div
-          variants={slideInLeft}
-          initial="hidden"
-          animate={isActive ? 'visible' : 'hidden'}
-          className="flex items-center gap-3"
-        >
-          {/* 캐릭터 아바타: scaleIn으로 강조 등장 */}
+        {/* AI manga character illustration (full width when available) */}
+        {dialogueVisual ? (
           <motion.div
             variants={scaleIn}
             initial="hidden"
             animate={isActive ? 'visible' : 'hidden'}
+            className="relative w-full"
           >
-            {character.image ? (
-              <div
-                className="h-14 w-14 overflow-hidden rounded-full shadow-lg"
-                style={{ border: `3px solid ${categoryInfo.accent}` }}
-              >
-                <img src={character.image} alt={character.name} className="h-full w-full object-cover" />
-              </div>
-            ) : (
-              <div
-                className="flex h-14 w-14 items-center justify-center rounded-full text-3xl shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${categoryInfo.accent}40, ${categoryInfo.accent}20)`,
-                  border: `3px solid ${categoryInfo.accent}80`,
-                }}
-              >
-                {character.emoji}
-              </div>
-            )}
+            <div
+              className="absolute -inset-2 rounded-3xl blur-2xl"
+              style={{ backgroundColor: 'rgba(217,119,6,0.20)' }}
+            />
+            <div
+              className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-2xl"
+              style={{ border: '2px solid rgba(217,119,6,0.40)' }}
+            >
+              <img src={dialogueVisual} alt={character.name} className="h-full w-full object-cover" />
+            </div>
+            {/* Character name badge overlay */}
+            <span
+              className="absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-bold text-white shadow-lg"
+              style={{ backgroundColor: '#D97706' }}
+            >
+              {character.name}
+            </span>
           </motion.div>
-          <span
-            className="rounded-full px-3 py-1 text-xs font-bold text-white"
-            style={{ backgroundColor: `${categoryInfo.accent}90` }}
+        ) : (
+          <motion.div
+            variants={slideInLeft}
+            initial="hidden"
+            animate={isActive ? 'visible' : 'hidden'}
+            className="flex items-center gap-3"
           >
-            {character.name}
-          </span>
-        </motion.div>
+            <motion.div
+              variants={scaleIn}
+              initial="hidden"
+              animate={isActive ? 'visible' : 'hidden'}
+            >
+              {character.image ? (
+                <div
+                  className="h-14 w-14 overflow-hidden rounded-full shadow-lg"
+                  style={{ border: `3px solid ${categoryInfo.accent}` }}
+                >
+                  <img src={character.image} alt={character.name} className="h-full w-full object-cover" />
+                </div>
+              ) : (
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-full text-3xl shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${categoryInfo.accent}40, ${categoryInfo.accent}20)`,
+                    border: `3px solid ${categoryInfo.accent}80`,
+                  }}
+                >
+                  {character.emoji}
+                </div>
+              )}
+            </motion.div>
+            <span
+              className="rounded-full px-3 py-1 text-xs font-bold text-white"
+              style={{ backgroundColor: `${categoryInfo.accent}90` }}
+            >
+              {character.name}
+            </span>
+          </motion.div>
+        )}
 
         {/* Comic speech bubble — 방향별 slideIn */}
         <motion.div
@@ -105,11 +136,10 @@ export default function DialogueStep({ step, card, isActive }: DialogueStepProps
             }}
           >
             <p
-              className="font-medium text-gray-800"
+              className="text-ko font-medium text-gray-800"
               style={{
                 fontSize: 'var(--card-text-body)',
                 lineHeight: 'var(--card-line-height)',
-                wordBreak: 'keep-all',
               }}
             >
               <TypingText text={step.content} isActive={isActive} speed={10} startDelay={100} />

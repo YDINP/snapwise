@@ -11,6 +11,7 @@ interface SceneStepProps {
   step: CardStep;
   card: CardMeta;
   isActive: boolean;
+  stepIndex?: number;
 }
 
 /**
@@ -30,9 +31,12 @@ function splitCaption(content: string): { caption: string | null; body: string }
   return { caption: null, body: content };
 }
 
-export default function SceneStep({ step, card, isActive }: SceneStepProps) {
+export default function SceneStep({ step, card, isActive, stepIndex }: SceneStepProps) {
   const categoryInfo = getCategoryInfo(card.category);
   const { caption, body } = splitCaption(step.content);
+  const sceneVisual = stepIndex !== undefined
+    ? card.visuals?.scenes?.find(s => s.stepIndex === stepIndex)?.src
+    : undefined;
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
@@ -78,15 +82,35 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
         />
       )}
 
-      {/* Centered text content */}
-      <div className="relative z-10 w-full px-8">
+      {/* Centered content: visual + text */}
+      <div className="relative z-10 flex w-full flex-col items-center gap-6 px-8">
+        {/* AI illustration */}
+        {sceneVisual && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="relative"
+          >
+            <div
+              className="absolute -inset-3 rounded-3xl blur-2xl"
+              style={{ backgroundColor: 'rgba(217,119,6,0.20)' }}
+            />
+            <div
+              className="relative h-52 w-52 overflow-hidden rounded-2xl shadow-xl"
+              style={{ border: '2px solid rgba(217,119,6,0.35)' }}
+            >
+              <img src={sceneVisual} alt="" className="h-full w-full object-cover" />
+            </div>
+          </motion.div>
+        )}
+
         {caption !== null && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="text-center text-xs tracking-widest text-white/50 mb-3 uppercase"
-            style={{ wordBreak: 'keep-all' }}
+            className="text-ko text-center text-xs tracking-widest text-white/50 uppercase"
           >
             {caption}
           </motion.p>
@@ -101,9 +125,8 @@ export default function SceneStep({ step, card, isActive }: SceneStepProps) {
             <motion.p
               key={i}
               variants={lineFadeUp}
-              className="text-center text-xl font-semibold text-white"
+              className="text-ko text-center text-lg font-semibold text-white"
               style={{
-                wordBreak: 'keep-all',
                 textWrap: 'balance' as React.CSSProperties['textWrap'],
                 textShadow: '0 2px 12px rgba(0,0,0,0.4)',
               }}

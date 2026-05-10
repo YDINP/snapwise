@@ -64,6 +64,17 @@ export interface CardMeta {
   seriesId?: string;        // 시리즈 식별자 (예: "gyeyujeongnan")
   part?: number;            // 챕터 번호 (1, 2, 3…)
   totalParts?: number;      // 시리즈 전체 챕터 수
+  // 비주얼 자산 (자동 생성)
+  visuals?: {
+    hook?: string;
+    thumbnail?: string;
+    scenes?: { stepIndex: number; src: string }[];
+    impacts?: { stepIndex: number; src: string }[];
+    dialogues?: { stepIndex: number; src: string }[];
+    showcases?: { stepIndex: number; src: string }[];
+    revealTitle?: string;
+  };
+  visualVersion?: string;  // 재생성 트리거용
 }
 
 export interface CategoryInfo {

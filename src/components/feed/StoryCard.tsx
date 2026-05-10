@@ -34,38 +34,42 @@ interface MotionConfig {
   initial: { opacity: number; y?: number; scale?: number };
   animate: { opacity: number; y?: number; scale?: number };
   exit: { opacity: number; y?: number; scale?: number };
-  duration: number;
+  transition: Record<string, unknown>;
 }
 
 function getMotionConfig(variant: TransitionVariant): MotionConfig {
   switch (variant) {
     case 'snap':
+      // opacity만 변하므로 spring 불필요 — tween 유지
       return {
         initial: { opacity: 0.6, y: 0 },
         animate: { opacity: 1, y: 0 },
         exit: { opacity: 0, y: 0 },
-        duration: 0.05,
+        transition: { duration: 0.05, ease: 'easeOut' },
       };
     case 'zoom':
+      // scale 전환 — spring 적용
       return {
         initial: { opacity: 0, scale: 0.97 },
         animate: { opacity: 1, scale: 1 },
         exit: { opacity: 0, scale: 1.02 },
-        duration: 0.25,
+        transition: { type: 'spring', stiffness: 380, damping: 38 },
       };
     case 'dramatic':
+      // opacity만 변하므로 tween 유지
       return {
         initial: { opacity: 0, y: 0 },
         animate: { opacity: 1, y: 0 },
         exit: { opacity: 0, y: 0 },
-        duration: 0.5,
+        transition: { duration: 0.5, ease: 'easeOut' },
       };
     default:
+      // y 전환 — spring 적용
       return {
         initial: { opacity: 0.88, y: 4 },
         animate: { opacity: 1, y: 0 },
         exit: { opacity: 0, y: -4 },
-        duration: 0.15,
+        transition: { type: 'spring', stiffness: 380, damping: 38 },
       };
   }
 }
@@ -162,7 +166,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden"
+      className="relative w-full h-full overflow-hidden grain-overlay"
       onClick={handleTap}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -209,7 +213,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
           initial={motionConfig.initial}
           animate={motionConfig.animate}
           exit={motionConfig.exit}
-          transition={{ duration: motionConfig.duration, ease: 'easeOut' }}
+          transition={motionConfig.transition}
           className="w-full h-full"
         >
           {card.isCinematic ? (
@@ -218,6 +222,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
               card={card}
               isActive={isActive}
               nextCard={nextCard}
+              stepIndex={currentStep}
             />
           ) : (
             <StepRenderer
@@ -281,7 +286,7 @@ export default function StoryCard({ card, isActive, nextCard, onComplete, topOff
             initial={{ opacity: 0, x: 8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 4 }}
-            transition={{ duration: 0.4 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
             className="pointer-events-none absolute right-4 top-1/2 z-30 -translate-y-1/2"
           >
             <motion.div

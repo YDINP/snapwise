@@ -47,18 +47,17 @@ export default function CategoryBar({ currentCategory, cardCounts }: CategoryBar
               layout
               animate={isAllSelected ? { scale: [1.04, 1.0] } : { scale: 1.0 }}
               transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-              className="nav-pill"
+              className={`nav-pill${isAllSelected ? '' : ' nav-pill-default'}`}
               style={
                 isAllSelected
                   ? {
-                      background: 'var(--color-accent)',
-                      color: 'var(--color-accent-inv)',
-                      boxShadow: 'var(--shadow-sm)',
+                      background: '#D97706',
+                      color: 'white',
+                      borderRadius: '9999px',
+                      fontWeight: 600,
+                      boxShadow: '0 2px 8px rgba(217,119,6,0.30)',
                     }
-                  : {
-                      background: 'var(--color-surface-2)',
-                      color: 'var(--color-text-sub)',
-                    }
+                  : undefined
               }
             >
               <span aria-hidden="true">🌟</span>
@@ -72,18 +71,17 @@ export default function CategoryBar({ currentCategory, cardCounts }: CategoryBar
               layout
               animate={isSavedPage ? { scale: [1.04, 1.0] } : { scale: 1.0 }}
               transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-              className="nav-pill"
+              className={`nav-pill${isSavedPage ? '' : ' nav-pill-default'}`}
               style={
                 isSavedPage
                   ? {
                       background: '#D97706',
-                      color: '#fff',
-                      boxShadow: '0 0 12px #D9770644, var(--shadow-xs)',
+                      color: 'white',
+                      borderRadius: '9999px',
+                      fontWeight: 600,
+                      boxShadow: '0 2px 8px rgba(217,119,6,0.30)',
                     }
-                  : {
-                      background: 'var(--color-surface-2)',
-                      color: 'var(--color-text-sub)',
-                    }
+                  : undefined
               }
             >
               <span aria-hidden="true">🔖</span>
@@ -102,18 +100,17 @@ export default function CategoryBar({ currentCategory, cardCounts }: CategoryBar
                   layout
                   animate={isSelected ? { scale: [1.04, 1.0] } : { scale: 1.0 }}
                   transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-                  className="nav-pill"
+                  className={`nav-pill${isSelected ? '' : ' nav-pill-default'}`}
                   style={
                     isSelected
                       ? {
                           backgroundColor: info.accent,
-                          color: '#fff',
-                          boxShadow: `0 0 12px ${info.accent}55, var(--shadow-xs)`,
+                          color: 'white',
+                          borderRadius: '9999px',
+                          fontWeight: 600,
+                          boxShadow: `0 2px 8px rgba(217,119,6,0.30)`,
                         }
-                      : {
-                          background: 'var(--color-surface-2)',
-                          color: 'var(--color-text-sub)',
-                        }
+                      : undefined
                   }
                 >
                   <span aria-hidden="true">{info.emoji}</span>

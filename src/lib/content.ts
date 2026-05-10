@@ -102,6 +102,45 @@ export function getAllCards(): CardMeta[] {
         const glossary = data.glossary as GlossaryItem[] | undefined;
         const steps = parseSteps(content, images);
 
+        // public/visuals/{slug}/ 자동 스캔
+        const visualsDir = path.join(process.cwd(), 'public', 'visuals', slug);
+        let visuals: CardMeta['visuals'] | undefined;
+        if (fs.existsSync(visualsDir)) {
+          const vFiles = fs.readdirSync(visualsDir);
+          visuals = {};
+          if (vFiles.includes('hook.webp')) visuals.hook = `/visuals/${slug}/hook.webp`;
+          if (vFiles.includes('thumbnail.webp')) visuals.thumbnail = `/visuals/${slug}/thumbnail.webp`;
+          if (vFiles.includes('reveal-title.webp')) visuals.revealTitle = `/visuals/${slug}/reveal-title.webp`;
+          const scenes = vFiles
+            .map(f => {
+              const m = f.match(/^scene-(\d+)\.webp$/);
+              return m ? { stepIndex: parseInt(m[1], 10), src: `/visuals/${slug}/${f}` } : null;
+            })
+            .filter((x): x is { stepIndex: number; src: string } => x !== null);
+          if (scenes.length) visuals.scenes = scenes;
+          const impacts = vFiles
+            .map(f => {
+              const m = f.match(/^impact-(\d+)\.webp$/);
+              return m ? { stepIndex: parseInt(m[1], 10), src: `/visuals/${slug}/${f}` } : null;
+            })
+            .filter((x): x is { stepIndex: number; src: string } => x !== null);
+          if (impacts.length) visuals.impacts = impacts;
+          const dialogues = vFiles
+            .map(f => {
+              const m = f.match(/^dialogue-(\d+)\.webp$/);
+              return m ? { stepIndex: parseInt(m[1], 10), src: `/visuals/${slug}/${f}` } : null;
+            })
+            .filter((x): x is { stepIndex: number; src: string } => x !== null);
+          if (dialogues.length) visuals.dialogues = dialogues;
+          const showcases = vFiles
+            .map(f => {
+              const m = f.match(/^showcase-(\d+)\.webp$/);
+              return m ? { stepIndex: parseInt(m[1], 10), src: `/visuals/${slug}/${f}` } : null;
+            })
+            .filter((x): x is { stepIndex: number; src: string } => x !== null);
+          if (showcases.length) visuals.showcases = showcases;
+        }
+
         cards.push({
           title: data.title || 'Untitled',
           slug,
@@ -128,6 +167,8 @@ export function getAllCards(): CardMeta[] {
           seriesId: data.seriesId as string | undefined,
           part: data.part as number | undefined,
           totalParts: data.totalParts as number | undefined,
+          visuals,
+          visualVersion: data.visualVersion as string | undefined,
         });
       }
     }

@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI agent / dev tools
+.serena/
+.taskmaster/
+__pycache__/
+.claude/agents/
+.claude/commands/

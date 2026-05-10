@@ -106,9 +106,8 @@ export default function NarrationStep({ step, card, isActive }: NarrationStepPro
 
             {/* 본문 텍스트 */}
             <p
-              className={`relative ${fontSize} font-medium text-white/90`}
+              className={`relative text-ko ${fontSize} font-medium text-white/90`}
               style={{
-                wordBreak: 'keep-all',
                 lineHeight: 'var(--card-line-height)',
                 textShadow: '0 1px 4px rgba(0,0,0,0.15)',
               }}

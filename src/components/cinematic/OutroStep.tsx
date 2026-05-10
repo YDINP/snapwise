@@ -99,6 +99,15 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
       {/* Category gradient background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
 
+      {/* Amber radial glow — bottom overlay */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 40% at 50% 100%, rgba(217,119,6,0.12) 0%, transparent 70%)',
+        }}
+      />
+
       {/* Content */}
       <div className="relative z-10 flex w-full flex-col items-center gap-6 px-6">
         {/* Card identity */}
@@ -121,7 +130,7 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           className="w-full max-w-sm"
         >
           <div className="flex flex-col items-center gap-1 rounded-xl bg-white/8 px-4 py-3 backdrop-blur-sm">
-            <Quote size={14} className="shrink-0 text-white/40" />
+            <Quote size={14} className="shrink-0" style={{ color: '#F59E0B', opacity: 0.7 }} />
             <motion.p
               initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
               animate={isActive ? { opacity: 1, clipPath: 'inset(0 0% 0 0)' } : {}}
@@ -214,16 +223,26 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2, duration: 0.6 }}
           className="flex items-center gap-3"
+          style={{
+            background: 'rgba(255,255,255,0.08)',
+            borderRadius: '9999px',
+            padding: '6px 10px',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
         >
           {/* Like button */}
           <motion.button
             onClick={handleLike}
             whileTap={{ scale: 0.92 }}
-            className={`relative flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium backdrop-blur-sm transition-colors ${
-              liked
-                ? 'bg-red-500/80 text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
+            whileHover={{ scale: 1.1 }}
+            className="relative flex items-center gap-2 px-5 py-3 text-sm font-medium backdrop-blur-sm transition-colors"
+            style={{
+              background: liked ? '#F59E0B' : 'transparent',
+              color: liked ? 'white' : 'rgba(255,255,255,0.5)',
+              borderRadius: '9999px',
+              boxShadow: liked ? '0 4px 16px rgba(245,158,11,0.35)' : 'none',
+            }}
           >
             {/* Heart fill scale animation */}
             <motion.span
@@ -231,12 +250,16 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
               transition={{ duration: 0.35, ease: 'easeOut' }}
               className="inline-flex"
             >
-              <Heart size={18} fill={liked ? 'currentColor' : 'none'} />
+              <Heart
+                size={18}
+                fill={liked ? '#FFFFFF' : 'none'}
+                stroke={liked ? '#FFFFFF' : 'rgba(255,255,255,0.5)'}
+              />
             </motion.span>
             {count}
             {/* Burst particles */}
             <AnimatePresence>
-              {justLiked && <LikeBurst accent="#ef4444" />}
+              {justLiked && <LikeBurst accent="#F59E0B" />}
             </AnimatePresence>
           </motion.button>
 
@@ -244,9 +267,17 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           <motion.button
             onClick={handleShare}
             whileTap={{ scale: 0.92 }}
-            className="flex items-center gap-2 rounded-full bg-white/20 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+            whileHover={{ scale: 1.1 }}
+            className="flex items-center gap-2 text-sm font-medium backdrop-blur-sm transition-colors"
+            style={{
+              background: '#D97706',
+              color: 'white',
+              borderRadius: '9999px',
+              padding: '12px 20px',
+              boxShadow: '0 4px 16px rgba(217,119,6,0.3)',
+            }}
           >
-            <Share2 size={18} />
+            <Share2 size={18} stroke="#FFFFFF" />
             공유
           </motion.button>
 
@@ -254,11 +285,15 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
           <motion.button
             onClick={handleSave}
             whileTap={{ scale: 0.92 }}
-            className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium backdrop-blur-sm transition-colors ${
-              saved
-                ? 'bg-yellow-500/80 text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
+            whileHover={{ scale: 1.1 }}
+            className="flex items-center gap-2 text-sm font-medium backdrop-blur-sm transition-colors"
+            style={{
+              background: saved ? '#7C6AF7' : 'transparent',
+              color: saved ? 'white' : 'rgba(255,255,255,0.5)',
+              borderRadius: '9999px',
+              padding: '12px 20px',
+              boxShadow: saved ? '0 4px 16px rgba(124,106,247,0.35)' : 'none',
+            }}
           >
             <motion.span
               animate={
@@ -269,7 +304,11 @@ export default function OutroStep({ step, card, isActive }: OutroStepProps) {
               transition={{ duration: 0.3, ease: 'easeOut' }}
               className="inline-flex"
             >
-              <Bookmark size={18} fill={saved ? 'currentColor' : 'none'} />
+              <Bookmark
+                size={18}
+                fill={saved ? '#FFFFFF' : 'none'}
+                stroke={saved ? '#FFFFFF' : 'rgba(255,255,255,0.5)'}
+              />
             </motion.span>
             {saved ? '저장됨' : '저장'}
           </motion.button>

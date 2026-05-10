@@ -23,6 +23,14 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
       {/* Category gradient background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${categoryInfo.gradient}`} />
 
+      {/* Warm amber glow overlay */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse 80% 60% at 50% 90%, rgba(217,119,6,0.10) 0%, transparent 70%)',
+        }}
+      />
+
       {/* Film grain texture */}
       {isActive && (
         <div
@@ -82,42 +90,60 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-6 px-6">
-        {/* Emoji with halo glow */}
-        <div className="relative">
-          {/* Halo glow behind emoji */}
+        {/* Hero visual: AI illustration OR emoji fallback */}
+        {card.visuals?.hook ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.3 }}
-            animate={isActive ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            className="absolute inset-0 flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.85, y: 10 }}
+            animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="relative"
           >
+            {/* Amber glow behind illustration */}
             <div
-              className="h-28 w-28 rounded-full blur-2xl"
-              style={{ backgroundColor: `${categoryInfo.accent}25` }}
+              className="absolute -inset-4 rounded-3xl blur-2xl"
+              style={{ backgroundColor: 'rgba(217,119,6,0.25)' }}
             />
+            <div
+              className="relative h-56 w-56 overflow-hidden rounded-3xl shadow-2xl"
+              style={{ border: '2px solid rgba(217,119,6,0.4)' }}
+            >
+              <img
+                src={card.visuals.hook}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            </div>
           </motion.div>
-
-          {/* Floating emoji */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={isActive
-              ? { opacity: 1, scale: [1, 1.04, 1], y: [0, -12, 0] }
-              : { opacity: 0, scale: 0.5 }
-            }
-            transition={{
-              opacity: { duration: 0.5 },
-              scale: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
-              y: {
-                duration: 1.8,
-                repeat: Infinity,
-                ease: 'easeInOut'
+        ) : (
+          <div className="relative">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.3 }}
+              animate={isActive ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 1, ease: 'easeOut' }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div
+                className="h-28 w-28 rounded-full blur-2xl"
+                style={{ backgroundColor: `${categoryInfo.accent}25` }}
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={isActive
+                ? { opacity: 1, scale: [1, 1.04, 1], y: [0, -12, 0] }
+                : { opacity: 0, scale: 0.5 }
               }
-            }}
-            className="relative text-8xl"
-          >
-            {card.emoji}
-          </motion.div>
-        </div>
+              transition={{
+                opacity: { duration: 0.5 },
+                scale: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
+                y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }
+              }}
+              className="relative text-8xl"
+            >
+              {card.emoji}
+            </motion.div>
+          </div>
+        )}
 
         {/* Title: 줄 단위 stagger fadeInUp + 볼드 마크다운 렌더링 */}
         <motion.div
@@ -133,6 +159,8 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
               variants={fadeInUp}
               className="text-xl font-bold text-white"
               style={{
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
                 textShadow: '0 2px 8px rgba(0,0,0,0.3)',
                 wordBreak: 'keep-all',
                 lineHeight: 'var(--card-line-height-tight)',
@@ -149,8 +177,8 @@ export default function CinematicHook({ step, card, isActive }: CinematicHookPro
           initial="hidden"
           animate={isActive ? 'visible' : 'hidden'}
           transition={{ delay: 0.1 + lines.length * 0.15 + 0.2 }}
-          className="rounded-full px-3 py-1 text-xs font-semibold tracking-wide text-white/80"
-          style={{ backgroundColor: `${categoryInfo.accent}30`, border: `1px solid ${categoryInfo.accent}50` }}
+          className="rounded-full px-3 py-1 text-xs font-semibold tracking-wide text-white"
+          style={{ backgroundColor: 'rgba(217,119,6,0.25)', border: '1px solid rgba(217,119,6,0.45)' }}
         >
           {categoryInfo.label}
         </motion.span>

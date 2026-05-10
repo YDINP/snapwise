@@ -3,8 +3,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import type { CardStep, CardMeta } from '@/types/content';
-import { getCategoryInfo } from '@/lib/categories';
-import { renderWithLineBreaks } from '@/lib/renderContent';
+import { parseInline } from '@/lib/renderContent';
 
 /** Highlight numbers/percentages in footer text with accent color */
 function renderFooterWithHighlight(text: string, accent: string): React.ReactNode {
@@ -66,6 +65,67 @@ interface VsParsed {
 /** Strip horizontal rule markers (───, ---, ===) from a line */
 function isHorizontalRule(line: string): boolean {
   return /^[─\-=]{3,}$/.test(line.trim());
+}
+
+/**
+ * Parse a single body line — detect "label: value" pattern.
+ * Conditions: label ≤ 20 chars, no digits in label (prevents "3억원: 시장" false positive).
+ */
+function parseBodyLine(line: string): { type: 'labeled'; label: string; value: string } | { type: 'plain'; text: string } {
+  const colonIdx = line.indexOf(':');
+  if (colonIdx > 0 && colonIdx < line.length - 1) {
+    const label = line.slice(0, colonIdx).trim();
+    const value = line.slice(colonIdx + 1).trim();
+    if (label.length > 0 && label.length <= 20 && value.length > 0 && !/\d/.test(label)) {
+      return { type: 'labeled', label, value };
+    }
+  }
+  return { type: 'plain', text: line };
+}
+
+/**
+ * Render panel body lines.
+ * "label: value" lines → stacked label (small/dim) + value (emphasized).
+ * Plain lines → centered text with inline bold support.
+ */
+function renderBodyLines(body: string, valueColor: string): React.ReactNode {
+  if (!body) return null;
+  const lines = body.split('\n').filter(l => l.trim());
+  return (
+    <div className="flex w-full flex-col gap-2">
+      {lines.map((rawLine, i) => {
+        const line = rawLine.trim();
+        const parsed = parseBodyLine(line);
+        if (parsed.type === 'labeled') {
+          return (
+            <div key={i} className="flex flex-col gap-0.5">
+              <span
+                className="text-[9px] font-medium uppercase tracking-wide text-white/40"
+                style={{ wordBreak: 'keep-all' }}
+              >
+                {parsed.label}
+              </span>
+              <span
+                className="text-xs font-semibold leading-snug"
+                style={{ color: valueColor, wordBreak: 'keep-all' }}
+              >
+                {parsed.value}
+              </span>
+            </div>
+          );
+        }
+        return (
+          <p
+            key={i}
+            className="text-center text-xs leading-relaxed text-white/80"
+            style={{ wordBreak: 'keep-all' }}
+          >
+            {parseInline(line)}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 /**
@@ -179,8 +239,16 @@ function parseVsContent(content: string): VsParsed {
   };
 }
 
+// Warm Intelligence 듀오톤 팔레트
+const AMBER = '#F59E0B';
+const PURPLE = '#7C6AF7';
+const AMBER_BG = 'rgba(245,158,11,0.15)';
+const PURPLE_BG = 'rgba(124,106,247,0.15)';
+const AMBER_BORDER = 'rgba(245,158,11,0.40)';
+const PURPLE_BORDER = 'rgba(124,106,247,0.40)';
+const VS_BG = '#D97706';
+
 export default function VsStep({ step, card, isActive }: VsStepProps) {
-  const categoryInfo = getCategoryInfo(card.category);
   const { leftTitle, rightTitle, leftBody, rightBody, footer } = parseVsContent(step.content);
 
   return (
@@ -188,19 +256,19 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
       {/* Dark base background */}
       <div className="absolute inset-0 bg-zinc-950" />
 
-      {/* Subtle top glow (blue tint) */}
+      {/* Amber glow — left side */}
       <div
-        className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
+        className="absolute top-0 left-0 h-full w-1/2 pointer-events-none"
         style={{
-          background: 'linear-gradient(to bottom, rgba(59,130,246,0.06) 0%, transparent 100%)',
+          background: 'radial-gradient(ellipse 80% 60% at 0% 50%, rgba(245,158,11,0.08) 0%, transparent 70%)',
         }}
       />
 
-      {/* Subtle bottom glow (accent tint) */}
+      {/* Purple glow — right side */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-1/2 pointer-events-none"
+        className="absolute top-0 right-0 h-full w-1/2 pointer-events-none"
         style={{
-          background: `linear-gradient(to top, ${categoryInfo.accent}0C 0%, transparent 100%)`,
+          background: 'radial-gradient(ellipse 80% 60% at 100% 50%, rgba(124,106,247,0.08) 0%, transparent 70%)',
         }}
       />
 
@@ -208,29 +276,26 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-6">
         <div className="relative flex w-full flex-row items-stretch">
 
-          {/* ── Left panel (A side) ── */}
+          {/* ── Left panel (A side) — Amber ── */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={isActive ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="flex flex-1 min-w-0 flex-col items-center justify-center overflow-hidden rounded-l-2xl border border-r-0 border-white/10 bg-zinc-800/25 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
+            className="flex flex-1 min-w-0 flex-col items-center justify-center overflow-hidden rounded-l-2xl border border-r-0 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
+            style={{
+              backgroundColor: AMBER_BG,
+              borderColor: AMBER_BORDER,
+            }}
           >
             {leftTitle && (
               <p
-                className="mb-2 text-center text-xs font-black text-white/85 sm:text-sm"
-                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
+                className="mb-2 text-center text-xs font-black sm:text-sm"
+                style={{ color: AMBER, wordBreak: 'keep-all', textWrap: 'balance' }}
               >
                 {leftTitle}
               </p>
             )}
-            {leftBody && (
-              <p
-                className="text-center text-xs leading-relaxed text-white/80 sm:text-sm"
-                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-              >
-                {renderWithLineBreaks(leftBody)}
-              </p>
-            )}
+            {leftBody && renderBodyLines(leftBody, AMBER)}
           </motion.div>
 
           {/* ── VS badge — absolute center ── */}
@@ -239,40 +304,33 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
             animate={isActive ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.5, delay: 0.25, type: 'spring', stiffness: 280, damping: 18 }}
             className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 bg-zinc-900"
-            style={{ borderColor: categoryInfo.accent }}
+            style={{ borderColor: VS_BG }}
           >
-            <span className="text-xs font-black tracking-tighter" style={{ color: categoryInfo.accent }}>
+            <span className="text-xs font-black tracking-tighter" style={{ color: 'white', backgroundColor: VS_BG, borderRadius: '9999px', padding: '2px 5px' }}>
               VS
             </span>
           </motion.div>
 
-          {/* ── Right panel (B side) ── */}
+          {/* ── Right panel (B side) — Purple ── */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={isActive ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
             className="flex flex-1 min-w-0 flex-col items-center justify-center overflow-hidden rounded-r-2xl border border-l-0 px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4"
             style={{
-              borderColor: `${categoryInfo.accent}50`,
-              backgroundColor: `${categoryInfo.accent}25`,
+              backgroundColor: PURPLE_BG,
+              borderColor: PURPLE_BORDER,
             }}
           >
             {rightTitle && (
               <p
                 className="mb-2 text-center text-xs font-black sm:text-sm"
-                style={{ color: categoryInfo.accent, wordBreak: 'keep-all' }}
+                style={{ color: PURPLE, wordBreak: 'keep-all' }}
               >
                 {rightTitle}
               </p>
             )}
-            {rightBody && (
-              <p
-                className="text-center text-xs leading-relaxed text-white/80 sm:text-sm"
-                style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
-              >
-                {renderWithLineBreaks(rightBody)}
-              </p>
-            )}
+            {rightBody && renderBodyLines(rightBody, PURPLE)}
           </motion.div>
         </div>
 
@@ -288,7 +346,7 @@ export default function VsStep({ step, card, isActive }: VsStepProps) {
               className="text-center text-xs leading-relaxed text-white/50 sm:text-sm"
               style={{ wordBreak: 'keep-all', textWrap: 'balance' }}
             >
-              {renderFooterWithHighlight(footer.join('\n'), categoryInfo.accent)}
+              {renderFooterWithHighlight(footer.join('\n'), AMBER)}
             </p>
           </motion.div>
         )}
