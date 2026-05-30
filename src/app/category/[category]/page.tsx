@@ -6,6 +6,7 @@ import { SITE_NAME, SITE_URL } from '@/lib/constants';
 import type { CategoryKey } from '@/types/content';
 import CardFeed from '@/components/feed/CardFeed';
 import CategoryBar from '@/components/navigation/CategoryBar';
+import CardIndexList from '@/components/navigation/CardIndexList';
 
 interface PageProps {
   params: Promise<{ category: string }>;
@@ -76,18 +77,29 @@ export default async function CategoryPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageJsonLd) }}
       />
-      <main className="relative h-dvh overflow-hidden">
-        <CategoryBar currentCategory={categoryKey} cardCounts={cardCounts} />
-        {cards.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center space-y-4 px-6">
-              <div className="text-6xl">{categoryInfo.emoji}</div>
-              <h2 className="text-2xl font-bold">{categoryInfo.label} 카테고리</h2>
-              <p className="text-lg opacity-70">아직 카드가 준비되지 않았습니다.</p>
+      <main>
+        {/* 히어로 피드: 풀스크린 1화면, 내부 scroll-snap */}
+        <div style={{ position: 'relative', height: '100dvh', overflow: 'hidden' }}>
+          <CategoryBar currentCategory={categoryKey} cardCounts={cardCounts} />
+          {cards.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center space-y-4 px-6">
+                <div className="text-6xl">{categoryInfo.emoji}</div>
+                <h2 className="text-2xl font-bold">{categoryInfo.label} 카테고리</h2>
+                <p className="text-lg opacity-70">아직 카드가 준비되지 않았습니다.</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <CardFeed cards={cards} />
+          ) : (
+            <CardFeed cards={cards} />
+          )}
+        </div>
+
+        {/* 크롤 가능 인덱스 섹션 */}
+        {cards.length > 0 && (
+          <CardIndexList
+            cards={cards}
+            heading={`${categoryInfo.emoji} ${categoryInfo.label} 카드`}
+          />
         )}
       </main>
     </>

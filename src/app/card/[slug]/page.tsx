@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getAllCards, getCardBySlug } from '@/lib/content';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 import SingleCardView from './SingleCardView';
+import CardArticle from '@/components/story/CardArticle';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -114,6 +115,7 @@ export default async function CardPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <SingleCardView card={card} />
+      <CardArticle card={card} />
     </>
   );
 }
